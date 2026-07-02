@@ -1,0 +1,11 @@
+# Local Claude Code settings (machine-specific, not shared)
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+
+# Raw source materials & pipeline intermediates (audio/video/transcripts/scripts
+# used to derive app/js/*-data.js) — not needed to run the app, kept locally only
+abed project/
+
+# OS cruft
+.DS_Store
+Thumbs.db
