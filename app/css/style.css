@@ -2,7 +2,7 @@
 :root {
   --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
   --rule: #E4E3E0; --active-bg: #F0EFE9;
-  --tray-h: 148px; --bar-h: 64px;
+  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1;
 }
 html, body {
   height: 100%; height: 100dvh; background: #fff; color: var(--black);
@@ -72,7 +72,7 @@ body.lang-en .lesson-intro { direction: ltr; }
 .chunk.flash { background: var(--active-bg); border-right-color: var(--black); }
 .chunk-time { font-size: 10px; color: var(--mid); letter-spacing: .06em; margin-bottom: 6px; font-variant-numeric: tabular-nums; direction: ltr; cursor: pointer; width: fit-content; transition: color .12s; }
 .chunk-time:hover { color: var(--black); text-decoration: underline; }
-.chunk p { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New','Arial Unicode MS',serif; font-size: 20px; line-height: 2.2; direction: rtl; text-align: right; }
+.chunk p { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New','Arial Unicode MS',serif; font-size: calc(20px * var(--reader-scale)); line-height: 2.2; direction: rtl; text-align: right; transition: font-size .15s; }
 /* .sentence.active highlight disabled — a second highlight layer inside the already-highlighted
    active chunk read as noise, not signal. Kept selector structure inert in case a different
    treatment (e.g. underline instead of background) is worth trying later. */
@@ -84,6 +84,23 @@ body.lang-en .lesson-intro { direction: ltr; }
 .word.in-range.range-start, .word.in-range.range-end { background: rgba(13,13,13,.22); }
 .word.live { box-shadow: inset 0 -3px 0 0 var(--black); }
 .word.live.selected { box-shadow: none; }
+
+/* ── READER TEXT SIZE CONTROL ── */
+/* Lives in the always-visible audio-toggle-row (fixed chrome, never scrolls) rather than
+   floating over the reading text — so it can never end up covering the very content it resizes,
+   and growing the text never requires pinch-zooming out to reach it or any other toolbar. */
+.text-size-ctrl {
+  display: flex; align-items: center; gap: 2px;
+  border: 1px solid var(--rule); border-radius: 20px; padding: 2px;
+}
+.text-size-btn {
+  width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent;
+  color: var(--black); font-weight: 700; font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .12s;
+}
+.text-size-btn:hover:not(:disabled) { background: var(--active-bg); }
+.text-size-btn:disabled { color: var(--light); cursor: default; }
+.text-size-label { font-size: 10px; color: var(--mid); min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
 
 /* ── READER BOTTOM ── */
 .reader-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
@@ -116,7 +133,7 @@ body.lang-en .gloss-he { direction: ltr; }
   cursor: default; pointer-events: none;
   border-color: var(--rule); color: var(--mid); background: var(--active-bg);
 }
-.audio-toggle-row { display: flex; justify-content: flex-start; padding: 6px 20px; border-top: 1px solid var(--rule); background: #fff; }
+.audio-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px; border-top: 1px solid var(--rule); background: #fff; }
 .audio-bar { height: var(--bar-h); display: flex; align-items: center; padding: 0 20px; gap: 14px; background: #fff; }
 .play-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--black); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .12s; }
 .play-btn:hover { opacity: .75; }
@@ -398,6 +415,7 @@ body.lang-en .vocab-row-he { direction: ltr; }
   .mute-btn { width: 36px; height: 36px; }
   .vocab-row-toggle, .vocab-row-delete { width: 36px; height: 36px; }
   .en-chip { padding: 6px 10px; }
+  .text-size-btn { width: 32px; height: 32px; }
 
   /* — verbs view: stack the pill list above the card instead of a fixed 620px side column — */
   .verbs-inner { padding: 24px 14px 40px; }

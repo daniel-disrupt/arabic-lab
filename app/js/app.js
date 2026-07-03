@@ -14,6 +14,27 @@ let lastActionWasDrag = false;
 let currentSelectionCtx = null;
 let lastScrolledChunkCi = -1;
 
+/* ─────────────── READER TEXT SIZE ─────────────── */
+// An in-app control instead of relying on the browser's pinch-zoom, which would scale the whole
+// page — header tabs and the audio bar/tray included — forcing a zoom-out just to reach them.
+// Only the reading text itself (the transcript paragraphs) grows; everything else in the frame
+// stays put and reachable.
+const READER_FONT_SCALES = [0.85, 1, 1.15, 1.3, 1.45, 1.6, 1.8, 2];
+let readerScaleIdx = READER_FONT_SCALES.indexOf(parseFloat(localStorage.getItem('arabicLabReaderScale')));
+if (readerScaleIdx < 0) readerScaleIdx = READER_FONT_SCALES.indexOf(1);
+function applyReaderScale() {
+  const scale = READER_FONT_SCALES[readerScaleIdx];
+  document.documentElement.style.setProperty('--reader-scale', scale);
+  document.getElementById('text-size-label').textContent = Math.round(scale * 100) + '%';
+  document.getElementById('text-size-dec').disabled = readerScaleIdx === 0;
+  document.getElementById('text-size-inc').disabled = readerScaleIdx === READER_FONT_SCALES.length - 1;
+  localStorage.setItem('arabicLabReaderScale', String(scale));
+}
+function adjustReaderScale(dir) {
+  readerScaleIdx = Math.min(READER_FONT_SCALES.length - 1, Math.max(0, readerScaleIdx + dir));
+  applyReaderScale();
+}
+
 /* ─────────────── LANGUAGE PREFERENCE (global, top-bar) ─────────────── */
 // 'he' = Hebrew-primary with full grammatical scaffolding (בניין, שורש badges, Hebrew
 // conjugation column) — English still reachable per word/phrase via the EN chip.
@@ -889,5 +910,6 @@ function renderAboutView() {
 
 buildReader();
 initTrayGestures();
+applyReaderScale();
 renderVerbsView();
 applyAppLang();
