@@ -390,6 +390,36 @@ body.lang-en .vocab-row-he { direction: ltr; }
 }
 .chunk-preview-hl { background: var(--black); color: #fff; border-radius: 3px; padding: 1px 5px; }
 
+/* WATCH VIEW */
+.watch-scroll { flex: 1; overflow-y: auto; }
+.watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
+.watch-head { padding-bottom: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; direction: rtl; text-align: start; }
+body.lang-en .watch-head { direction: ltr; }
+.watch-title { font-size: 22px; font-weight: 600; line-height: 1.35; margin-bottom: 10px; }
+.watch-intro { font-size: 14px; line-height: 1.7; color: var(--black); }
+.watch-layout { display: flex; gap: 28px; align-items: flex-start; }
+.watch-video { flex: 0 0 auto; width: 100%; max-width: 460px; max-height: 58vh; border-radius: 8px; background: #000; }
+.watch-transcript { flex: 1; min-width: 0; max-height: 58vh; overflow-y: auto; border: 1px solid var(--rule); border-radius: 8px; padding: 4px 0; user-select: none; -webkit-user-select: none; }
+.watch-cue { padding: 10px 16px; font-size: 14px; line-height: 1.85; color: var(--mid); cursor: pointer; border-right: 3px solid transparent; transition: background .12s, color .12s; }
+.watch-cue:hover { background: var(--active-bg); }
+.watch-cue.active { color: var(--black); background: var(--active-bg); border-right-color: var(--black); font-weight: 500; }
+.watch-word { cursor: pointer; display: inline; border-radius: 3px; padding: 2px 1px; transition: background .08s; }
+.watch-word:hover { background: rgba(13,13,13,.06); }
+.watch-word.selected { background: var(--black); color: #fff; }
+.watch-word.in-range { background: rgba(13,13,13,.13); }
+.watch-word.in-range.range-start, .watch-word.in-range.range-end { background: rgba(13,13,13,.22); }
+.watch-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
+.watch-word.live.selected { box-shadow: none; }
+
+/* Watch tab's bottom bar mirrors the Reader's reader-bottom (tray + audio-bar), same classes reused */
+.watch-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
+
+@media (max-width: 720px) {
+  .watch-layout { flex-direction: column; }
+  .watch-video { max-width: 100%; max-height: 46vh; margin: 0 auto; display: block; }
+  .watch-transcript { max-height: 32vh; width: 100%; }
+}
+
 /* ABOUT VIEW */
 .about-scroll { flex: 1; overflow-y: auto; }
 .about-wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 64px; }
