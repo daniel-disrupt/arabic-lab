@@ -109,7 +109,12 @@ function ffprobeDuration(file) {
 function concatMp3s(files, outFile) {
   const listFile = path.join(AUDIO_DIR, 'concat-list.txt');
   fs.writeFileSync(listFile, files.map((f) => `file '${path.basename(f)}'`).join('\n'));
-  execFileSync('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c', 'copy', outFile], {
+  // Re-encode (not -c copy) so the result is one consistent MP3 stream rather than 13
+  // independently-encoded clips stitched at the byte level -- stream-copy concatenation can
+  // leave inconsistent frame boundaries at splice points, which some browsers handle by
+  // silently failing or misplacing currentTime seeks near/across those points, even though
+  // normal continuous playback sounds fine.
+  execFileSync('ffmpeg', ['-y', '-f', 'concat', '-safe', '0', '-i', listFile, '-c:a', 'libmp3lame', '-q:a', '2', outFile], {
     cwd: AUDIO_DIR,
   });
   fs.unlinkSync(listFile);

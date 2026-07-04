@@ -25,7 +25,10 @@ from faster_whisper import WhisperModel
 
 WHISPER_MODEL = "large-v3"
 
-TASHKEEL = re.compile(r'[ؐ-ًؚ-ٰۖ-ۭـ]')
+# Built from explicit unicode escapes, not literal characters -- a literal range here
+# previously got silently transposed (likely by bidi-aware copy/paste) into one that
+# matched base letters too, degrading every alignment that used it.
+TASHKEEL = re.compile('[' + 'ً-ٰٟۖ-ۭـ' + ']')
 PUNCT = '.,،؛؟!:'
 
 
