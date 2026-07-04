@@ -193,6 +193,11 @@ body.lang-en .gloss-he { direction: ltr; }
 .audio-toggle-btn:not(.on) { color: var(--mid); background: transparent; border: 1px solid var(--rule); }
 .audio-toggle-btn:not(.on):hover { border-color: var(--black); color: var(--black); }
 .audio-bar.audio-off { display: none; }
+.voice-toggle { display: flex; gap: 4px; }
+.voice-toggle-btn { font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .12s; flex-shrink: 0; white-space: nowrap; color: var(--mid); background: transparent; border: 1px solid var(--rule); }
+.voice-toggle-btn:hover:not(:disabled) { border-color: var(--black); color: var(--black); }
+.voice-toggle-btn.active { color: #fff; background: var(--black); border-color: var(--black); }
+.voice-toggle-btn:disabled { opacity: .35; cursor: not-allowed; }
 
 /* ── VERBS VIEW ── */
 .verbs-scroll { flex: 1; overflow-y: auto; }

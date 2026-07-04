@@ -726,6 +726,11 @@ const CHUNKS = [
   ]},
 ];
 
+// Node-only export (e.g. for scripts/generate-voiceover.js) — no-op in the browser.
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { CHUNKS };
+}
+
 const PHRASE_GLOSSES = [
   {
     keys: [

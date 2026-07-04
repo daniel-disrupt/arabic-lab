@@ -248,20 +248,21 @@ function buildReader() {
     timeEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!audioModeOn) return;
-      audioEl.currentTime = chunk.start; audioEl.play();
+      audioEl.currentTime = AUDIO_SOURCES[audioSource].chunks[ci].start; audioEl.play();
     });
     div.appendChild(timeEl);
     div.addEventListener('click', () => {
       if (lastActionWasDrag) { lastActionWasDrag = false; return; }
       if (!audioModeOn) return;
-      const inThisChunk = audioEl.currentTime >= chunk.start && audioEl.currentTime < chunk.end;
+      const activeChunk = AUDIO_SOURCES[audioSource].chunks[ci];
+      const inThisChunk = audioEl.currentTime >= activeChunk.start && audioEl.currentTime < activeChunk.end;
       if (inThisChunk) {
         // Audio is already positioned in this chunk — pause in place so the user can click
         // around freely (translate words, etc.) without losing their spot. Resumes exactly
         // where it paused via the play button, not from the chunk's start.
         audioEl.pause();
       } else {
-        audioEl.currentTime = chunk.start; audioEl.play();
+        audioEl.currentTime = activeChunk.start; audioEl.play();
       }
     });
     const p = document.createElement('p');
@@ -499,6 +500,26 @@ function resetEnChip() {
 function toggleEn(e) { e.stopPropagation(); enVisible=!enVisible; document.getElementById('tray-en').classList.toggle('hidden',!enVisible); const c=document.getElementById('en-chip'); c.classList.toggle('showing',enVisible); c.textContent=enVisible?'EN ×':'EN ›'; }
 
 /* ─────────────── REAL AUDIO PLAYBACK ─────────────── */
+const AUDIO_SOURCES = {
+  recording: { src: 'audio/abed-speech.mp3', chunks: CHUNKS },
+  voiceover: VOICEOVER_SRC ? { src: VOICEOVER_SRC, chunks: VOICEOVER_CHUNKS } : null,
+};
+let audioSource = 'recording';
+function setAudioSource(mode) {
+  const source = AUDIO_SOURCES[mode];
+  if (!source || mode === audioSource) return;
+  const wasPlaying = !audioEl.paused;
+  audioSource = mode;
+  audioEl.src = source.src;
+  audioEl.load();
+  lastScrolledChunkCi = -1;
+  document.querySelectorAll('.voice-toggle-btn').forEach((b) => b.classList.toggle('active', b.dataset.src === mode));
+  if (wasPlaying) audioEl.play();
+}
+function initVoiceToggle() {
+  const btn = document.getElementById('voiceover-btn');
+  if (!AUDIO_SOURCES.voiceover) { btn.disabled = true; btn.title = 'Not generated yet — see scripts/generate-voiceover.js'; }
+}
 function togglePlay() { audioEl.paused ? audioEl.play() : audioEl.pause(); }
 function fmtTime(s) { if (!isFinite(s)) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60).toString().padStart(2,'0'); return m+':'+sec; }
 function updateTimeLabel() { document.getElementById('time-label').textContent = fmtTime(audioEl.currentTime) + ' / ' + fmtTime(audioEl.duration); }
@@ -507,7 +528,7 @@ function updateProgress() {
   document.getElementById('scrubber-fill').style.width = (audioEl.currentTime/total*100) + '%';
   updateTimeLabel();
   let active = -1;
-  CHUNKS.forEach((c,i) => { if (audioEl.currentTime >= c.start && audioEl.currentTime < c.end) active = i; });
+  AUDIO_SOURCES[audioSource].chunks.forEach((c,i) => { if (audioEl.currentTime >= c.start && audioEl.currentTime < c.end) active = i; });
   document.querySelectorAll('.chunk').forEach((el,i) => el.classList.toggle('active', i===active));
   // Only auto-scroll when the active chunk actually changes, not on every timeupdate tick —
   // otherwise it fights any manual scrolling the user does while audio keeps playing.
@@ -945,6 +966,7 @@ function renderAboutView() {
 }
 
 buildReader();
+initVoiceToggle();
 initTrayGestures();
 applyReaderScale();
 initOutsideTapClose('verbs-scroll', (target) => !target.closest('.verb-pill') && !target.closest('.verb-card'), closeVerbDrawer);
