@@ -88,13 +88,13 @@ const INTRO_CONTENT = {
     title: "Abed Abu Shehadeh's Speech",
     speakerLabel: 'Speaker:', speaker: 'Abed Abu Shehadeh',
     locationLabel: 'Location:', location: 'Ghazaza Park, Jaffa · June 28, 2026',
-    text: "Abed Abu Shehadeh's call to a grieving, frustrated Jaffa — recorded live at a protest against organized crime and police inaction, then cleaned up here into a readable text synced with the real audio. Listen first, then read: tap any word, or drag across a phrase, for its meaning. The full story is in the About tab.",
+    text: "Abed Abu Shehadeh's call to a grieving, frustrated Jaffa — recorded live at a protest against organized crime and police inaction, then cleaned up here into a readable text, read aloud by an AI voice synced word-for-word with it. Listen first, then read: tap any word, or drag across a phrase, for its meaning. For the real recording, watch the video in the Watch tab. The full story is in the About tab.",
   },
   he: {
     title: 'נאומו של עבד אבו שחאדה',
     speakerLabel: 'דובר:', speaker: 'עבד אבו שחאדה',
     locationLabel: 'מיקום:', location: 'גן אל-ע׳זאזווה, יפו · 28 ביוני 2026',
-    text: 'קריאתו של עבד אבו שחאדה ליפו האבלה והמתוסכלת — הוקלטה בשידור חי בהפגנה נגד הפשיעה המאורגנת וכשלון המשטרה, ונערכה כאן לטקסט קריא המסונכרן עם ההקלטה האמיתית. תחילה הקשיבו, ואז קראו: הקישו על כל מילה, או גררו על פני ביטוי, לקבלת פירושו. הסיפור המלא נמצא בלשונית "אודות".',
+    text: 'קריאתו של עבד אבו שחאדה ליפו האבלה והמתוסכלת — הוקלטה בשידור חי בהפגנה נגד הפשיעה המאורגנת וכשלון המשטרה, ונערכה כאן לטקסט קריא המוקרא בקול בינה מלאכותית המסונכרן איתו מילה במילה. תחילה הקשיבו, ואז קראו: הקישו על כל מילה, או גררו על פני ביטוי, לקבלת פירושו. את ההקלטה האמיתית אפשר לצפות בסרטון בלשונית "צפייה". הסיפור המלא נמצא בלשונית "אודות".',
   },
 };
 // Every static UI label/menu/button in Vocab/Verbs/Reader chrome — keyed by appLang.
@@ -255,6 +255,10 @@ function switchTab(name) {
   const viewEl = document.getElementById('view-' + name);
   if (viewEl) viewEl.classList.add('active');
   else { document.getElementById('view-reader').classList.add('active'); name = 'reader'; }
+  if (activeTabName === 'watch' && name !== 'watch') {
+    const video = document.getElementById('watch-video');
+    if (video) video.pause();
+  }
   activeTabName = name;
   const tabs = document.querySelectorAll('.tab');
   const idx = ['watch','reader','vocab','verbs','about'].indexOf(name);
@@ -289,18 +293,18 @@ function buildReader() {
     const div = document.createElement('div');
     div.className = 'chunk'; div.dataset.ci = ci;
     const timeEl = document.createElement('div');
-    timeEl.className = 'chunk-time'; timeEl.textContent = chunk.label;
+    timeEl.className = 'chunk-time'; timeEl.textContent = VOICEOVER_CHUNKS[ci].label;
     timeEl.title = t('jumpToAudio');
     timeEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!audioModeOn) return;
-      audioEl.currentTime = AUDIO_SOURCES[audioSource].chunks[ci].start; audioEl.play();
+      audioEl.currentTime = VOICEOVER_CHUNKS[ci].start; audioEl.play();
     });
     div.appendChild(timeEl);
     div.addEventListener('click', () => {
       if (lastActionWasDrag) { lastActionWasDrag = false; return; }
       if (!audioModeOn) return;
-      const activeChunk = AUDIO_SOURCES[audioSource].chunks[ci];
+      const activeChunk = VOICEOVER_CHUNKS[ci];
       const inThisChunk = audioEl.currentTime >= activeChunk.start && audioEl.currentTime < activeChunk.end;
       if (inThisChunk) {
         // Audio is already positioned in this chunk — pause in place so the user can click
@@ -546,36 +550,13 @@ function resetEnChip() {
 function toggleEn(e) { e.stopPropagation(); enVisible=!enVisible; document.getElementById('tray-en').classList.toggle('hidden',!enVisible); const c=document.getElementById('en-chip'); c.classList.toggle('showing',enVisible); c.textContent=enVisible?'EN ×':'EN ›'; }
 
 /* ─────────────── REAL AUDIO PLAYBACK ─────────────── */
-const AUDIO_SOURCES = {
-  recording: { src: 'audio/abed-speech.mp3', chunks: CHUNKS },
-  voiceover: VOICEOVER_SRC ? { src: VOICEOVER_SRC, chunks: VOICEOVER_CHUNKS } : null,
-};
-// Karaoke (per-word) highlighting only runs on the AI voiceover — it's synthesized
-// directly from these exact tokens, so word-level alignment is reliable. On the real
-// recording, word-level ASR timestamps proved too unreliable/distracting (see
-// updateLiveWord below and the disabled call further down) and chunk-level is all
-// that's used there.
+// The Reader plays only the AI voiceover (audio/voiceover/reading-edition.mp3, set as
+// audio-el's src in index.html) — it's synthesized directly from these exact reading-edition
+// tokens, so word-level alignment is reliable enough for karaoke-mode highlighting. The real
+// recording lives in the Watch tab instead, alongside the video.
 const voiceoverTimedWords = (typeof VOICEOVER_WORD_TIMES !== 'undefined' && VOICEOVER_WORD_TIMES)
   ? VOICEOVER_WORD_TIMES.slice().sort((a, b) => a.t - b.t)
   : [];
-let audioSource = 'recording';
-function setAudioSource(mode) {
-  const source = AUDIO_SOURCES[mode];
-  if (!source || mode === audioSource) return;
-  const wasPlaying = !audioEl.paused;
-  audioSource = mode;
-  audioEl.src = source.src;
-  audioEl.load();
-  lastScrolledChunkCi = -1;
-  if (liveWordIdx >= 0 && wordEls[liveWordIdx]) wordEls[liveWordIdx].el.classList.remove('live');
-  liveWordIdx = -1;
-  document.querySelectorAll('.voice-toggle-btn').forEach((b) => b.classList.toggle('active', b.dataset.src === mode));
-  if (wasPlaying) audioEl.play();
-}
-function initVoiceToggle() {
-  const btn = document.getElementById('voiceover-btn');
-  if (!AUDIO_SOURCES.voiceover) { btn.disabled = true; btn.title = 'Not generated yet — see scripts/generate-voiceover.js'; }
-}
 function togglePlay() { audioEl.paused ? audioEl.play() : audioEl.pause(); }
 function fmtTime(s) { if (!isFinite(s)) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60).toString().padStart(2,'0'); return m+':'+sec; }
 function updateTimeLabel() { document.getElementById('time-label').textContent = fmtTime(audioEl.currentTime) + ' / ' + fmtTime(audioEl.duration); }
@@ -584,7 +565,7 @@ function updateProgress() {
   document.getElementById('scrubber-fill').style.width = (audioEl.currentTime/total*100) + '%';
   updateTimeLabel();
   let active = -1;
-  AUDIO_SOURCES[audioSource].chunks.forEach((c,i) => { if (audioEl.currentTime >= c.start && audioEl.currentTime < c.end) active = i; });
+  VOICEOVER_CHUNKS.forEach((c,i) => { if (audioEl.currentTime >= c.start && audioEl.currentTime < c.end) active = i; });
   document.querySelectorAll('.chunk').forEach((el,i) => el.classList.toggle('active', i===active));
   // Only auto-scroll when the active chunk actually changes, not on every timeupdate tick —
   // otherwise it fights any manual scrolling the user does while audio keeps playing.
@@ -592,10 +573,9 @@ function updateProgress() {
     document.querySelector('.chunk[data-ci="'+active+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
     lastScrolledChunkCi = active;
   }
-  // Per-word live highlighting (karaoke mode): only on the AI voiceover, where word-level
-  // alignment is reliable (see voiceoverTimedWords above). On the real recording, word-level
-  // ASR timestamps proved too unreliable/distracting, so it stays chunk-level only there.
-  if (audioSource === 'voiceover') updateLiveWord();
+  // Per-word live highlighting (karaoke mode) -- reliable here since the AI voiceover is
+  // synthesized directly from these tokens (see voiceoverTimedWords above).
+  updateLiveWord();
   // Sentence-level highlighting disabled too — a second highlight layer nested inside the
   // already-highlighted active chunk read as visual noise rather than useful signal. Chunk-level
   // highlighting alone (above) is the sync UI for now. sentT data and updateActiveSentence() are
@@ -896,7 +876,6 @@ function renderVocabView() {
   list.innerHTML = visible.map(({ v, i }) => {
     const meta = v.type === 'phrase' ? phraseTypeBadgeHtml(v.phraseType) : rootMetaHtml(v.root, !!v.sharedRoot);
     const isOpen = expandedVocab.has(i);
-    const chunk = CHUNKS[v.ci];
     const primary = appLang === 'en' ? (v.en||'') : v.he;
     const enWrapHtml = appLang === 'en' ? '' : `
           <div class="vocab-row-en-wrap">
@@ -919,7 +898,7 @@ function renderVocabView() {
         </div>
         <div class="vocab-expand${isOpen?' open':''}">
           <div class="vocab-expand-inner">
-            <div class="vocab-expand-time">${chunk.label}</div>
+            <div class="vocab-expand-time">${VOICEOVER_CHUNKS[v.ci].label}</div>
             <p class="vocab-expand-text">${renderChunkPreview(v.ci, v.ar)}</p>
           </div>
         </div>
@@ -1406,7 +1385,6 @@ function updateWatchActiveCue() {
 }
 
 buildReader();
-initVoiceToggle();
 buildWatchTranscript();
 initWatchToolbar();
 initTrayGestures();

@@ -10,15 +10,14 @@
    2. Sends each chunk's text to OpenAI's TTS API and saves the returned audio as
       app/audio/voiceover/chunk-<i>.mp3.
    3. Concatenates the per-chunk files (via ffmpeg) into one lesson-length file,
-      app/audio/voiceover/reading-edition.mp3 — so the reader can swap it in for
-      audio-el.src exactly like the original recording.
-   4. Measures each chunk's duration (via ffprobe) to compute new start/end
-      timestamps against the voiceover's own pacing, and writes them to
+      app/audio/voiceover/reading-edition.mp3 — this is the Reader tab's audio-el.src.
+   4. Measures each chunk's duration (via ffprobe) to compute start/end timestamps
+      and mm:ss labels against the voiceover's own pacing, and writes them to
       app/js/voiceover-data.js.
    5. Runs scripts/align-voiceover-words.py (faster-whisper) against each chunk's
       audio to get per-word timestamps for karaoke-mode highlighting, aligned back
-      to the known reading-edition tokens — reliable here (unlike the real
-      recording) because the audio was synthesized directly from that same text.
+      to the known reading-edition tokens — reliable here (unlike ASR against the
+      real recording) because the audio was synthesized directly from that same text.
 
    Requirements:
    - Node 18+ (uses global fetch)
@@ -96,6 +95,11 @@ async function synthesize(text, voice) {
   return Buffer.from(await res.arrayBuffer());
 }
 
+function fmtTime(s) {
+  const m = Math.floor(s / 60), sec = Math.floor(s % 60).toString().padStart(2, '0');
+  return m + ':' + sec;
+}
+
 function ffprobeDuration(file) {
   const out = execFileSync('ffprobe', [
     '-v', 'error',
@@ -146,7 +150,7 @@ async function main() {
   let cursor = 0;
   const voiceoverChunks = chunkFiles.map((file, i) => {
     const dur = ffprobeDuration(file);
-    const entry = { start: cursor, end: cursor + dur, label: CHUNKS[i].label };
+    const entry = { start: cursor, end: cursor + dur, label: fmtTime(cursor) + ' – ' + fmtTime(cursor + dur) };
     cursor += dur;
     return entry;
   });

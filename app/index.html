@@ -85,10 +85,6 @@
     </div>
     <div class="audio-toggle-row">
       <button class="audio-toggle-btn on" id="audio-toggle-btn" onclick="toggleAudioMode()" title="Turn off to read without the player driving audio">Audio: On</button>
-      <div class="voice-toggle" id="voice-toggle">
-        <button class="voice-toggle-btn active" data-src="recording" onclick="setAudioSource('recording')" title="The real recorded speech">Recording</button>
-        <button class="voice-toggle-btn" id="voiceover-btn" data-src="voiceover" onclick="setAudioSource('voiceover')" title="AI voiceover of the reading-edition text">AI reading</button>
-      </div>
       <div class="text-size-ctrl" id="text-size-ctrl">
         <button class="text-size-btn" id="text-size-dec" onclick="adjustReaderScale(-1)" aria-label="Decrease text size">A&#8315;</button>
         <span class="text-size-label" id="text-size-label">100%</span>
@@ -96,7 +92,7 @@
       </div>
     </div>
     <div class="audio-bar" id="audio-bar">
-      <audio id="audio-el" src="audio/abed-speech.mp3" preload="metadata"></audio>
+      <audio id="audio-el" src="audio/voiceover/reading-edition.mp3" preload="metadata"></audio>
       <button class="play-btn" id="play-btn" onclick="togglePlay()">
         <svg id="play-icon" width="13" height="13" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
       </button>
