@@ -539,12 +539,12 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
   body.watch-theater-active .header { display: none; }
   .watch-close-btn { top: calc(12px + env(safe-area-inset-top)); }
 
-  /* Toolbar has 6 controls at this width (theater-expand button hidden below, since the close
-     button above already covers "exit expanded view" on mobile) -- tighten gap/padding so
-     nothing gets pushed past the screen edge, which is what silently ate the theater/translation
-     buttons before (they rendered off-canvas with no scroll affordance to reach them). */
-  #watch-toolbar { gap: 8px; padding: 0 12px; }
-  #watch-theater-btn { display: none; }
+  /* Tighten gap/padding so all 7 controls (the theater toggle included) stay on-screen -- this
+     is what silently ate the theater/translation buttons before (they rendered off-canvas with
+     no scroll affordance to reach them). The theater button duplicates the corner expand/close
+     buttons burned onto the video, but users expect a fullscreen toggle in the control bar
+     itself too, so keep both -- the scrubber just renders narrower to make room. */
+  #watch-toolbar { gap: 6px; padding: 0 10px; }
 }
 
 /* ABOUT VIEW */
