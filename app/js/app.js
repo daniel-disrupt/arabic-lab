@@ -299,6 +299,21 @@ function selectMenuTab(name) {
   closeMenu();
 }
 
+/* ─────────────── AI-PROCESS DOC MODAL ─────────────── */
+// The iframe's src is only set on open (not eagerly in the HTML) so the doc page isn't fetched
+// until someone actually asks to read it.
+function openAiProcessDoc() {
+  const iframe = document.getElementById('doc-modal-iframe');
+  if (!iframe.src) iframe.src = 'ai-process.html';
+  document.getElementById('doc-modal-backdrop').classList.add('open');
+  document.getElementById('doc-modal').classList.add('open');
+}
+function closeAiProcessDoc() {
+  document.getElementById('doc-modal-backdrop').classList.remove('open');
+  document.getElementById('doc-modal').classList.remove('open');
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAiProcessDoc(); });
+
 /* ─────────────── READER BUILD ─────────────── */
 function buildReader() {
   const reader = document.getElementById('reader');
@@ -1081,7 +1096,7 @@ const ABOUT_CONTENT = {
       ]},
       { eyebrow: 'How I Built This', heading: 'The process, and where AI came in', paragraphs: [
         'AI did a lot of the heavy lifting in the development of this tool: transcribing Abed\'s raw audio, translating it into Hebrew and English, producing a simplified written piece, adding the tashkeel that makes spoken Arabic legible to a learner, and generating the AI voiceover you hear in the Reader. I also used an AI coding assistant (Claude Code) to build the site itself — the tap-to-translate reader, the vocab and verb tools, all of it came together through that back-and-forth. My part was choosing the speech, shaping the pedagogy, checking translations, and deciding what a learner at my level actually needs.',
-      ], source: 'For a detailed technical write-up of that process — including what went wrong along the way and what I learned about working with agentic AI — see <a href="https://github.com/daniel-disrupt/arabic-lab/blob/master/files/AI-PROCESS.md" target="_blank" rel="noopener noreferrer">AI-PROCESS.md</a> (<a href="AI-PROCESS.md" download="AI-PROCESS.md">download</a>).' },
+      ], source: 'For a detailed technical write-up of that process — including what went wrong along the way and what I learned about working with agentic AI — see <a href="#" onclick="openAiProcessDoc(); return false;">AI-PROCESS.md</a> (<a href="AI-PROCESS.md" download="AI-PROCESS.md">download</a>).' },
     ],
   },
   he: {
@@ -1099,7 +1114,7 @@ const ABOUT_CONTENT = {
       ]},
       { eyebrow: 'איך בניתי את זה', heading: 'התהליך, והיכן נכנסה בינה מלאכותית', paragraphs: [
         'בינה מלאכותית עשתה חלק גדול מהעבודה הקשה בפיתוח הכלי הזה: תמלול ההקלטה הגולמית של עבד, תרגומה לעברית ולאנגלית, הפקת נוסח כתוב מפושט, הוספת התשכיל שהופך ערבית מדוברת לקריאה עבור לומד, והפקת הקראת הבינה המלאכותית שנשמעת בלשונית הקורא. השתמשתי גם בעוזר תכנות מבוסס בינה מלאכותית (Claude Code) לבניית האתר עצמו — הקורא המבוסס על הקשה-לתרגום, כלי אוצר המילים והפעלים, הכול נבנה דרך אותו דיאלוג. החלק שלי היה לבחור את הנאום, לעצב את הגישה הפדגוגית, לבדוק תרגומים, ולהחליט מה לומד בשלב שלי צריך בפועל.',
-      ], source: 'לכתיבה טכנית מפורטת יותר על התהליך הזה — כולל מה שהשתבש בדרך ומה שלמדתי על עבודה עם בינה מלאכותית אגנטית — ראו <a href="https://github.com/daniel-disrupt/arabic-lab/blob/master/files/AI-PROCESS.md" target="_blank" rel="noopener noreferrer">AI-PROCESS.md</a> (<a href="AI-PROCESS.md" download="AI-PROCESS.md">הורדה</a>).' },
+      ], source: 'לכתיבה טכנית מפורטת יותר על התהליך הזה — כולל מה שהשתבש בדרך ומה שלמדתי על עבודה עם בינה מלאכותית אגנטית — ראו <a href="#" onclick="openAiProcessDoc(); return false;">AI-PROCESS.md</a> (<a href="AI-PROCESS.md" download="AI-PROCESS.md">הורדה</a>).' },
     ],
   },
 };

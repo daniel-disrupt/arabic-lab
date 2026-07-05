@@ -562,6 +562,33 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(6px); background: var(--black); color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 4px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 99; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+/* AI-PROCESS doc modal -- keeps the long-form writeup readable inside the app itself (an iframe
+   onto its own standalone, self-styled page) instead of sending the reader out to an external
+   site. Direction is pinned ltr regardless of app language, since the doc itself is English prose. */
+.doc-modal-backdrop { position: fixed; inset: 0; background: rgba(13,13,13,.55); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .18s; }
+.doc-modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.doc-modal {
+  position: fixed; top: 4vh; left: 50%; direction: ltr;
+  width: min(760px, 92vw); height: min(88vh, 900px);
+  transform: translate(-50%, 8px);
+  background: #fff; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  z-index: 41; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
+  overflow: hidden;
+}
+.doc-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.doc-modal-iframe { width: 100%; height: 100%; border: none; display: block; }
+.doc-modal-close {
+  position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%;
+  border: none; background: rgba(13,13,13,.68); color: #fff; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; z-index: 2; transition: background .12s;
+}
+.doc-modal-close:hover { background: rgba(13,13,13,.9); }
+@media (max-width: 600px) {
+  .doc-modal { top: 0; left: 0; width: 100%; height: 100%; border-radius: 0; transform: translateY(8px); }
+  .doc-modal.open { transform: translateY(0); }
+  .doc-modal-close { top: calc(10px + env(safe-area-inset-top)); }
+}
+
 /* ══════════════════════════ MOBILE (≤720px) ══════════════════════════ */
 @media (max-width: 720px) {
   /* — header: swap the tab row for a hamburger + centered title, so Vocab/Verbs/About live in

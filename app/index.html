@@ -244,6 +244,15 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- AI-PROCESS DOC MODAL (opened from the About tab, keeps the reader inside the app) -->
+<div class="doc-modal-backdrop" id="doc-modal-backdrop" onclick="closeAiProcessDoc()"></div>
+<div class="doc-modal" id="doc-modal">
+  <button class="doc-modal-close" id="doc-modal-close" onclick="closeAiProcessDoc()" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 13 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="1" x2="12" y2="12"/><line x1="12" y1="1" x2="1" y2="12"/></svg>
+  </button>
+  <iframe class="doc-modal-iframe" id="doc-modal-iframe" title="Building Arabic Lab with Agentic AI"></iframe>
+</div>
+
 <script src="js/lesson-data.js"></script>
 <script src="js/voiceover-data.js"></script>
 <script src="js/verbs-data.js"></script>
