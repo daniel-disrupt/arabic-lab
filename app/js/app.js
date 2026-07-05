@@ -80,18 +80,15 @@ const TAB_LABELS = {
 };
 // Homepage (the "watch" view/tab internally) frames the video as the emotional entry point:
 // context on the moment, then the speech itself, then a bridge into the study tools in the
-// other tabs. Split into intro (above the video) and outro (below it) paragraph arrays so the
-// video sits in between, same trilingual-by-appLang pattern as ABOUT_CONTENT below.
+// other tabs -- all as intro paragraphs above the video, same trilingual-by-appLang pattern as
+// ABOUT_CONTENT below.
 const HOME_CONTENT = {
   en: {
     title: 'Abed Abu Shehadeh, in his own words',
     subtitle: 'Ghazaza Park, Jaffa &middot; June 28, 2026',
     intro: [
       "In June 2026, three young men were killed in Jaffa within the span of three days — the latest in a wave of organized-crime violence that a shaken, furious community felt the police had done nothing to stop. On the evening of June 28, hundreds gathered at Ghazaza Park to demand accountability. Abed Abu Shehadeh, chairman of Jaffa's Islamic Council, addressed the crowd.",
-      'To really understand what a community is going through — the grief, the exhaustion, the anger underneath it — reading a summary isn’t enough. We have to listen closely: to the words people reach for, the tone they take, the cry underneath the argument. What follows is Abed, in his own words.',
-    ],
-    outro: [
-      "The tabs above turn this speech into something you can study, not just watch. I took Abed's words and built a simplified, cleaned-up version of the text — fully translated, fully voweled with tashkeel, and read aloud by an AI voice — so Arabic learners can work through it slowly: word by word in Reader, phrase by phrase and verb by verb in Vocab and Verbs. The full story behind the protest, the speaker, and this project is in About.",
+      "To really understand what a community is going through — the grief, the exhaustion, the anger underneath it — I find that reading a summary isn't enough; I have to listen closely to the words people reach for and the cry underneath the argument. That's what the tabs above are for: I took Abed's words and turned them into something I can study — in addition to the speech with subtitles, I produced a simplified, cleaned-up version of the text, fully translated, fully voweled with tashkeel, and read aloud by an AI voice, so Arabic learners like myself can work through it slowly in Reader. From there, I also bring together key terms and verbs in the Vocab and Verbs tabs for review and practice. The processing, transcription, and translation of the speech were all done with AI tools, so please forgive areas where it didn't get things exactly right. The full story behind the protest, the speaker, and this project is in About.",
     ],
   },
   he: {
@@ -99,25 +96,18 @@ const HOME_CONTENT = {
     subtitle: 'גן אל-ע׳זאזווה, יפו &middot; 28 ביוני 2026',
     intro: [
       'ביוני 2026 נרצחו שלושה צעירים ביפו בתוך פרק זמן של שלושה ימים — האחרונה בשורת אלימות של פשיעה מאורגנת שקהילה מזועזעת וזועמת חשה שהמשטרה לא עשתה כלום כדי לעצור. בערב ה-28 ביוני התאספו מאות בגן אל-ע׳זאזווה כדי לדרוש אחריותיות. עבד אבו שחאדה, יו״ר המועצה האסלאמית ביפו, פנה לקהל.',
-      'כדי להבין באמת מה עוברת קהילה — האבל, התשישות, הזעם שמתחתיו — לא מספיק לקרוא תקציר. צריך להקשיב מקרוב: למילים שאנשים בוחרים, לטון שהם נוקטים, לזעקה שמתחת לטיעון. מה שבא בהמשך הוא עבד, במילים שלו.',
-    ],
-    outro: [
-      'הלשוניות שמעל הופכות את הנאום הזה לדבר שאפשר ללמוד ממנו, לא רק לצפות בו. לקחתי את מילותיו של עבד ובניתי מהן גרסה מפושטת ומסודרת של הטקסט — מתורגמת במלואה, מנוקדת במלואה בתשכיל, ומוקראת בקול בינה מלאכותית — כך שלומדי ערבית יוכלו לעבוד עליה לאט: מילה במילה בלשונית הקורא, ביטוי-ביטוי ופועל-פועל באוצר המילים ובפעלים. הסיפור המלא על ההפגנה, הדובר, והפרויקט הזה נמצא בלשונית אודות.',
+      'כדי להבין באמת מה עוברת קהילה — האבל, התשישות, הזעם שמתחתיו — לדעתי לא מספיק לקרוא תקציר; אני צריך להקשיב מקרוב למילים שאנשים בוחרים ולזעקה שמתחת לטיעון. לשם כך נועדו הלשוניות שמעל: לקחתי את מילותיו של עבד והפכתי אותן לדבר שאני יכול ללמוד ממנו — בנוסף לנאום עם כתוביות, הכנתי גרסה מפושטת ומסודרת של הטקסט, מתורגמת במלואה, מנוקדת במלואה בתשכיל, ומוקראת בקול בינה מלאכותית, כך שלומדי ערבית כמוני יוכלו לעבוד עליה לאט בלשונית הקורא. משם, אני גם מרכז מונחי מפתח ופעלים בלשוניות אוצר המילים ופעלים לתרגול וחזרה. העיבוד, התמלול והתרגום של הנאום נעשו כולם בעזרת כלי בינה מלאכותית, אז נא לסלוח על מקומות שבהם זה לא דויק בול. הסיפור המלא על ההפגנה, הדובר, והפרויקט הזה נמצא בלשונית אודות.',
     ],
   },
 };
 const INTRO_CONTENT = {
   en: {
     title: "Abed Abu Shehadeh's Speech",
-    speakerLabel: 'Speaker:', speaker: 'Abed Abu Shehadeh',
-    locationLabel: 'Location:', location: 'Ghazaza Park, Jaffa · June 28, 2026',
-    text: "Abed Abu Shehadeh's call to a grieving, frustrated Jaffa — recorded live at a protest against organized crime and police inaction, then cleaned up here into a readable text, read aloud by an AI voice synced word-for-word with it. Listen first, then read: tap any word, or drag across a phrase, for its meaning. For the real recording, watch the video on the Home tab. The full story is in the About tab.",
+    text: "This is a simplified version of the speech — the spoken Palestinian dialect of Jaffa, preserved, but cleaned up so it reads like an essay. It's fully voweled with tashkeel and accompanied by an AI voice in sync, to support pronunciation if you need it. Tap any word, or drag across a phrase, for its meaning, and save what you want to keep studying to Vocab.",
   },
   he: {
     title: 'נאומו של עבד אבו שחאדה',
-    speakerLabel: 'דובר:', speaker: 'עבד אבו שחאדה',
-    locationLabel: 'מיקום:', location: 'גן אל-ע׳זאזווה, יפו · 28 ביוני 2026',
-    text: 'קריאתו של עבד אבו שחאדה ליפו האבלה והמתוסכלת — הוקלטה בשידור חי בהפגנה נגד הפשיעה המאורגנת וכשלון המשטרה, ונערכה כאן לטקסט קריא המוקרא בקול בינה מלאכותית המסונכרן איתו מילה במילה. תחילה הקשיבו, ואז קראו: הקישו על כל מילה, או גררו על פני ביטוי, לקבלת פירושו. את ההקלטה האמיתית אפשר לצפות בסרטון בלשונית "בית". הסיפור המלא נמצא בלשונית "אודות".',
+    text: 'זו גרסה מפושטת של הנאום — הניב המדובר הפלסטיני של יפו נשמר, אבל מסודר ומצוחצח כך שהוא נקרא כמו חיבור. הטקסט מנוקד במלואו בתשכיל ומלווה בקול בינה מלאכותית מסונכרן, כדי לתמוך בהגייה אם צריך. הקישו על כל מילה, או גררו על פני ביטוי, לקבלת פירושו, ושמרו את מה שתרצו להמשיך ולתרגל באוצר המילים.',
   },
 };
 // Every static UI label/menu/button in Vocab/Verbs/Reader chrome — keyed by appLang.
@@ -145,6 +135,8 @@ const STRINGS = {
     jumpToAudio: 'Jump to this part of the audio',
     enterTheater: 'Expand', exitTheater: 'Exit expanded view',
     hideTranslation: 'Hide translation', showTranslation: 'Show translation',
+    playPronunciation: 'Hear pronunciation', playPassage: 'Play this passage',
+    pronunciationUnavailable: 'No audio available for this form',
   },
   he: {
     vocabTitle: 'אוצר מילים שמור',
@@ -169,6 +161,8 @@ const STRINGS = {
     jumpToAudio: 'קפצו לחלק הזה בהקלטה',
     enterTheater: 'הרחבה', exitTheater: 'יציאה מתצוגה מורחבת',
     hideTranslation: 'הסתר תרגום', showTranslation: 'הצג תרגום',
+    playPronunciation: 'השמע הגייה', playPassage: 'נגן את הקטע הזה',
+    pronunciationUnavailable: 'אין הקלטה זמינה לצורה הזאת',
   },
 };
 function t(key) { return STRINGS[appLang][key]; }
@@ -183,10 +177,6 @@ function applyAppLang() {
   document.querySelectorAll('.lang-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === appLang));
   const intro = INTRO_CONTENT[appLang];
   document.getElementById('lesson-title').textContent = intro.title;
-  document.getElementById('meta-speaker-label').textContent = intro.speakerLabel;
-  document.getElementById('meta-speaker-value').textContent = intro.speaker;
-  document.getElementById('meta-location-label').textContent = intro.locationLabel;
-  document.getElementById('meta-location-value').textContent = intro.location;
   document.getElementById('lesson-intro').textContent = intro.text;
   const tabLabels = TAB_LABELS[appLang];
   document.getElementById('tab-reader').textContent = tabLabels.reader;
@@ -204,7 +194,6 @@ function applyAppLang() {
   document.getElementById('watch-title').textContent = home.title;
   document.getElementById('watch-subtitle').innerHTML = home.subtitle;
   document.getElementById('watch-intro').innerHTML = home.intro.map(p => '<p class="watch-p">' + p + '</p>').join('');
-  document.getElementById('watch-outro').innerHTML = home.outro.map(p => '<p class="watch-p">' + p + '</p>').join('');
   document.getElementById('vocab-title').textContent = t('vocabTitle');
   document.getElementById('vocab-search').placeholder = t('vocabSearchPlaceholder');
   document.getElementById('chip-all').textContent = t('filterAll');
@@ -503,7 +492,7 @@ function commitWord(idx) {
   document.getElementById('tray-he').textContent = appLang === 'en' ? (data.en||'') : data.he;
   document.getElementById('tray-en').textContent = data.en||'';
   document.getElementById('tray-meta').innerHTML = rootMetaHtml(data.root, !!data.sharedRoot);
-  currentSelectionCtx = { type:'word', ar:data.w, he:data.he, en:data.en||'', root:data.root||null, sharedRoot:!!data.sharedRoot, isVerb:data.pos==='verb', ci:ciForIdx(idx) };
+  currentSelectionCtx = { type:'word', ar:data.w, he:data.he, en:data.en||'', root:data.root||null, sharedRoot:!!data.sharedRoot, isVerb:data.pos==='verb', ci:ciForIdx(idx), wordIdx:idx, wordEndIdx:idx };
   refreshSaveButton();
   resetEnChip(); openTray();
 }
@@ -522,7 +511,7 @@ function commitPhrase(lo, hi) {
   document.getElementById('tray-he').textContent = appLang === 'en' ? (enText || '—') : heText;
   document.getElementById('tray-en').textContent = enText;
   document.getElementById('tray-meta').innerHTML = phraseTypeBadgeHtml(gloss ? gloss.type : null);
-  currentSelectionCtx = { type:'phrase', ar:phrase, he:heText, en:enText, phraseType:gloss?gloss.type:null, ci:ciForIdx(lo) };
+  currentSelectionCtx = { type:'phrase', ar:phrase, he:heText, en:enText, phraseType:gloss?gloss.type:null, ci:ciForIdx(lo), wordIdx:lo, wordEndIdx:hi };
   refreshSaveButton();
   resetEnChip(); openTray();
 }
@@ -651,6 +640,123 @@ audioEl.addEventListener('play', () => { document.getElementById('play-icon').in
 audioEl.addEventListener('pause', () => { document.getElementById('play-icon').innerHTML = '<polygon points="3,1 13,7 3,13"/>'; });
 audioEl.addEventListener('ended', () => { audioEl.currentTime = 0; });
 
+/* ─────────────── PRONUNCIATION AUDIO (Vocab + Verbs) ───────────────
+   Reuses the AI voiceover (reading-edition.mp3) instead of synthesizing anything new: since that
+   audio was generated directly from the reading-edition tokens, any word/phrase appearing
+   verbatim in the text already has a reliable timestamp (VOICEOVER_WORD_TIMES). Saved Vocab
+   items always come from those exact tokens (Reader taps, or hand-curated entries matched the
+   same way — see renderChunkPreview), so a lookup within the item's own chunk is enough. Verbs
+   don't carry a chunk reference, so arDisplay (documented as "the exact form as heard") is
+   searched across the whole lesson instead, with tashkeel-normalized matching (same approach as
+   align-voiceover-words.py) to tolerate diacritic drift between verbs-data.js and lesson-data.js.
+   Conjugation-table forms, participles, masdar, and the verb's dictionary/lemma (verb.ar) are NOT
+   covered — most were never actually spoken in this recording (other persons/tenses), so there's
+   no honest audio to slice, and synthesizing on the fly isn't possible without a backend (static
+   site, no server to hide an API key behind). A separate offline batch-TTS pass, matching the
+   reading-edition.mp3 pipeline, would be the way to cover those later.
+*/
+// Explicit unicode ranges (verified via ord() dump against scripts/align-voiceover-words.py's
+// TASHKEEL constant) -- Arabic combining marks are easy to silently mis-copy via bidi-aware
+// clipboard tools, so this was double-checked codepoint by codepoint, not just eyeballed.
+const AR_TASHKEEL_RE = /[ً-ٰٟۖ-ۭـ]/g;
+function normAr(s) {
+  return (s || '').replace(AR_TASHKEEL_RE, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').trim();
+}
+const voWordTimeByIdx = new Map((typeof VOICEOVER_WORD_TIMES !== 'undefined' ? VOICEOVER_WORD_TIMES : []).map(w => [w.idx, w.t]));
+// Exact match within a known chunk -- same technique renderChunkPreview() already uses successfully.
+function findWordRangeInChunk(ci, targetAr) {
+  const range = chunkRanges[ci];
+  if (!range) return null;
+  const targetWords = targetAr.split(' ').filter(Boolean);
+  for (let i = range.startIdx; i <= range.endIdx - targetWords.length + 1; i++) {
+    let ok = true;
+    for (let j = 0; j < targetWords.length; j++) { if (wordEls[i + j].data.w !== targetWords[j]) { ok = false; break; } }
+    if (ok) return { startGi: i, endGi: i + targetWords.length - 1 };
+  }
+  return null;
+}
+// Normalized match across the whole lesson -- for verbs, which don't carry a chunk reference.
+// Also tries stripping a leading "و" (the "and" conjunction, which Arabic orthography fuses
+// directly onto the next word with no space) from each candidate token before comparing -- a
+// citation form like "نِتْعامَل" won't equal the actually-spoken "ونِتْعامَل" otherwise, even
+// though the verb genuinely was said. Verified against all 70 curated verbs in verbs-data.js:
+// this raised the match rate from 65/70 to 69/70 (the one holdout is a real citation mismatch --
+// the form shown genuinely isn't the one spoken -- not a tokenization issue).
+function stripLeadingWaw(s) { return s.length > 2 && s[0] === 'و' ? s.slice(1) : s; }
+function findWordRangeGlobal(targetAr) {
+  const targetWords = targetAr.split(' ').filter(Boolean).map(normAr);
+  if (!targetWords.length) return null;
+  for (let i = 0; i <= wordEls.length - targetWords.length; i++) {
+    let ok = true;
+    for (let j = 0; j < targetWords.length; j++) {
+      const w = normAr(wordEls[i + j].data.w);
+      if (w !== targetWords[j] && stripLeadingWaw(w) !== targetWords[j]) { ok = false; break; }
+    }
+    if (ok) return { startGi: i, endGi: i + targetWords.length - 1 };
+  }
+  return null;
+}
+// Start = first timed word in range (falls back to the chunk start if none of the range's words
+// got an alignment hit). Stop = just after the next timed word past the range, capped to the
+// chunk's own end so a word near a chunk boundary never bleeds into unrelated following text.
+function lessonAudioTimesFor(startGi, endGi) {
+  const ci = ciForIdx(startGi);
+  const chunk = VOICEOVER_CHUNKS[ci];
+  let startT = null;
+  for (let gi = startGi; gi <= endGi; gi++) { if (voWordTimeByIdx.has(gi)) { startT = voWordTimeByIdx.get(gi); break; } }
+  if (startT === null) startT = chunk.start;
+  let endT = null;
+  voWordTimeByIdx.forEach((tm, idx) => { if (idx > endGi && (endT === null || tm < endT)) endT = tm; });
+  if (endT === null || endT > chunk.end) endT = chunk.end;
+  endT = Math.min(endT + 0.2, chunk.end);
+  if (endT <= startT) endT = Math.min(startT + 1.2, chunk.end);
+  return { startT, endT };
+}
+let audioSliceStopHandler = null;
+function stopAudioSliceWatch() {
+  if (audioSliceStopHandler) { audioEl.removeEventListener('timeupdate', audioSliceStopHandler); audioSliceStopHandler = null; }
+}
+function playLessonAudioSlice(startT, endT) {
+  stopAudioSliceWatch();
+  audioEl.currentTime = startT;
+  audioEl.play();
+  audioSliceStopHandler = () => { if (audioEl.currentTime >= endT) { audioEl.pause(); stopAudioSliceWatch(); } };
+  audioEl.addEventListener('timeupdate', audioSliceStopHandler);
+}
+function playVocabPronunciation(e, i) {
+  e.stopPropagation();
+  const v = SAVED_VOCAB[i];
+  // Words/phrases saved via the Reader (this session or a past one) know exactly which
+  // occurrence was tapped -- use that directly. Only reconstruct by text search (which can land
+  // on the WRONG occurrence if the word repeats within its chunk) for hand-curated SEED_VOCAB
+  // entries that never went through the Reader's tap-to-save flow.
+  const range = v.wordIdx !== undefined
+    ? { startGi: v.wordIdx, endGi: v.wordEndIdx !== undefined ? v.wordEndIdx : v.wordIdx }
+    : findWordRangeInChunk(v.ci, v.ar);
+  if (!range) { showToast(t('pronunciationUnavailable')); return; }
+  const { startT, endT } = lessonAudioTimesFor(range.startGi, range.endGi);
+  playLessonAudioSlice(startT, endT);
+}
+function playVocabPassage(e, i) {
+  e.stopPropagation();
+  const chunk = VOICEOVER_CHUNKS[SAVED_VOCAB[i].ci];
+  playLessonAudioSlice(chunk.start, chunk.end);
+}
+function playVerbPronunciation(e, verbId) {
+  e.stopPropagation();
+  const v = SAVED_VERBS.find(x => x.id === verbId);
+  if (!v || !v.arDisplay) return;
+  // Verbs auto-saved from the Reader know their exact occurrence (see addVerbToVerbsTab). The
+  // curated verbs-data.js set doesn't carry a lesson position at all, so fall back to searching
+  // the whole lesson for arDisplay -- fine here since, unlike ordinary vocab words, a verb's
+  // exact inflected surface form rarely repeats more than once in a single ~7-minute speech.
+  const range = v.wordIdx !== undefined ? { startGi: v.wordIdx, endGi: v.wordIdx } : findWordRangeGlobal(v.arDisplay);
+  if (!range) { showToast(t('pronunciationUnavailable')); return; }
+  const { startT, endT } = lessonAudioTimesFor(range.startGi, range.endGi);
+  playLessonAudioSlice(startT, endT);
+}
+const PRONOUNCE_ICON_SVG = '<svg width="13" height="12" viewBox="0 0 15 14" fill="none"><path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+
 /* ─────────────── SAVE (Vocab + auto Verbs) ─────────────── */
 function handleSave(e) {
   e.stopPropagation();
@@ -682,6 +788,7 @@ function addVerbToVerbsTab(ctx) {
     participle: null,
     masdar: null,
     conj: null,
+    wordIdx: ctx.wordIdx,
   });
   activeVerbId = SAVED_VERBS[0].id;
   activeConjTab = 'present';
@@ -834,7 +941,10 @@ function renderVerbsView() {
     <div class="verb-card-head">
       <div class="verb-card-ar">
         <div class="verb-ar-main">${verb.ar}</div>
-        <div class="verb-ar-sub">${arSubHtml}</div>
+        <div class="verb-ar-sub-row">
+          <div class="verb-ar-sub">${arSubHtml}</div>
+          <button class="mute-btn verb-pronounce-btn" title="${t('playPronunciation')}" onclick="playVerbPronunciation(event, '${verb.id}')">${PRONOUNCE_ICON_SVG}</button>
+        </div>
         ${glossHtml}
       </div>
       <div class="verb-card-meta">
@@ -914,6 +1024,7 @@ function renderVocabView() {
         <div class="vocab-card-head">
           <div class="vocab-row-ar${v.type==='phrase'?' phrase':''}">${v.ar}</div>
           <div class="vocab-card-actions">
+            <button class="vocab-row-pronounce" title="${t('playPronunciation')}" onclick="playVocabPronunciation(event, ${i})">${PRONOUNCE_ICON_SVG}</button>
             <button class="vocab-row-toggle${isOpen?' open':''}" title="${t('showSourceLine')}" onclick="toggleVocabExpand(${i})"><span class="chev">&#9662;</span></button>
             <button class="vocab-row-delete" title="${t('removeFromVocab')}" onclick="removeVocabItem(event, ${i})">&times;</button>
           </div>
@@ -925,7 +1036,10 @@ function renderVocabView() {
         </div>
         <div class="vocab-expand${isOpen?' open':''}">
           <div class="vocab-expand-inner">
-            <div class="vocab-expand-time">${VOICEOVER_CHUNKS[v.ci].label}</div>
+            <div class="vocab-expand-head">
+              <div class="vocab-expand-time">${VOICEOVER_CHUNKS[v.ci].label}</div>
+              <button class="vocab-row-pronounce" title="${t('playPassage')}" onclick="playVocabPassage(event, ${i})">${PRONOUNCE_ICON_SVG}</button>
+            </div>
             <p class="vocab-expand-text">${renderChunkPreview(v.ci, v.ar)}</p>
           </div>
         </div>
@@ -986,19 +1100,17 @@ const ABOUT_CONTENT = {
       { eyebrow: 'The Protest', heading: 'Jaffa, June 28, 2026', paragraphs: [
         'Three young men were killed in Jaffa within a three-day span in June 2026, the last — Mustafa Abu Lasan — by a car bomb as he was driving his 6-year-old son to school. Frustration at organized crime, and at a police response residents saw as negligent at best, boiled over into a demonstration at Ghazaza Park in Jaffa on Sunday evening, June 28. Protesters demanded the removal of the local police station commander and immediate, concrete steps to stop the killing.',
         'Organizers announced follow-up actions from the same stage: a sit-in tent at Ghazaza Park the following Thursday, where bereaved mothers and sisters could tell their own stories, and a Friday march through Jaffa with black flags.',
-      ]},
+      ], source: 'Source: <a href="https://www.mawteni48.com/archives/337152" target="_blank" rel="noopener noreferrer">mawteni48.com &middot; coverage of the June 28, 2026 protest</a> (Arabic)' },
       { eyebrow: "Who's Speaking", heading: 'Abed Abu Shehadeh', paragraphs: [
         "Abed Abu Shehadeh is the chairman of the Islamic Council (al-Hay'a al-Islamiyya) in Jaffa. He led the June 28 protest and this speech, framing the community's silence in the face of repeated killings as itself dangerous — normalizing what should never be normal — and calling on Jaffa's youth to set aside internal political divisions in favor of solidarity.",
       ]},
       { eyebrow: 'Why I Built This', heading: 'A personal study tool', paragraphs: [
-        'I have a decent command of everyday spoken Palestinian Arabic, but seek to push further into the register used in grassroots community organizing and activism — the vocabulary for demanding accountability, mobilizing a community, and speaking publicly about grief and injustice. This speech, given by a community leader who I admire, about an urgent crisis in Jaffa, the city I love and where my daughter was born and lives, became the seed for a personal study tool: real audio, a cleaned-up readable text focused on spoken dialect, and vocabulary/verbs pulled from it, curated to my personal needs and learning style.',
+        "I have a decent command of everyday spoken Palestinian Arabic, but seek to push further into the register used in grassroots community organizing and activism — the vocabulary for demanding accountability, mobilizing a community, and speaking publicly about grief and injustice. This speech, given by a community leader who I admire, about an urgent crisis in Jaffa, the city I love and where my daughter was born and lives, became the seed for a personal study tool: real audio, a cleaned-up readable text focused on spoken dialect, and vocabulary/verbs pulled from it, curated to my personal needs and learning style. That's also why the site itself is bilingual in Hebrew and English, built with a native Hebrew speaker in mind: in my own experience, learning spoken Arabic through Hebrew as a frame of reference was consistently more intuitive than working through English. Arabic and Hebrew share roots and verb patterns that English has no real equivalent for, so wherever that overlap exists — a shared root, a familiar verb structure — this tool tries to surface it.",
       ]},
       { eyebrow: 'How I Built This', heading: 'The process, and where AI came in', paragraphs: [
-        "This isn't a professional build — it's something I put together myself, evenings and weekends, because I wanted this tool to exist and didn't want to wait for someone else to make it.",
         'AI did a lot of the heavy lifting in the development of this tool: transcribing Abed\'s raw audio, translating it into Hebrew and English, producing a simplified written piece, adding the tashkeel that makes spoken Arabic legible to a learner, and generating the AI voiceover you hear in the Reader. I also used an AI coding assistant (Claude Code) to build the site itself — the tap-to-translate reader, the vocab and verb tools, all of it came together through that back-and-forth. My part was choosing the speech, shaping the pedagogy, checking translations, and deciding what a learner at my level actually needs.',
       ]},
     ],
-    source: 'Source: <a href="https://www.mawteni48.com/archives/337152" target="_blank" rel="noopener noreferrer">mawteni48.com &middot; coverage of the June 28, 2026 protest</a> (Arabic)',
   },
   he: {
     dir: 'rtl',
@@ -1006,19 +1118,17 @@ const ABOUT_CONTENT = {
       { eyebrow: 'ההפגנה', heading: 'יפו, 28 ביוני 2026', paragraphs: [
         'שלושה צעירים נרצחו ביפו בתוך פרק זמן של שלושה ימים ביוני 2026, האחרון שבהם — מוסטפא אבו לסאן — בפיצוץ מטען חבלה ברכבו, בעודו נוהג את בנו בן השש לבית הספר. תסכול מהפשיעה המאורגנת, ומתגובת המשטרה שתושבים תפסו כרשלנית בלשון המעטה, התפרץ להפגנה בגן אל-ע׳זאזווה ביפו בערב יום ראשון, 28 ביוני. המפגינים דרשו את הדחתו של מפקד תחנת המשטרה המקומית ונקיטת צעדים מיידיים וממשיים לעצירת ההרג.',
         'המארגנים הכריזו מאותה הבמה על צעדי המשך: אוהל מחאה בגן אל-ע׳זאזווה ביום חמישי הקרוב, שבו אמהות ואחיות שכולות יוכלו לספר את סיפוריהן, וצעדה ביום שישי ברחבי יפו עם דגלים שחורים.',
-      ]},
+      ], source: 'מקור: <a href="https://www.mawteni48.com/archives/337152" target="_blank" rel="noopener noreferrer">mawteni48.com &middot; סיקור ההפגנה מ-28 ביוני 2026</a> (בערבית)' },
       { eyebrow: 'מי מדבר', heading: 'עבד אבו שחאדה', paragraphs: [
         'עבד אבו שחאדה הוא יו״ר המועצה האסלאמית ביפו. הוא הוביל את ההפגנה ואת הנאום הזה ב-28 ביוני, והציג את שתיקת הקהילה מול רציחות חוזרות ונשנות כמסוכנת כשלעצמה — מה שאסור שייחשב לשגרה הופך לשגרה — וקרא לבני הנוער ביפו להניח בצד את הפילוגים הפוליטיים הפנימיים למען אחדות.',
       ]},
       { eyebrow: 'למה בניתי את זה', heading: 'כלי לימוד אישי', paragraphs: [
-        'יש לי שליטה סבירה בערבית פלסטינית מדוברת יומיומית, אך אני מבקש להעמיק אל תוך הרובד הלשוני שבו משתמשים בארגון קהילתי ובאקטיביזם בשטח — אוצר המילים לדרישת אחריותיות, לגיוס קהילה, ולדיבור פומבי על אבל ועל אי-צדק. הנאום הזה, שנשא אותו מנהיג קהילתי שאני מעריך, על משבר דוחק ביפו — העיר שאני אוהב ושבה נולדה וחיה בתי — הפך לזרע של כלי לימוד אישי: הקלטת שמע אמיתית, טקסט קריא ומסודר שמתמקד בניב המדובר, ואוצר מילים ופעלים שנשלפו ממנו, שנאספו בהתאמה לצרכים האישיים ולסגנון הלמידה שלי.',
+        'יש לי שליטה סבירה בערבית פלסטינית מדוברת יומיומית, אך אני מבקש להעמיק אל תוך הרובד הלשוני שבו משתמשים בארגון קהילתי ובאקטיביזם בשטח — אוצר המילים לדרישת אחריותיות, לגיוס קהילה, ולדיבור פומבי על אבל ועל אי-צדק. הנאום הזה, שנשא אותו מנהיג קהילתי שאני מעריך, על משבר דוחק ביפו — העיר שאני אוהב ושבה נולדה וחיה בתי — הפך לזרע של כלי לימוד אישי: הקלטת שמע אמיתית, טקסט קריא ומסודר שמתמקד בניב המדובר, ואוצר מילים ופעלים שנשלפו ממנו, שנאספו בהתאמה לצרכים האישיים ולסגנון הלמידה שלי. זו גם הסיבה שהאתר עצמו הוא דו-לשוני, בעברית ובאנגלית, ונבנה בחשיבה על דובר עברית כשפת אם: מהניסיון שלי, ללמוד ערבית מדוברת דרך העברית כמסגרת התייחסות היה תמיד יותר אינטואיטיבי מלעבוד דרך האנגלית. לערבית ולעברית משותפים שורשים ותבניות פועל שלאנגלית אין להן מקבילה ממשית, כך שבכל מקום שקיימת בו חפיפה כזו — שורש משותף, תבנית פועל מוכרת — הכלי הזה מנסה להעלות אותה על פני השטח.',
       ]},
       { eyebrow: 'איך בניתי את זה', heading: 'התהליך, והיכן נכנסה בינה מלאכותית', paragraphs: [
-        'זה לא פיתוח מקצועי — זה משהו שהרכבתי בעצמי, בערבים ובסופי שבוע, כי רציתי שהכלי הזה יתקיים ולא רציתי לחכות שמישהו אחר יבנה אותו.',
         'בינה מלאכותית עשתה חלק גדול מהעבודה הקשה בפיתוח הכלי הזה: תמלול ההקלטה הגולמית של עבד, תרגומה לעברית ולאנגלית, הפקת נוסח כתוב מפושט, הוספת התשכיל שהופך ערבית מדוברת לקריאה עבור לומד, והפקת הקראת הבינה המלאכותית שנשמעת בלשונית הקורא. השתמשתי גם בעוזר תכנות מבוסס בינה מלאכותית (Claude Code) לבניית האתר עצמו — הקורא המבוסס על הקשה-לתרגום, כלי אוצר המילים והפעלים, הכול נבנה דרך אותו דיאלוג. החלק שלי היה לבחור את הנאום, לעצב את הגישה הפדגוגית, לבדוק תרגומים, ולהחליט מה לומד בשלב שלי צריך בפועל.',
       ]},
     ],
-    source: 'מקור: <a href="https://www.mawteni48.com/archives/337152" target="_blank" rel="noopener noreferrer">mawteni48.com &middot; סיקור ההפגנה מ-28 ביוני 2026</a> (בערבית)',
   },
 };
 function renderAboutView() {
@@ -1031,8 +1141,9 @@ function renderAboutView() {
       <div class="about-eyebrow">${s.eyebrow}</div>
       <h2 class="about-heading">${s.heading}</h2>
       ${s.paragraphs.map(p => `<p class="about-text">${p}</p>`).join('')}
+      ${s.source ? `<div class="about-source">${s.source}</div>` : ''}
     </div>
-  `).join('') + `<div class="about-source">${data.source}</div>`;
+  `).join('');
 }
 
 /* ─────────────── WATCH TAB ─────────────── */
@@ -1326,7 +1437,11 @@ function initWatchDragSelect() {
 /* ─────────────── WATCH TAB: bottom toolbar (mirrors Reader's audio-bar) ─────────────── */
 let watchSpeed = 1;
 function toggleWatchPlay() { const v = document.getElementById('watch-video'); v.paused ? v.play() : v.pause(); }
-function scrubWatch(e) { const v = document.getElementById('watch-video'); const r = e.currentTarget.getBoundingClientRect(); const pct = (e.clientX - r.left) / r.width; v.currentTime = pct * (v.duration || 0); updateWatchProgress(); }
+function skipWatch(delta) {
+  const v = document.getElementById('watch-video');
+  v.currentTime = Math.min(Math.max(0, v.currentTime + delta), v.duration || Infinity);
+  updateWatchProgress();
+}
 function cycleWatchSpeed() { const v = document.getElementById('watch-video'); const s = [0.75, 1, 1.25], l = ['0.75×', '1×', '1.25×'], i = s.indexOf(watchSpeed); watchSpeed = s[(i + 1) % s.length]; v.playbackRate = watchSpeed; document.getElementById('watch-speed-btn').textContent = l[(i + 1) % l.length]; }
 function toggleWatchMute() { document.getElementById('watch-video').muted = !document.getElementById('watch-video').muted; }
 function updateWatchMuteIcon() {
@@ -1348,11 +1463,10 @@ function updateWatchProgress() {
   document.getElementById('watch-video-scrubber-fill').style.width = pct;
   updateWatchTimeLabel();
 }
-// Draggable scrub bar overlaid on the video itself (separate from the toolbar's click-only
-// scrubber) -- mirrors the Reader's word drag-select gesture handling: pointerdown seeks
+// Draggable scrub bar, shared by the overlay on the video itself and the toolbar's scrubber
+// below -- mirrors the Reader's word drag-select gesture handling: pointerdown seeks
 // immediately and arms dragging, pointermove re-seeks continuously, pointerup disarms.
-function initVideoScrubberDrag() {
-  const hit = document.getElementById('watch-video-scrubber-hit');
+function makeScrubberDraggable(hit) {
   const v = document.getElementById('watch-video');
   let dragging = false;
   function seekFromClientX(clientX) {
@@ -1368,6 +1482,10 @@ function initVideoScrubberDrag() {
   hit.addEventListener('touchmove', (e) => { if (dragging) { seekFromClientX(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
   hit.addEventListener('touchend', () => { dragging = false; hit.classList.remove('dragging'); });
   hit.addEventListener('touchcancel', () => { dragging = false; hit.classList.remove('dragging'); });
+}
+function initVideoScrubberDrag() {
+  makeScrubberDraggable(document.getElementById('watch-video-scrubber-hit'));
+  makeScrubberDraggable(document.getElementById('watch-scrubber'));
 }
 function initWatchToolbar() {
   const v = document.getElementById('watch-video');
@@ -1447,6 +1565,14 @@ function updateWatchActiveCue() {
     watchTrCueEls[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
+// Left/right arrow seeking on the Home tab, same 5s step as the skip buttons -- skipped
+// while typing in a field (e.g. Vocab search) so arrow keys there behave normally.
+document.addEventListener('keydown', (e) => {
+  if (activeTabName !== 'watch') return;
+  if (e.target.closest('input, textarea, [contenteditable]')) return;
+  if (e.key === 'ArrowLeft') { skipWatch(-5); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { skipWatch(5); e.preventDefault(); }
+});
 
 buildReader();
 buildWatchTranscript();

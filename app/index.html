@@ -52,11 +52,7 @@
     <main class="reader" id="reader">
       <div class="lesson-head">
         <h1 class="lesson-title" id="lesson-title" onclick="showHeaderGloss('title')">Abed Abu Shehadeh's Speech</h1>
-        <div class="lesson-meta">
-          <span class="lesson-meta-item"><span class="lesson-meta-label" id="meta-speaker-label">Speaker:</span> <span id="meta-speaker-value">Abed Abu Shehadeh</span></span>
-          <span class="lesson-meta-item"><span class="lesson-meta-label" id="meta-location-label">Location:</span> <span id="meta-location-value">Jaffa &middot; June 28, 2026</span></span>
-        </div>
-        <p class="lesson-intro" id="lesson-intro">Abed Abu Shehadeh's call to a grieving, frustrated Jaffa — recorded live at a protest against organized crime and police inaction, then cleaned up here into a readable text synced with the real audio. Listen first, then read: tap any word, or drag across a phrase, for its meaning. The full story is in the About tab.</p>
+        <p class="lesson-intro" id="lesson-intro">This is a simplified version of the speech — the spoken Palestinian dialect of Jaffa, preserved, but cleaned up so it reads like an essay. It's fully voweled with tashkeel and accompanied by an AI voice in sync, to support pronunciation if you need it. Tap any word, or drag across a phrase, for its meaning, and save what you want to keep studying to Vocab.</p>
       </div>
       <div class="lesson-title-ar" id="lesson-title-ar" onclick="showHeaderGloss('title')">&#1603;َ&#1604;ِ&#1605;َ&#1577; &#1593;َ&#1576;ْ&#1583; &#1571;َ&#1576;ُ&#1608; &#1588;َ&#1581;َ&#1575;&#1583;َ&#1577;</div>
       <div class="lesson-location-ar" id="lesson-location-ar" onclick="showHeaderGloss('location')">وقفة يافا — حديقة الغزازوة، ٢٨ حزيران ٢٠٢٦</div>
@@ -186,7 +182,6 @@
         <div class="watch-transcript" id="watch-transcript-ar"></div>
         <div class="watch-transcript watch-transcript-tr-panel" id="watch-transcript-tr"></div>
       </div>
-      <div class="watch-outro-group" id="watch-outro"></div>
     </div>
   </div>
   <div class="watch-bottom">
@@ -198,11 +193,17 @@
       </div>
     </div>
     <div class="audio-bar" id="watch-toolbar">
+      <button class="mute-btn skip-btn" id="watch-skip-back-btn" onclick="skipWatch(-5)" title="Back 5 seconds" aria-label="Back 5 seconds">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><polygon points="7,1 7,11 0.5,6"/><polygon points="13.5,1 13.5,11 7,6"/></svg>
+      </button>
       <button class="play-btn" id="watch-play-btn" onclick="toggleWatchPlay()">
         <svg id="watch-play-icon" width="13" height="13" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
       </button>
+      <button class="mute-btn skip-btn" id="watch-skip-fwd-btn" onclick="skipWatch(5)" title="Forward 5 seconds" aria-label="Forward 5 seconds">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><polygon points="7,1 7,11 13.5,6"/><polygon points="0.5,1 0.5,11 7,6"/></svg>
+      </button>
       <span class="time-label" id="watch-time-label">0:00 / 0:00</span>
-      <div class="scrubber" onclick="scrubWatch(event)">
+      <div class="scrubber" id="watch-scrubber">
         <div class="scrubber-fill" id="watch-scrubber-fill" style="width:0%"></div>
       </div>
       <button class="speed-btn" id="watch-speed-btn" onclick="cycleWatchSpeed()">1&times;</button>
