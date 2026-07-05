@@ -4,6 +4,7 @@ const SAVED_VOCAB = SEED_VOCAB.slice();
 /* ─────────────── READER STATE ─────────────── */
 const wordEls = [];
 const chunkRanges = [];
+const chunkEls = [];
 const timedWords = [];
 const sentenceEls = [];
 let liveWordIdx = -1;
@@ -14,57 +15,58 @@ let lastActionWasDrag = false;
 let currentSelectionCtx = null;
 let lastScrolledChunkCi = -1;
 
-/* ─────────────── READER TEXT SIZE ─────────────── */
+/* ─────────────── TEXT SIZE (Reader + Watch) ─────────────── */
 // An in-app control instead of relying on the browser's pinch-zoom, which would scale the whole
 // page — header tabs and the audio bar/tray included — forcing a zoom-out just to reach them.
 // Only the reading text itself (the transcript paragraphs) grows; everything else in the frame
-// stays put and reachable.
-const READER_FONT_SCALES = [0.85, 1, 1.15, 1.3, 1.45, 1.6, 1.8, 2];
-let readerScaleIdx = READER_FONT_SCALES.indexOf(parseFloat(localStorage.getItem('arabicLabReaderScale')));
-if (readerScaleIdx < 0) readerScaleIdx = READER_FONT_SCALES.indexOf(1);
-function applyReaderScale() {
-  const scale = READER_FONT_SCALES[readerScaleIdx];
-  document.documentElement.style.setProperty('--reader-scale', scale);
-  document.getElementById('text-size-label').textContent = Math.round(scale * 100) + '%';
-  document.getElementById('text-size-dec').disabled = readerScaleIdx === 0;
-  document.getElementById('text-size-inc').disabled = readerScaleIdx === READER_FONT_SCALES.length - 1;
-  localStorage.setItem('arabicLabReaderScale', String(scale));
+// stays put and reachable. Reader and Watch each get their own scale/localStorage key since users
+// may want the two sized differently.
+const FONT_SCALES = [0.85, 1, 1.15, 1.3, 1.45, 1.6, 1.8, 2];
+function createFontScaler({ cssVar, storageKey, labelId, decId, incId, onAdjusted }) {
+  let idx = FONT_SCALES.indexOf(parseFloat(localStorage.getItem(storageKey)));
+  if (idx < 0) idx = FONT_SCALES.indexOf(1);
+  function apply() {
+    const scale = FONT_SCALES[idx];
+    document.documentElement.style.setProperty(cssVar, scale);
+    document.getElementById(labelId).textContent = Math.round(scale * 100) + '%';
+    document.getElementById(decId).disabled = idx === 0;
+    document.getElementById(incId).disabled = idx === FONT_SCALES.length - 1;
+    localStorage.setItem(storageKey, String(scale));
+  }
+  function adjust(dir) {
+    idx = Math.min(FONT_SCALES.length - 1, Math.max(0, idx + dir));
+    apply();
+    if (onAdjusted) onAdjusted();
+  }
+  return { apply, adjust };
 }
-function adjustReaderScale(dir) {
-  readerScaleIdx = Math.min(READER_FONT_SCALES.length - 1, Math.max(0, readerScaleIdx + dir));
-  applyReaderScale();
-}
+const readerScaler = createFontScaler({
+  cssVar: '--reader-scale', storageKey: 'arabicLabReaderScale',
+  labelId: 'text-size-label', decId: 'text-size-dec', incId: 'text-size-inc',
+});
+function applyReaderScale() { readerScaler.apply(); }
+function adjustReaderScale(dir) { readerScaler.adjust(dir); }
 
-/* ─────────────── WATCH TEXT SIZE ─────────────── */
-// Same in-app scaling approach as the Reader, applied to the transcript panel instead --
-// separate scale/localStorage key since users may want the two sized differently.
-const WATCH_FONT_SCALES = [0.85, 1, 1.15, 1.3, 1.45, 1.6, 1.8, 2];
-let watchScaleIdx = WATCH_FONT_SCALES.indexOf(parseFloat(localStorage.getItem('arabicLabWatchScale')));
-if (watchScaleIdx < 0) watchScaleIdx = WATCH_FONT_SCALES.indexOf(1);
-function applyWatchScale() {
-  const scale = WATCH_FONT_SCALES[watchScaleIdx];
-  document.documentElement.style.setProperty('--watch-scale', scale);
-  document.getElementById('watch-text-size-label').textContent = Math.round(scale * 100) + '%';
-  document.getElementById('watch-text-size-dec').disabled = watchScaleIdx === 0;
-  document.getElementById('watch-text-size-inc').disabled = watchScaleIdx === WATCH_FONT_SCALES.length - 1;
-  localStorage.setItem('arabicLabWatchScale', String(scale));
-}
-function adjustWatchScale(dir) {
-  watchScaleIdx = Math.min(WATCH_FONT_SCALES.length - 1, Math.max(0, watchScaleIdx + dir));
-  applyWatchScale();
-  // .watch-cue-ar/.watch-cue-tr transition font-size over .15s -- wait for that to finish before
-  // re-measuring natural heights, or the sync would lock in a mid-transition (wrong) height.
-  setTimeout(() => {
-    syncWatchCueHeights();
-    // Every cue above the active one just changed height, so the old scroll position no longer
-    // lines the two columns up the way it did a moment ago -- snap the active cue to the top of
-    // both panels so they visibly reset back into alignment instead of drifting.
-    if (activeWatchCueIdx >= 0) {
-      watchArCueEls[activeWatchCueIdx].scrollIntoView({ behavior: 'auto', block: 'start' });
-      watchTrCueEls[activeWatchCueIdx].scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
-  }, 180);
-}
+const watchScaler = createFontScaler({
+  cssVar: '--watch-scale', storageKey: 'arabicLabWatchScale',
+  labelId: 'watch-text-size-label', decId: 'watch-text-size-dec', incId: 'watch-text-size-inc',
+  onAdjusted: () => {
+    // .watch-cue-ar/.watch-cue-tr transition font-size over .15s -- wait for that to finish before
+    // re-measuring natural heights, or the sync would lock in a mid-transition (wrong) height.
+    setTimeout(() => {
+      syncWatchCueHeights();
+      // Every cue above the active one just changed height, so the old scroll position no longer
+      // lines the two columns up the way it did a moment ago -- snap the active cue to the top of
+      // both panels so they visibly reset back into alignment instead of drifting.
+      if (activeWatchCueIdx >= 0) {
+        watchArCueEls[activeWatchCueIdx].scrollIntoView({ behavior: 'auto', block: 'start' });
+        watchTrCueEls[activeWatchCueIdx].scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }, 180);
+  },
+});
+function applyWatchScale() { watchScaler.apply(); }
+function adjustWatchScale(dir) { watchScaler.adjust(dir); }
 
 /* ─────────────── LANGUAGE PREFERENCE (global, top-bar) ─────────────── */
 // 'he' = Hebrew-primary with full grammatical scaffolding (בניין, שורש badges, Hebrew
@@ -88,7 +90,7 @@ const HOME_CONTENT = {
     subtitle: 'Ghazaza Park, Jaffa &middot; June 28, 2026',
     intro: [
       "In June 2026, three young men were killed in Jaffa within the span of three days — the latest in a wave of organized-crime violence that a shaken, furious community felt the police had done nothing to stop. On the evening of June 28, hundreds gathered at Ghazaza Park to demand accountability. Abed Abu Shehadeh, chairman of Jaffa's Islamic Council, addressed the crowd.",
-      "To really understand what a community is going through — the grief, the exhaustion, the anger underneath it — I find that reading a summary isn't enough; I have to listen closely to the words people reach for and the cry underneath the argument. That's what the tabs above are for: I took Abed's words and turned them into something I can study — in addition to the speech with subtitles, I produced a simplified, cleaned-up version of the text, fully translated, fully voweled with tashkeel, and read aloud by an AI voice, so Arabic learners like myself can work through it slowly in Reader. From there, I also bring together key terms and verbs in the Vocab and Verbs tabs for review and practice. The processing, transcription, and translation of the speech were all done with AI tools, so please forgive areas where it didn't get things exactly right. The full story behind the protest, the speaker, and this project is in About.",
+      "To really understand what a community is going through — the grief, the exhaustion, the anger underneath it — I find that reading a summary isn't enough; I have to listen closely to the words people reach for and the cry underneath the argument. That's what the tabs above are for: I took Abed's words and turned them into something I can study — in addition to the speech with subtitles, I produced a simplified, cleaned-up version of the text, fully translated, fully voweled with tashkeel, and read aloud by an AI voice, so Arabic learners like myself can work through it slowly in <a href=\"#\" onclick=\"switchTab('reader'); return false;\">Reader</a>. From there, I also bring together key terms and verbs in the <a href=\"#\" onclick=\"switchTab('vocab'); return false;\">Vocab</a> and <a href=\"#\" onclick=\"switchTab('verbs'); return false;\">Verbs</a> tabs for review and practice. The processing, transcription, and translation of the speech were all done with AI tools, so please forgive areas where it didn't get things exactly right. The full story behind the protest, the speaker, and this project is in <a href=\"#\" onclick=\"switchTab('about'); return false;\">About</a>.",
     ],
   },
   he: {
@@ -96,7 +98,7 @@ const HOME_CONTENT = {
     subtitle: 'גן אל-ע׳זאזווה, יפו &middot; 28 ביוני 2026',
     intro: [
       'ביוני 2026 נרצחו שלושה צעירים ביפו בתוך פרק זמן של שלושה ימים — האחרונה בשורת אלימות של פשיעה מאורגנת שקהילה מזועזעת וזועמת חשה שהמשטרה לא עשתה כלום כדי לעצור. בערב ה-28 ביוני התאספו מאות בגן אל-ע׳זאזווה כדי לדרוש אחריותיות. עבד אבו שחאדה, יו״ר המועצה האסלאמית ביפו, פנה לקהל.',
-      'כדי להבין באמת מה עוברת קהילה — האבל, התשישות, הזעם שמתחתיו — לדעתי לא מספיק לקרוא תקציר; אני צריך להקשיב מקרוב למילים שאנשים בוחרים ולזעקה שמתחת לטיעון. לשם כך נועדו הלשוניות שמעל: לקחתי את מילותיו של עבד והפכתי אותן לדבר שאני יכול ללמוד ממנו — בנוסף לנאום עם כתוביות, הכנתי גרסה מפושטת ומסודרת של הטקסט, מתורגמת במלואה, מנוקדת במלואה בתשכיל, ומוקראת בקול בינה מלאכותית, כך שלומדי ערבית כמוני יוכלו לעבוד עליה לאט בלשונית הקורא. משם, אני גם מרכז מונחי מפתח ופעלים בלשוניות אוצר המילים ופעלים לתרגול וחזרה. העיבוד, התמלול והתרגום של הנאום נעשו כולם בעזרת כלי בינה מלאכותית, אז נא לסלוח על מקומות שבהם זה לא דויק בול. הסיפור המלא על ההפגנה, הדובר, והפרויקט הזה נמצא בלשונית אודות.',
+      'כדי להבין באמת מה עוברת קהילה — האבל, התשישות, הזעם שמתחתיו — לדעתי לא מספיק לקרוא תקציר; אני צריך להקשיב מקרוב למילים שאנשים בוחרים ולזעקה שמתחת לטיעון. לשם כך נועדו הלשוניות שמעל: לקחתי את מילותיו של עבד והפכתי אותן לדבר שאני יכול ללמוד ממנו — בנוסף לנאום עם כתוביות, הכנתי גרסה מפושטת ומסודרת של הטקסט, מתורגמת במלואה, מנוקדת במלואה בתשכיל, ומוקראת בקול בינה מלאכותית, כך שלומדי ערבית כמוני יוכלו לעבוד עליה לאט בלשונית <a href="#" onclick="switchTab(\'reader\'); return false;">הקורא</a>. משם, אני גם מרכז מונחי מפתח ופעלים בלשוניות <a href="#" onclick="switchTab(\'vocab\'); return false;">אוצר המילים</a> ו<a href="#" onclick="switchTab(\'verbs\'); return false;">פעלים</a> לתרגול וחזרה. העיבוד, התמלול והתרגום של הנאום נעשו כולם בעזרת כלי בינה מלאכותית, אז נא לסלוח על מקומות שבהם זה לא דויק בול. הסיפור המלא על ההפגנה, הדובר, והפרויקט הזה נמצא בלשונית <a href="#" onclick="switchTab(\'about\'); return false;">אודות</a>.',
     ],
   },
 };
@@ -235,7 +237,9 @@ function phraseTypeBadgeHtml(type) {
 
 /* ─────────────── AUDIO ─────────────── */
 const audioEl = document.getElementById('audio-el');
-let speed = 1;
+// Cached here (not re-queried per call) since it's a static element present in the initial HTML,
+// same as audioEl above -- shared by the Watch tab's video, toolbar, scrubber and captions code.
+const watchVideoEl = document.getElementById('watch-video');
 let audioModeOn = true;
 function toggleAudioMode() {
   audioModeOn = !audioModeOn;
@@ -269,8 +273,7 @@ function switchTab(name) {
   if (viewEl) viewEl.classList.add('active');
   else { document.getElementById('view-reader').classList.add('active'); name = 'reader'; }
   if (activeTabName === 'watch' && name !== 'watch') {
-    const video = document.getElementById('watch-video');
-    if (video) video.pause();
+    watchVideoEl.pause();
     exitWatchTheater();
   }
   activeTabName = name;
@@ -321,6 +324,7 @@ function buildReader() {
   CHUNKS.forEach((chunk, ci) => {
     const div = document.createElement('div');
     div.className = 'chunk'; div.dataset.ci = ci;
+    chunkEls.push(div);
     const timeEl = document.createElement('div');
     timeEl.className = 'chunk-time'; timeEl.textContent = VOICEOVER_CHUNKS[ci].label;
     timeEl.title = t('jumpToAudio');
@@ -590,18 +594,66 @@ const voiceoverTimedWords = (typeof VOICEOVER_WORD_TIMES !== 'undefined' && VOIC
   : [];
 function togglePlay() { clearActivePronounceIndicator(); audioEl.paused ? audioEl.play() : audioEl.pause(); }
 function fmtTime(s) { if (!isFinite(s)) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60).toString().padStart(2,'0'); return m+':'+sec; }
-function updateTimeLabel() { document.getElementById('time-label').textContent = fmtTime(audioEl.currentTime) + ' / ' + fmtTime(audioEl.duration); }
+// Shared by every "scan a sorted {idx,t} array for the last entry at/before `time`" live-word
+// lookup (Reader, Vocab preview, Watch) -- same karaoke-highlight logic, different word arrays.
+function findActiveTimedIndex(sortedTimedWords, time) {
+  let idx = -1;
+  for (let i = 0; i < sortedTimedWords.length; i++) {
+    if (sortedTimedWords[i].t <= time) idx = sortedTimedWords[i].idx; else break;
+  }
+  return idx;
+}
+const MUTE_ICON_MUTED_SVG = '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M9.5 4.5L13 8M13 4.5L9.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>';
+const MUTE_ICON_UNMUTED_SVG = '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>';
+// Mute/speed/time-label chrome shared by the Reader's audio bar and the Watch tab's video
+// toolbar -- same controls, different <audio>/<video> element underneath.
+function createMediaChrome({ mediaEl, muteBtnId, muteIconId, speedBtnSelector, timeLabelId }) {
+  const speeds = [0.75, 1, 1.25], speedLabels = ['0.75×', '1×', '1.25×'];
+  let speedIdx = speeds.indexOf(1);
+  const muteBtn = document.getElementById(muteBtnId);
+  const muteIcon = document.getElementById(muteIconId);
+  const timeLabelEl = document.getElementById(timeLabelId);
+  function cycleSpeed() {
+    speedIdx = (speedIdx + 1) % speeds.length;
+    mediaEl.playbackRate = speeds[speedIdx];
+    document.querySelector(speedBtnSelector).textContent = speedLabels[speedIdx];
+  }
+  function toggleMute() { mediaEl.muted = !mediaEl.muted; }
+  function updateMuteIcon() {
+    muteBtn.classList.toggle('muted', mediaEl.muted);
+    muteBtn.title = mediaEl.muted ? t('unmuteAudio') : t('muteAudio');
+    muteIcon.innerHTML = mediaEl.muted ? MUTE_ICON_MUTED_SVG : MUTE_ICON_UNMUTED_SVG;
+  }
+  function updateTimeLabel() {
+    timeLabelEl.textContent = fmtTime(mediaEl.currentTime) + ' / ' + fmtTime(mediaEl.duration);
+  }
+  return { cycleSpeed, toggleMute, updateMuteIcon, updateTimeLabel };
+}
+const audioChrome = createMediaChrome({
+  mediaEl: audioEl, muteBtnId: 'mute-btn', muteIconId: 'mute-icon',
+  speedBtnSelector: '.speed-btn', timeLabelId: 'time-label',
+});
+function updateTimeLabel() { audioChrome.updateTimeLabel(); }
+function cycleSpeed() { audioChrome.cycleSpeed(); }
+function toggleMute() { audioChrome.toggleMute(); }
+function updateMuteIcon() { audioChrome.updateMuteIcon(); }
+
+const scrubberFillEl = document.getElementById('scrubber-fill');
 function updateProgress() {
   const total = audioEl.duration || 1;
-  document.getElementById('scrubber-fill').style.width = (audioEl.currentTime/total*100) + '%';
+  scrubberFillEl.style.width = (audioEl.currentTime/total*100) + '%';
   updateTimeLabel();
   let active = -1;
   VOICEOVER_CHUNKS.forEach((c,i) => { if (audioEl.currentTime >= c.start && audioEl.currentTime < c.end) active = i; });
-  document.querySelectorAll('.chunk').forEach((el,i) => el.classList.toggle('active', i===active));
-  // Only auto-scroll when the active chunk actually changes, not on every timeupdate tick —
-  // otherwise it fights any manual scrolling the user does while audio keeps playing.
-  if (active !== -1 && active !== lastScrolledChunkCi) {
-    document.querySelector('.chunk[data-ci="'+active+'"]')?.scrollIntoView({behavior:'smooth',block:'center'});
+  // Only touch the DOM (highlight + auto-scroll) when the active chunk actually changes, not on
+  // every timeupdate tick — otherwise it also fights any manual scrolling the user does while
+  // audio keeps playing.
+  if (active !== lastScrolledChunkCi) {
+    if (lastScrolledChunkCi >= 0) chunkEls[lastScrolledChunkCi]?.classList.remove('active');
+    if (active >= 0) {
+      chunkEls[active].classList.add('active');
+      chunkEls[active].scrollIntoView({behavior:'smooth',block:'center'});
+    }
     lastScrolledChunkCi = active;
   }
   // Per-word live highlighting (karaoke mode) -- reliable here since the AI voiceover is
@@ -625,28 +677,13 @@ function updateActiveSentence() {
   if (activeSentenceEl) activeSentenceEl.classList.add('active');
 }
 function updateLiveWord() {
-  const time = audioEl.currentTime;
-  let idx = -1;
-  for (let i = 0; i < voiceoverTimedWords.length; i++) {
-    if (voiceoverTimedWords[i].t <= time) idx = voiceoverTimedWords[i].idx; else break;
-  }
+  const idx = findActiveTimedIndex(voiceoverTimedWords, audioEl.currentTime);
   if (idx === liveWordIdx) return;
   if (liveWordIdx >= 0 && wordEls[liveWordIdx]) wordEls[liveWordIdx].el.classList.remove('live');
   liveWordIdx = idx;
   if (liveWordIdx >= 0) wordEls[liveWordIdx].el.classList.add('live');
 }
 function scrub(e) { clearActivePronounceIndicator(); const r=e.currentTarget.getBoundingClientRect(); const pct=(e.clientX-r.left)/r.width; audioEl.currentTime = pct * (audioEl.duration||0); updateProgress(); }
-function cycleSpeed() { const s=[0.75,1,1.25],l=['0.75×','1×','1.25×'],i=s.indexOf(speed); speed=s[(i+1)%s.length]; audioEl.playbackRate=speed; document.querySelector('.speed-btn').textContent=l[(i+1)%l.length]; }
-function toggleMute() { audioEl.muted = !audioEl.muted; }
-function updateMuteIcon() {
-  const btn = document.getElementById('mute-btn');
-  const icon = document.getElementById('mute-icon');
-  btn.classList.toggle('muted', audioEl.muted);
-  btn.title = audioEl.muted ? t('unmuteAudio') : t('muteAudio');
-  icon.innerHTML = audioEl.muted
-    ? '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M9.5 4.5L13 8M13 4.5L9.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'
-    : '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>';
-}
 audioEl.addEventListener('volumechange', updateMuteIcon);
 
 audioEl.addEventListener('loadedmetadata', updateTimeLabel);
@@ -694,11 +731,7 @@ function clearVocabPreviewLiveWord() {
 }
 function updateVocabPreviewLiveWord() {
   if (!activeVocabPreviewEl) return;
-  const time = audioEl.currentTime;
-  let gi = -1;
-  for (let i = 0; i < voiceoverTimedWords.length; i++) {
-    if (voiceoverTimedWords[i].t <= time) gi = voiceoverTimedWords[i].idx; else break;
-  }
+  const gi = findActiveTimedIndex(voiceoverTimedWords, audioEl.currentTime);
   if (gi === vocabPreviewLiveGi) return;
   vocabPreviewLiveGi = gi;
   if (vocabPreviewLiveEl) vocabPreviewLiveEl.classList.remove('live');
@@ -1143,10 +1176,6 @@ function renderAboutView() {
 // highlight, same pairing as the AI voiceover -- reliable here (86.7%, see
 // watch-captions-data.js) because both the segment text and the word timestamps come from
 // transcribing the same raw speech, unlike the Reader's cleaned-text alignment attempt.
-// Karaoke (per-word) highlighting on the Arabic line is layered on top of the cue-level
-// highlight, same pairing as the AI voiceover -- reliable here (86.7%, see
-// watch-captions-data.js) because both the segment text and the word timestamps come from
-// transcribing the same raw speech, unlike the Reader's cleaned-text alignment attempt.
 // The translation panel does NOT get word-level karaoke -- it's a full-sentence AI translation
 // with no real per-word correspondence to the Arabic, and an interpolated/estimated per-word
 // timing there read as distracting rather than helpful. Instead, clicking a word (or dragging
@@ -1165,7 +1194,7 @@ let liveWatchWordIdx = -1;
 function buildWatchTranscript() {
   const arPanel = document.getElementById('watch-transcript-ar');
   const trPanel = document.getElementById('watch-transcript-tr');
-  const video = document.getElementById('watch-video');
+  const video = watchVideoEl;
   arPanel.innerHTML = '';
   trPanel.innerHTML = '';
   watchWordEls = [];
@@ -1347,7 +1376,7 @@ function linkWatchSelectionToTranslation(loGlobal, hiGlobal) {
   watchTrCueEls[ci].scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 function commitWatchDrag(lo, hi) {
-  const video = document.getElementById('watch-video');
+  const video = watchVideoEl;
   const ci = watchCueOfWordIdx[lo];
   const cue = WATCH_CAPTIONS[ci];
   linkWatchSelectionToTranslation(lo, hi);
@@ -1422,39 +1451,34 @@ function initWatchDragSelect() {
 
 
 /* ─────────────── WATCH TAB: bottom toolbar (mirrors Reader's audio-bar) ─────────────── */
-let watchSpeed = 1;
-function toggleWatchPlay() { const v = document.getElementById('watch-video'); v.paused ? v.play() : v.pause(); }
+const watchChrome = createMediaChrome({
+  mediaEl: watchVideoEl, muteBtnId: 'watch-mute-btn', muteIconId: 'watch-mute-icon',
+  speedBtnSelector: '#watch-speed-btn', timeLabelId: 'watch-time-label',
+});
+function cycleWatchSpeed() { watchChrome.cycleSpeed(); }
+function toggleWatchMute() { watchChrome.toggleMute(); }
+function updateWatchMuteIcon() { watchChrome.updateMuteIcon(); }
+function updateWatchTimeLabel() { watchChrome.updateTimeLabel(); }
+function toggleWatchPlay() { const v = watchVideoEl; v.paused ? v.play() : v.pause(); }
 function skipWatch(delta) {
-  const v = document.getElementById('watch-video');
+  const v = watchVideoEl;
   v.currentTime = Math.min(Math.max(0, v.currentTime + delta), v.duration || Infinity);
   updateWatchProgress();
 }
-function cycleWatchSpeed() { const v = document.getElementById('watch-video'); const s = [0.75, 1, 1.25], l = ['0.75×', '1×', '1.25×'], i = s.indexOf(watchSpeed); watchSpeed = s[(i + 1) % s.length]; v.playbackRate = watchSpeed; document.getElementById('watch-speed-btn').textContent = l[(i + 1) % l.length]; }
-function toggleWatchMute() { document.getElementById('watch-video').muted = !document.getElementById('watch-video').muted; }
-function updateWatchMuteIcon() {
-  const v = document.getElementById('watch-video');
-  const btn = document.getElementById('watch-mute-btn');
-  const icon = document.getElementById('watch-mute-icon');
-  btn.classList.toggle('muted', v.muted);
-  btn.title = v.muted ? t('unmuteAudio') : t('muteAudio');
-  icon.innerHTML = v.muted
-    ? '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M9.5 4.5L13 8M13 4.5L9.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'
-    : '<path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>';
-}
-function updateWatchTimeLabel() { const v = document.getElementById('watch-video'); document.getElementById('watch-time-label').textContent = fmtTime(v.currentTime) + ' / ' + fmtTime(v.duration); }
+const watchScrubberFillEl = document.getElementById('watch-scrubber-fill');
+const watchVideoScrubberFillEl = document.getElementById('watch-video-scrubber-fill');
 function updateWatchProgress() {
-  const v = document.getElementById('watch-video');
-  const total = v.duration || 1;
-  const pct = (v.currentTime / total * 100) + '%';
-  document.getElementById('watch-scrubber-fill').style.width = pct;
-  document.getElementById('watch-video-scrubber-fill').style.width = pct;
+  const total = watchVideoEl.duration || 1;
+  const pct = (watchVideoEl.currentTime / total * 100) + '%';
+  watchScrubberFillEl.style.width = pct;
+  watchVideoScrubberFillEl.style.width = pct;
   updateWatchTimeLabel();
 }
 // Draggable scrub bar, shared by the overlay on the video itself and the toolbar's scrubber
 // below -- mirrors the Reader's word drag-select gesture handling: pointerdown seeks
 // immediately and arms dragging, pointermove re-seeks continuously, pointerup disarms.
 function makeScrubberDraggable(hit) {
-  const v = document.getElementById('watch-video');
+  const v = watchVideoEl;
   let dragging = false;
   function seekFromClientX(clientX) {
     const r = hit.getBoundingClientRect();
@@ -1475,7 +1499,7 @@ function initVideoScrubberDrag() {
   makeScrubberDraggable(document.getElementById('watch-scrubber'));
 }
 function initWatchToolbar() {
-  const v = document.getElementById('watch-video');
+  const v = watchVideoEl;
   v.addEventListener('volumechange', updateWatchMuteIcon);
   v.addEventListener('loadedmetadata', updateWatchTimeLabel);
   v.addEventListener('timeupdate', updateWatchProgress);
@@ -1524,11 +1548,7 @@ function updateWatchTheaterIcon() {
   btn.title = watchTheaterOn ? t('exitTheater') : t('enterTheater');
 }
 function updateWatchLiveWord() {
-  const time = document.getElementById('watch-video').currentTime;
-  let idx = -1;
-  for (let i = 0; i < watchTimedWords.length; i++) {
-    if (watchTimedWords[i].t <= time) idx = watchTimedWords[i].idx; else break;
-  }
+  const idx = findActiveTimedIndex(watchTimedWords, watchVideoEl.currentTime);
   if (idx === liveWatchWordIdx) return;
   if (liveWatchWordIdx >= 0) {
     watchWordEls[liveWatchWordIdx]?.classList.remove('live');
@@ -1541,7 +1561,7 @@ function updateWatchLiveWord() {
   }
 }
 function updateWatchActiveCue() {
-  const time = document.getElementById('watch-video').currentTime;
+  const time = watchVideoEl.currentTime;
   let idx = -1;
   for (let i = 0; i < WATCH_CAPTIONS.length; i++) {
     if (WATCH_CAPTIONS[i].start <= time) idx = i; else break;
