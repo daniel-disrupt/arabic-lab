@@ -135,8 +135,7 @@ const STRINGS = {
     jumpToAudio: 'Jump to this part of the audio',
     enterTheater: 'Expand', exitTheater: 'Exit expanded view',
     hideTranslation: 'Hide translation', showTranslation: 'Show translation',
-    playPronunciation: 'Hear pronunciation', playPassage: 'Play this passage',
-    pronunciationUnavailable: 'No audio available for this form',
+    playPassage: 'Play this passage',
   },
   he: {
     vocabTitle: 'אוצר מילים שמור',
@@ -161,8 +160,7 @@ const STRINGS = {
     jumpToAudio: 'קפצו לחלק הזה בהקלטה',
     enterTheater: 'הרחבה', exitTheater: 'יציאה מתצוגה מורחבת',
     hideTranslation: 'הסתר תרגום', showTranslation: 'הצג תרגום',
-    playPronunciation: 'השמע הגייה', playPassage: 'נגן את הקטע הזה',
-    pronunciationUnavailable: 'אין הקלטה זמינה לצורה הזאת',
+    playPassage: 'נגן את הקטע הזה',
   },
 };
 function t(key) { return STRINGS[appLang][key]; }
@@ -314,12 +312,14 @@ function buildReader() {
     timeEl.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!audioModeOn) return;
+      clearActivePronounceIndicator();
       audioEl.currentTime = VOICEOVER_CHUNKS[ci].start; audioEl.play();
     });
     div.appendChild(timeEl);
     div.addEventListener('click', () => {
       if (lastActionWasDrag) { lastActionWasDrag = false; return; }
       if (!audioModeOn) return;
+      clearActivePronounceIndicator();
       const activeChunk = VOICEOVER_CHUNKS[ci];
       const inThisChunk = audioEl.currentTime >= activeChunk.start && audioEl.currentTime < activeChunk.end;
       if (inThisChunk) {
@@ -492,7 +492,7 @@ function commitWord(idx) {
   document.getElementById('tray-he').textContent = appLang === 'en' ? (data.en||'') : data.he;
   document.getElementById('tray-en').textContent = data.en||'';
   document.getElementById('tray-meta').innerHTML = rootMetaHtml(data.root, !!data.sharedRoot);
-  currentSelectionCtx = { type:'word', ar:data.w, he:data.he, en:data.en||'', root:data.root||null, sharedRoot:!!data.sharedRoot, isVerb:data.pos==='verb', ci:ciForIdx(idx), wordIdx:idx, wordEndIdx:idx };
+  currentSelectionCtx = { type:'word', ar:data.w, he:data.he, en:data.en||'', root:data.root||null, sharedRoot:!!data.sharedRoot, isVerb:data.pos==='verb', ci:ciForIdx(idx) };
   refreshSaveButton();
   resetEnChip(); openTray();
 }
@@ -511,7 +511,7 @@ function commitPhrase(lo, hi) {
   document.getElementById('tray-he').textContent = appLang === 'en' ? (enText || '—') : heText;
   document.getElementById('tray-en').textContent = enText;
   document.getElementById('tray-meta').innerHTML = phraseTypeBadgeHtml(gloss ? gloss.type : null);
-  currentSelectionCtx = { type:'phrase', ar:phrase, he:heText, en:enText, phraseType:gloss?gloss.type:null, ci:ciForIdx(lo), wordIdx:lo, wordEndIdx:hi };
+  currentSelectionCtx = { type:'phrase', ar:phrase, he:heText, en:enText, phraseType:gloss?gloss.type:null, ci:ciForIdx(lo) };
   refreshSaveButton();
   resetEnChip(); openTray();
 }
@@ -573,7 +573,7 @@ function toggleEn(e) { e.stopPropagation(); enVisible=!enVisible; document.getEl
 const voiceoverTimedWords = (typeof VOICEOVER_WORD_TIMES !== 'undefined' && VOICEOVER_WORD_TIMES)
   ? VOICEOVER_WORD_TIMES.slice().sort((a, b) => a.t - b.t)
   : [];
-function togglePlay() { audioEl.paused ? audioEl.play() : audioEl.pause(); }
+function togglePlay() { clearActivePronounceIndicator(); audioEl.paused ? audioEl.play() : audioEl.pause(); }
 function fmtTime(s) { if (!isFinite(s)) return '0:00'; const m=Math.floor(s/60), sec=Math.floor(s%60).toString().padStart(2,'0'); return m+':'+sec; }
 function updateTimeLabel() { document.getElementById('time-label').textContent = fmtTime(audioEl.currentTime) + ' / ' + fmtTime(audioEl.duration); }
 function updateProgress() {
@@ -620,7 +620,7 @@ function updateLiveWord() {
   liveWordIdx = idx;
   if (liveWordIdx >= 0) wordEls[liveWordIdx].el.classList.add('live');
 }
-function scrub(e) { const r=e.currentTarget.getBoundingClientRect(); const pct=(e.clientX-r.left)/r.width; audioEl.currentTime = pct * (audioEl.duration||0); updateProgress(); }
+function scrub(e) { clearActivePronounceIndicator(); const r=e.currentTarget.getBoundingClientRect(); const pct=(e.clientX-r.left)/r.width; audioEl.currentTime = pct * (audioEl.duration||0); updateProgress(); }
 function cycleSpeed() { const s=[0.75,1,1.25],l=['0.75×','1×','1.25×'],i=s.indexOf(speed); speed=s[(i+1)%s.length]; audioEl.playbackRate=speed; document.querySelector('.speed-btn').textContent=l[(i+1)%l.length]; }
 function toggleMute() { audioEl.muted = !audioEl.muted; }
 function updateMuteIcon() {
@@ -640,122 +640,95 @@ audioEl.addEventListener('play', () => { document.getElementById('play-icon').in
 audioEl.addEventListener('pause', () => { document.getElementById('play-icon').innerHTML = '<polygon points="3,1 13,7 3,13"/>'; });
 audioEl.addEventListener('ended', () => { audioEl.currentTime = 0; });
 
-/* ─────────────── PRONUNCIATION AUDIO (Vocab + Verbs) ───────────────
-   Reuses the AI voiceover (reading-edition.mp3) instead of synthesizing anything new: since that
-   audio was generated directly from the reading-edition tokens, any word/phrase appearing
-   verbatim in the text already has a reliable timestamp (VOICEOVER_WORD_TIMES). Saved Vocab
-   items always come from those exact tokens (Reader taps, or hand-curated entries matched the
-   same way — see renderChunkPreview), so a lookup within the item's own chunk is enough. Verbs
-   don't carry a chunk reference, so arDisplay (documented as "the exact form as heard") is
-   searched across the whole lesson instead, with tashkeel-normalized matching (same approach as
-   align-voiceover-words.py) to tolerate diacritic drift between verbs-data.js and lesson-data.js.
-   Conjugation-table forms, participles, masdar, and the verb's dictionary/lemma (verb.ar) are NOT
-   covered — most were never actually spoken in this recording (other persons/tenses), so there's
-   no honest audio to slice, and synthesizing on the fly isn't possible without a backend (static
-   site, no server to hide an API key behind). A separate offline batch-TTS pass, matching the
-   reading-edition.mp3 pipeline, would be the way to cover those later.
+/* ─────────────── PRONUNCIATION AUDIO (Vocab) ───────────────
+   Reuses the AI voiceover (reading-edition.mp3) instead of synthesizing anything new: the
+   expanded source-context panel gets a speaker icon that plays the whole chunk a saved
+   word/phrase came from, using that chunk's own start/end from VOICEOVER_CHUNKS. Per-word
+   playback (on the vocab row header, and on the Verbs card) was tried and then removed by
+   request in favor of just this passage-level button.
 */
-// Explicit unicode ranges (verified via ord() dump against scripts/align-voiceover-words.py's
-// TASHKEEL constant) -- Arabic combining marks are easy to silently mis-copy via bidi-aware
-// clipboard tools, so this was double-checked codepoint by codepoint, not just eyeballed.
-const AR_TASHKEEL_RE = /[ً-ٰٟۖ-ۭـ]/g;
-function normAr(s) {
-  return (s || '').replace(AR_TASHKEEL_RE, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').trim();
-}
-const voWordTimeByIdx = new Map((typeof VOICEOVER_WORD_TIMES !== 'undefined' ? VOICEOVER_WORD_TIMES : []).map(w => [w.idx, w.t]));
-// Exact match within a known chunk -- same technique renderChunkPreview() already uses successfully.
-function findWordRangeInChunk(ci, targetAr) {
-  const range = chunkRanges[ci];
-  if (!range) return null;
-  const targetWords = targetAr.split(' ').filter(Boolean);
-  for (let i = range.startIdx; i <= range.endIdx - targetWords.length + 1; i++) {
-    let ok = true;
-    for (let j = 0; j < targetWords.length; j++) { if (wordEls[i + j].data.w !== targetWords[j]) { ok = false; break; } }
-    if (ok) return { startGi: i, endGi: i + targetWords.length - 1 };
-  }
-  return null;
-}
-// Normalized match across the whole lesson -- for verbs, which don't carry a chunk reference.
-// Also tries stripping a leading "و" (the "and" conjunction, which Arabic orthography fuses
-// directly onto the next word with no space) from each candidate token before comparing -- a
-// citation form like "نِتْعامَل" won't equal the actually-spoken "ونِتْعامَل" otherwise, even
-// though the verb genuinely was said. Verified against all 70 curated verbs in verbs-data.js:
-// this raised the match rate from 65/70 to 69/70 (the one holdout is a real citation mismatch --
-// the form shown genuinely isn't the one spoken -- not a tokenization issue).
-function stripLeadingWaw(s) { return s.length > 2 && s[0] === 'و' ? s.slice(1) : s; }
-function findWordRangeGlobal(targetAr) {
-  const targetWords = targetAr.split(' ').filter(Boolean).map(normAr);
-  if (!targetWords.length) return null;
-  for (let i = 0; i <= wordEls.length - targetWords.length; i++) {
-    let ok = true;
-    for (let j = 0; j < targetWords.length; j++) {
-      const w = normAr(wordEls[i + j].data.w);
-      if (w !== targetWords[j] && stripLeadingWaw(w) !== targetWords[j]) { ok = false; break; }
-    }
-    if (ok) return { startGi: i, endGi: i + targetWords.length - 1 };
-  }
-  return null;
-}
-// Start = first timed word in range (falls back to the chunk start if none of the range's words
-// got an alignment hit). Stop = just after the next timed word past the range, capped to the
-// chunk's own end so a word near a chunk boundary never bleeds into unrelated following text.
-function lessonAudioTimesFor(startGi, endGi) {
-  const ci = ciForIdx(startGi);
-  const chunk = VOICEOVER_CHUNKS[ci];
-  let startT = null;
-  for (let gi = startGi; gi <= endGi; gi++) { if (voWordTimeByIdx.has(gi)) { startT = voWordTimeByIdx.get(gi); break; } }
-  if (startT === null) startT = chunk.start;
-  let endT = null;
-  voWordTimeByIdx.forEach((tm, idx) => { if (idx > endGi && (endT === null || tm < endT)) endT = tm; });
-  if (endT === null || endT > chunk.end) endT = chunk.end;
-  endT = Math.min(endT + 0.2, chunk.end);
-  if (endT <= startT) endT = Math.min(startT + 1.2, chunk.end);
-  return { startT, endT };
-}
 let audioSliceStopHandler = null;
 function stopAudioSliceWatch() {
   if (audioSliceStopHandler) { audioEl.removeEventListener('timeupdate', audioSliceStopHandler); audioSliceStopHandler = null; }
 }
-function playLessonAudioSlice(startT, endT) {
+const PRONOUNCE_ICON_SVG = '<svg width="13" height="12" viewBox="0 0 15 14" fill="none"><path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+// fill="currentColor" on the rects matters here -- without it an SVG shape defaults to black
+// fill regardless of the button's CSS color, so the icon would stay invisible-on-black once the
+// "playing" state turns the circle black and the button's color white.
+const PRONOUNCE_STOP_ICON_SVG = '<svg width="13" height="12" viewBox="0 0 14 14"><rect x="3" y="2" width="3" height="10" fill="currentColor"/><rect x="8" y="2" width="3" height="10" fill="currentColor"/></svg>';
+// The one button currently "armed" -- tracks the specific DOM button, not just "something is
+// playing", so clicking it again toggles off instead of restarting.
+let activePronounceBtn = null;
+function setPronounceBtnPlaying(btn, playing) {
+  if (!btn) return;
+  btn.classList.toggle('playing', playing);
+  btn.innerHTML = playing ? PRONOUNCE_STOP_ICON_SVG : PRONOUNCE_ICON_SVG;
+}
+// Karaoke-mode word highlighting during passage playback, mirroring the Reader's own
+// updateLiveWord() -- reuses the same voiceoverTimedWords data (word-level timestamps, reliable
+// here since the AI voiceover was synthesized directly from these tokens) and the same data-gi
+// scheme (global word index) that renderChunkPreview() now stamps onto each word span.
+let activeVocabPreviewEl = null;
+let vocabPreviewLiveGi = -1;
+let vocabPreviewLiveEl = null;
+function clearVocabPreviewLiveWord() {
+  if (vocabPreviewLiveEl) vocabPreviewLiveEl.classList.remove('live');
+  vocabPreviewLiveEl = null;
+  vocabPreviewLiveGi = -1;
+  activeVocabPreviewEl = null;
+}
+function updateVocabPreviewLiveWord() {
+  if (!activeVocabPreviewEl) return;
+  const time = audioEl.currentTime;
+  let gi = -1;
+  for (let i = 0; i < voiceoverTimedWords.length; i++) {
+    if (voiceoverTimedWords[i].t <= time) gi = voiceoverTimedWords[i].idx; else break;
+  }
+  if (gi === vocabPreviewLiveGi) return;
+  vocabPreviewLiveGi = gi;
+  if (vocabPreviewLiveEl) vocabPreviewLiveEl.classList.remove('live');
+  vocabPreviewLiveEl = gi >= 0 ? activeVocabPreviewEl.querySelector('[data-gi="' + gi + '"]') : null;
+  if (vocabPreviewLiveEl) vocabPreviewLiveEl.classList.add('live');
+}
+audioEl.addEventListener('timeupdate', updateVocabPreviewLiveWord);
+function stopPronunciation() {
   stopAudioSliceWatch();
+  audioEl.pause();
+  setPronounceBtnPlaying(activePronounceBtn, false);
+  activePronounceBtn = null;
+  clearVocabPreviewLiveWord();
+}
+// For other code paths that take over audioEl directly (Reader chunk clicks, the main play
+// button, scrubbing) -- clears the stale "playing" indicator without re-pausing audio that's
+// already moved on to something else.
+function clearActivePronounceIndicator() {
+  stopAudioSliceWatch();
+  setPronounceBtnPlaying(activePronounceBtn, false);
+  activePronounceBtn = null;
+  clearVocabPreviewLiveWord();
+}
+function playLessonAudioSlice(startT, endT, btnEl) {
+  if (btnEl && btnEl === activePronounceBtn) { stopPronunciation(); return; }
+  stopAudioSliceWatch();
+  setPronounceBtnPlaying(activePronounceBtn, false);
   audioEl.currentTime = startT;
   audioEl.play();
-  audioSliceStopHandler = () => { if (audioEl.currentTime >= endT) { audioEl.pause(); stopAudioSliceWatch(); } };
+  activePronounceBtn = btnEl || null;
+  setPronounceBtnPlaying(activePronounceBtn, true);
+  audioSliceStopHandler = () => { if (audioEl.currentTime >= endT) stopPronunciation(); };
   audioEl.addEventListener('timeupdate', audioSliceStopHandler);
 }
-function playVocabPronunciation(e, i) {
-  e.stopPropagation();
-  const v = SAVED_VOCAB[i];
-  // Words/phrases saved via the Reader (this session or a past one) know exactly which
-  // occurrence was tapped -- use that directly. Only reconstruct by text search (which can land
-  // on the WRONG occurrence if the word repeats within its chunk) for hand-curated SEED_VOCAB
-  // entries that never went through the Reader's tap-to-save flow.
-  const range = v.wordIdx !== undefined
-    ? { startGi: v.wordIdx, endGi: v.wordEndIdx !== undefined ? v.wordEndIdx : v.wordIdx }
-    : findWordRangeInChunk(v.ci, v.ar);
-  if (!range) { showToast(t('pronunciationUnavailable')); return; }
-  const { startT, endT } = lessonAudioTimesFor(range.startGi, range.endGi);
-  playLessonAudioSlice(startT, endT);
-}
+// Every pronounce button's click handler calls stopPropagation(), so this only ever sees clicks
+// that landed somewhere else on the page -- i.e. "anywhere out of the frame" cancels playback.
+document.addEventListener('click', () => { if (activePronounceBtn) stopPronunciation(); });
+// Embedded speaker icon inside the expanded source-context panel -- plays the whole chunk shown
+// in that gray box (the full passage the word came from), not just the isolated word/phrase.
 function playVocabPassage(e, i) {
   e.stopPropagation();
   const chunk = VOICEOVER_CHUNKS[SAVED_VOCAB[i].ci];
-  playLessonAudioSlice(chunk.start, chunk.end);
+  activeVocabPreviewEl = e.currentTarget.closest('.vocab-expand-inner')?.querySelector('.vocab-expand-text') || null;
+  playLessonAudioSlice(chunk.start, chunk.end, e.currentTarget);
 }
-function playVerbPronunciation(e, verbId) {
-  e.stopPropagation();
-  const v = SAVED_VERBS.find(x => x.id === verbId);
-  if (!v || !v.arDisplay) return;
-  // Verbs auto-saved from the Reader know their exact occurrence (see addVerbToVerbsTab). The
-  // curated verbs-data.js set doesn't carry a lesson position at all, so fall back to searching
-  // the whole lesson for arDisplay -- fine here since, unlike ordinary vocab words, a verb's
-  // exact inflected surface form rarely repeats more than once in a single ~7-minute speech.
-  const range = v.wordIdx !== undefined ? { startGi: v.wordIdx, endGi: v.wordIdx } : findWordRangeGlobal(v.arDisplay);
-  if (!range) { showToast(t('pronunciationUnavailable')); return; }
-  const { startT, endT } = lessonAudioTimesFor(range.startGi, range.endGi);
-  playLessonAudioSlice(startT, endT);
-}
-const PRONOUNCE_ICON_SVG = '<svg width="13" height="12" viewBox="0 0 15 14" fill="none"><path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/><path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
 
 /* ─────────────── SAVE (Vocab + auto Verbs) ─────────────── */
 function handleSave(e) {
@@ -788,7 +761,6 @@ function addVerbToVerbsTab(ctx) {
     participle: null,
     masdar: null,
     conj: null,
-    wordIdx: ctx.wordIdx,
   });
   activeVerbId = SAVED_VERBS[0].id;
   activeConjTab = 'present';
@@ -941,10 +913,7 @@ function renderVerbsView() {
     <div class="verb-card-head">
       <div class="verb-card-ar">
         <div class="verb-ar-main">${verb.ar}</div>
-        <div class="verb-ar-sub-row">
-          <div class="verb-ar-sub">${arSubHtml}</div>
-          <button class="mute-btn verb-pronounce-btn" title="${t('playPronunciation')}" onclick="playVerbPronunciation(event, '${verb.id}')">${PRONOUNCE_ICON_SVG}</button>
-        </div>
+        <div class="verb-ar-sub">${arSubHtml}</div>
         ${glossHtml}
       </div>
       <div class="verb-card-meta">
@@ -1024,7 +993,6 @@ function renderVocabView() {
         <div class="vocab-card-head">
           <div class="vocab-row-ar${v.type==='phrase'?' phrase':''}">${v.ar}</div>
           <div class="vocab-card-actions">
-            <button class="vocab-row-pronounce" title="${t('playPronunciation')}" onclick="playVocabPronunciation(event, ${i})">${PRONOUNCE_ICON_SVG}</button>
             <button class="vocab-row-toggle${isOpen?' open':''}" title="${t('showSourceLine')}" onclick="toggleVocabExpand(${i})"><span class="chev">&#9662;</span></button>
             <button class="vocab-row-delete" title="${t('removeFromVocab')}" onclick="removeVocabItem(event, ${i})">&times;</button>
           </div>
@@ -1081,13 +1049,17 @@ function renderChunkPreview(ci, targetAr) {
     for (let j = 0; j < targetWords.length; j++) { if (wordTokens[i+j].w !== targetWords[j]) { ok = false; break; } }
     if (ok) { matchStart = i; break; }
   }
+  // Global word index (matches VOICEOVER_WORD_TIMES' idx / wordEls[].globalIdx in the Reader) --
+  // lets karaoke-mode live-word highlighting during passage playback find the right span here.
+  const chunkStartGi = chunkRanges[ci].startIdx;
   let wi = -1;
   return allTokens.map(t => {
     if (t.sep !== undefined) return t.sep;
     wi++;
     const isMatch = matchStart >= 0 && wi >= matchStart && wi < matchStart + targetWords.length;
     const text = t.w + (t.punct || '');
-    return isMatch ? '<mark class="chunk-preview-hl">'+text+'</mark>' : text;
+    const span = '<span class="chunk-preview-word" data-gi="' + (chunkStartGi + wi) + '">' + text + '</span>';
+    return isMatch ? '<mark class="chunk-preview-hl">'+span+'</mark>' : span;
   }).join(' ');
 }
 function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
