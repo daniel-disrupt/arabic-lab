@@ -1,0 +1,694 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
+  --rule: #E4E3E0; --active-bg: #F0EFE9;
+  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1;
+}
+html, body {
+  height: 100%; height: 100dvh; background: #fff; color: var(--black);
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden; display: flex; flex-direction: column;
+  user-select: none; -webkit-user-select: none;
+  direction: rtl;
+}
+button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action: manipulation; }
+
+/* ── HEADER ── */
+.header {
+  flex-shrink: 0; height: 52px; background: #fff;
+  border-bottom: 1px solid var(--rule);
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding: 0 20px; z-index: 10;
+}
+.header-side { display: flex; align-items: center; }
+.tabs { display: flex; justify-self: center; }
+.tab {
+  font-size: 13px; font-weight: 500; color: var(--mid);
+  padding: 0 14px; height: 52px; display: flex; align-items: center;
+  cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s;
+}
+.tab.active { color: var(--black); border-bottom-color: var(--black); }
+
+/* ── HAMBURGER MENU (mobile only — see mobile media query for display:flex/block) ── */
+.hamburger-btn {
+  display: none; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border: none; background: transparent; color: var(--black);
+  cursor: pointer; flex-shrink: 0; border-radius: 6px; transition: background .12s;
+}
+.hamburger-btn svg rect { fill: currentColor; }
+.hamburger-btn:hover { background: var(--active-bg); }
+.mobile-header-title { display: none; font-size: 14px; font-weight: 600; }
+.menu-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.32);
+  opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 40;
+}
+.menu-backdrop.open { opacity: 1; pointer-events: auto; }
+.side-menu {
+  position: fixed; top: 0; bottom: 0; right: 0; width: min(78vw, 300px);
+  background: #fff; box-shadow: -6px 0 24px rgba(0,0,0,.16);
+  transform: translateX(100%); transition: transform .26s cubic-bezier(.25,.8,.25,1);
+  z-index: 41; display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+}
+.side-menu.open { transform: translateX(0); }
+.side-menu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0;
+}
+.side-menu-title { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+.side-menu-close {
+  width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
+  color: var(--mid); font-size: 20px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all .12s;
+}
+.side-menu-close:hover { background: var(--active-bg); color: var(--black); }
+.side-menu-items { display: flex; flex-direction: column; padding: 8px 0; overflow-y: auto; }
+.side-menu-item {
+  padding: 14px 20px; font-size: 15px; font-weight: 500; color: var(--black);
+  cursor: pointer; border-right: 3px solid transparent; text-align: right;
+  transition: background .12s, border-color .12s;
+}
+.side-menu-item.active { border-right-color: var(--black); background: var(--active-bg); font-weight: 700; }
+.side-menu-item:hover:not(.active) { background: var(--active-bg); }
+
+/* ── GLOBAL LANGUAGE SWITCH ── */
+.lang-switch { display: flex; align-items: center; gap: 6px; direction: ltr; }
+.lang-switch-btn {
+  font-size: 12px; font-weight: 600; padding: 5px 11px;
+  border: 1px solid var(--rule); border-radius: 3px; background: transparent; color: var(--mid);
+  cursor: pointer; transition: all .12s;
+}
+.lang-switch-btn:hover { border-color: var(--black); color: var(--black); }
+.lang-switch-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
+
+/* ── VIEWS ── */
+.view { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+.view.active { display: flex; }
+
+/* ── READER ── */
+.scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.reader { max-width: 660px; margin: 0 auto; padding: 40px 0 48px; }
+.lesson-head { padding: 0 28px 32px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; text-align: right; user-select: text; -webkit-user-select: text; }
+.lesson-title { font-size: 22px; font-weight: 600; line-height: 1.35; direction: rtl; text-align: start; margin-bottom: 10px; cursor: pointer; transition: opacity .12s; }
+.lesson-title:hover { opacity: .65; }
+body.lang-en .lesson-title { direction: ltr; }
+.lesson-intro { font-size: 14px; line-height: 1.7; color: var(--black); margin-top: 12px; direction: rtl; text-align: start; }
+body.lang-en .lesson-intro { direction: ltr; }
+.lesson-title-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 26px; line-height: 1.5; direction: rtl; text-align: right;
+  padding: 0 28px 4px; cursor: pointer; transition: opacity .12s;
+  user-select: text; -webkit-user-select: text;
+}
+.lesson-title-ar:hover { opacity: .65; }
+.lesson-location-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 15px; color: var(--mid); direction: rtl; text-align: right;
+  padding: 0 28px 24px; cursor: pointer; transition: opacity .12s;
+  user-select: text; -webkit-user-select: text;
+}
+.lesson-location-ar:hover { opacity: .65; }
+.chunk { padding: 18px 28px; border-right: 3px solid transparent; transition: background .2s, border-color .2s; cursor: pointer; }
+.chunk.active { background: var(--active-bg); border-right-color: var(--black); }
+.chunk.flash { background: var(--active-bg); border-right-color: var(--black); }
+.chunk-time { font-size: 10px; color: var(--mid); letter-spacing: .06em; margin-bottom: 6px; font-variant-numeric: tabular-nums; direction: ltr; cursor: pointer; width: fit-content; transition: color .12s; }
+.chunk-time:hover { color: var(--black); text-decoration: underline; }
+.chunk p { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New','Arial Unicode MS',serif; font-size: calc(20px * var(--reader-scale)); line-height: 2.2; direction: rtl; text-align: right; transition: font-size .15s; }
+/* .sentence.active highlight disabled — a second highlight layer inside the already-highlighted
+   active chunk read as noise, not signal. Kept selector structure inert in case a different
+   treatment (e.g. underline instead of background) is worth trying later. */
+.sentence { border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.word { cursor: pointer; display: inline; border-radius: 3px; padding: 2px 1px; transition: background .08s; }
+.word:hover { background: rgba(13,13,13,.06); }
+.word.selected { background: var(--black); color: #fff; }
+.word.in-range { background: rgba(13,13,13,.13); }
+.word.in-range.range-start, .word.in-range.range-end { background: rgba(13,13,13,.22); }
+.word.live { box-shadow: inset 0 -3px 0 0 var(--black); }
+.word.live.selected { box-shadow: none; }
+
+/* ── READER TEXT SIZE CONTROL ── */
+/* Lives in the always-visible audio-toggle-row (fixed chrome, never scrolls) rather than
+   floating over the reading text — so it can never end up covering the very content it resizes,
+   and growing the text never requires pinch-zooming out to reach it or any other toolbar. */
+.text-size-ctrl {
+  display: flex; align-items: center; gap: 2px;
+  border: 1px solid var(--rule); border-radius: 20px; padding: 2px;
+}
+.text-size-btn {
+  width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent;
+  color: var(--black); font-weight: 700; font-size: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: background .12s;
+}
+.text-size-btn:hover:not(:disabled) { background: var(--active-bg); }
+.text-size-btn:disabled { color: var(--light); cursor: default; }
+.text-size-label { font-size: 10px; color: var(--mid); min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* ── READER BOTTOM ── */
+.reader-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
+.tray { height: 0; overflow: hidden; border-top: 0px solid var(--rule); transition: height .22s cubic-bezier(.25,.8,.25,1), border-top-width .22s; display: flex; align-items: stretch; }
+.tray.open { height: var(--tray-h); border-top-width: 1px; }
+.tray-handle-row { display: none; }
+.tray-content { flex: 1; display: flex; align-items: center; padding: 0 28px; gap: 28px; min-width: 0; }
+.tray-arabic { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; font-size: 30px; line-height: 1.4; direction: rtl; min-width: 100px; max-width: 200px; text-align: right; flex-shrink: 0; }
+.tray-arabic.phrase { font-size: 18px; line-height: 1.65; min-width: 130px; }
+.tray-divider { width: 1px; background: var(--rule); align-self: stretch; margin: 20px 0; flex-shrink: 0; }
+.tray-gloss { flex: 1; display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.gloss-he { font-size: 20px; font-weight: 500; direction: rtl; text-align: start; }
+body.lang-en .gloss-he { direction: ltr; }
+.tray-meta-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.gloss-root { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; letter-spacing: .06em; color: var(--mid); padding: 2px 7px; border: 1px solid var(--rule); border-radius: 3px; }
+.root-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--black); }
+.badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+.badge-idiom { color: var(--black); border: 1px solid var(--black); }
+.badge-proverb { color: #fff; background: var(--black); border: 1px solid var(--black); }
+.gloss-en-wrap { display: flex; align-items: center; gap: 8px; }
+.gloss-en { font-size: 13px; color: var(--mid); transition: opacity .15s; direction: ltr; text-align: start; }
+.gloss-en.hidden { opacity: 0; pointer-events: none; }
+.en-chip { font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 3px 8px; border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; color: var(--mid); background: transparent; transition: all .12s; }
+.en-chip:hover { border-color: var(--black); color: var(--black); }
+.en-chip.showing { background: var(--black); color: #fff; border-color: var(--black); }
+.tray-actions { display: flex; flex-direction: column; gap: 8px; padding: 0 0 0 20px; align-items: flex-end; justify-content: center; flex-shrink: 0; }
+.save-btn { font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 8px 14px; border-radius: 3px; cursor: pointer; border: 1.5px solid var(--black); background: transparent; color: var(--black); transition: all .12s; white-space: nowrap; min-width: 104px; text-align: center; }
+.save-btn:hover { background: var(--black); color: #fff; }
+.save-btn:disabled, .save-btn.saved {
+  cursor: default; pointer-events: none;
+  border-color: var(--rule); color: var(--mid); background: var(--active-bg);
+}
+.audio-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px; border-top: 1px solid var(--rule); background: #fff; }
+.audio-bar { height: var(--bar-h); display: flex; align-items: center; padding: 0 20px; gap: 14px; background: #fff; }
+.play-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--black); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .12s; }
+.play-btn:hover { opacity: .75; }
+.play-btn svg { fill: #fff; }
+.time-label { font-size: 11px; color: var(--mid); font-variant-numeric: tabular-nums; letter-spacing: .04em; flex-shrink: 0; min-width: 76px; }
+.scrubber { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; cursor: pointer; position: relative; }
+.scrubber-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--black); border-radius: 2px; }
+.speed-btn { font-size: 11px; font-weight: 700; color: var(--mid); padding: 4px 8px; border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; background: transparent; transition: all .12s; flex-shrink: 0; }
+.speed-btn:hover { border-color: var(--black); color: var(--black); }
+.mute-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--mid); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; background: transparent; transition: all .12s; flex-shrink: 0; }
+.mute-btn:hover { border-color: var(--black); color: var(--black); }
+.mute-btn.muted { color: #fff; background: var(--black); border-color: var(--black); }
+.audio-toggle-btn { font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .12s; flex-shrink: 0; white-space: nowrap; }
+.audio-toggle-btn.on { color: #fff; background: var(--black); border: 1px solid var(--black); }
+.audio-toggle-btn:not(.on) { color: var(--mid); background: transparent; border: 1px solid var(--rule); }
+.audio-toggle-btn:not(.on):hover { border-color: var(--black); color: var(--black); }
+.audio-bar.audio-off { display: none; }
+
+/* ── VERBS VIEW ── */
+.verbs-scroll { flex: 1; overflow-y: auto; }
+.verbs-inner { max-width: 1360px; margin: 0 auto; padding: 32px 24px 48px; }
+
+.verbs-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+.verbs-title { font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.verbs-count { font-size: 12px; color: var(--mid); }
+
+/* two-column layout: list (right, RTL) + drill-down card (left) */
+.verbs-layout { display: flex; gap: 28px; align-items: flex-start; }
+
+/* verb list (right column) */
+.verb-pills { display: flex; flex-direction: column; gap: 0; width: 620px; flex-shrink: 0; max-height: calc(100vh - 180px); overflow-y: auto; position: sticky; top: 0; }
+.verb-group-header {
+  display: flex; align-items: baseline; gap: 8px; cursor: pointer; user-select: none;
+  padding: 6px 2px 8px; border-bottom: 1.5px solid var(--black);
+}
+.verb-group-title { font-size: 15px; font-weight: 800; letter-spacing: .04em; color: var(--black); }
+.verb-group-sub { font-weight: 700; letter-spacing: .02em; color: var(--black); font-size: 15px; }
+.verb-group-wazn {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-weight: 700; color: var(--black); font-size: 21px; direction: rtl; unicode-bidi: isolate;
+}
+.verb-group-count { font-size: 11px; font-weight: 600; color: var(--mid); margin-inline-start: auto; }
+.verb-group-chevron { font-size: 10px; color: var(--mid); transition: transform .15s; flex-shrink: 0; }
+.verb-group-header.collapsed .verb-group-chevron { transform: rotate(-90deg); }
+.verb-pill-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 8px; }
+.verb-pill-row.collapsed { display: none; }
+.verb-group-header:hover .verb-group-title { color: var(--black); text-decoration: underline; }
+.verb-pill {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+  width: 100%; box-sizing: border-box; text-align: right;
+  font-size: 15px; padding: 6px 8px;
+  border: 1.5px solid var(--rule); border-radius: 4px;
+  cursor: pointer; background: transparent; color: var(--black);
+  transition: all .12s;
+}
+.verb-pill.active { background: var(--black); color: #fff; border-color: var(--black); }
+.verb-pill:hover:not(.active) { border-color: var(--black); }
+.verb-pill-ar { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; font-size: 17px; direction: rtl; }
+.verb-pill-root { font-size: 10px; font-weight: 600; letter-spacing: .04em; color: var(--mid); flex-shrink: 0; }
+.verb-pill.active .verb-pill-root { color: rgba(255,255,255,.6); }
+
+/* drill-down card (left column) */
+.verb-pills + .verb-card { flex: 1; min-width: 0; }
+
+/* main verb card */
+.verb-card { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+
+.verb-card-head {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+}
+.verb-card-ar { text-align: right; }
+.verb-ar-main {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 38px; line-height: 1.3; direction: rtl; color: var(--black);
+}
+.verb-ar-sub {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 15px; direction: rtl; color: var(--mid); margin-top: 2px; text-align: right;
+}
+.verb-card-meta { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+.binyan-badge {
+  font-size: 13px; font-weight: 700; letter-spacing: .04em;
+  padding: 5px 12px; border: 1.5px solid var(--black); border-radius: 4px;
+  color: var(--black); white-space: nowrap;
+}
+.binyan-badge-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-weight: 700; font-size: 19px; direction: rtl; unicode-bidi: isolate;
+}
+.verb-root-tag {
+  font-size: 11px; font-weight: 600; letter-spacing: .1em; color: var(--mid);
+  text-transform: uppercase;
+}
+.verb-gloss-he { font-size: 19px; font-weight: 500; direction: rtl; text-align: start; }
+body.lang-en .verb-gloss-he { direction: ltr; }
+.verb-gloss-en-wrap { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+.verb-gloss-en { font-size: 13px; color: var(--mid); direction: ltr; text-align: start; }
+.verb-gloss-en.hidden { display: none; }
+
+/* derived forms */
+.verb-derived { padding: 20px 28px; border-bottom: 1px solid var(--rule); }
+.derived-label { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mid); margin-bottom: 12px; }
+.derived-row { display: flex; gap: 24px; flex-wrap: wrap; }
+.derived-item { display: flex; flex-direction: column; gap: 3px; }
+.derived-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 20px; direction: rtl; color: var(--black);
+}
+.derived-sub { font-size: 11px; color: var(--mid); direction: rtl; text-align: right; }
+
+/* conjugation */
+.verb-conj { padding: 20px 28px; }
+.conj-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 1px solid var(--rule); }
+.conj-tab {
+  font-size: 13px; font-weight: 500; color: var(--mid);
+  padding: 8px 16px; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .12s, border-color .12s;
+}
+.conj-tab.active { color: var(--black); border-bottom-color: var(--black); }
+
+.conj-table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.conj-table { width: 100%; border-collapse: collapse; direction: rtl; }
+.conj-table tr { border-bottom: 1px solid var(--rule); }
+.conj-table tr:last-child { border-bottom: none; }
+.conj-table td { padding: 10px 0; vertical-align: middle; }
+.conj-pronoun {
+  font-size: 12px; color: var(--mid); font-weight: 500;
+  text-align: right; padding-right: 0; padding-left: 24px;
+  white-space: nowrap; width: 80px;
+}
+.conj-he {
+  font-size: 13px; color: var(--mid); text-align: right;
+  padding-left: 20px; direction: rtl; white-space: nowrap;
+}
+.conj-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 20px; direction: rtl; text-align: right;
+  color: var(--black);
+}
+.conj-context { font-size: 11px; color: var(--light); font-style: italic; text-align: left; direction: ltr; padding-left: 8px; }
+
+/* ── VOCAB VIEW ── */
+.vocab-scroll { flex: 1; overflow-y: auto; }
+.vocab-inner { max-width: 900px; margin: 0 auto; padding: 32px 24px 48px; }
+.vocab-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+.vocab-title { font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
+.vocab-count { font-size: 12px; color: var(--mid); }
+.vocab-empty { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; line-height: 1.6; }
+.vocab-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.vocab-search {
+  flex: 1 1 200px; min-width: 160px; font-size: 13px; padding: 8px 12px;
+  border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--black);
+  font-family: inherit;
+}
+.vocab-search:focus { outline: none; border-color: var(--black); }
+.vocab-chip-group { display: flex; gap: 6px; flex-wrap: wrap; }
+.vocab-chip {
+  font-size: 12px; font-weight: 600; padding: 7px 12px; border-radius: 20px;
+  border: 1px solid var(--rule); background: transparent; color: var(--mid); cursor: pointer;
+  transition: all .12s; white-space: nowrap;
+}
+.vocab-chip:hover { border-color: var(--black); color: var(--black); }
+.vocab-chip.active { background: var(--black); border-color: var(--black); color: #fff; }
+.vocab-sort {
+  font-size: 12px; font-weight: 500; padding: 7px 10px; border-radius: 6px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer;
+  font-family: inherit;
+}
+.vocab-no-results { grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--mid); font-size: 14px; }
+.vocab-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 560px) { .vocab-list { grid-template-columns: 1fr; } }
+.vocab-item {
+  border: 1px solid var(--rule); border-radius: 10px; background: #fff;
+  padding: 16px 16px 6px; display: flex; flex-direction: column;
+}
+.vocab-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.vocab-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.vocab-row-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 21px; line-height: 1.4; direction: rtl; text-align: right;
+  flex: 1; min-width: 0;
+}
+.vocab-row-ar.phrase { font-size: 16px; line-height: 1.55; }
+.vocab-card-divider { height: 1px; background: var(--rule); margin: 12px 0; flex-shrink: 0; }
+.vocab-row-gloss { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding-bottom: 12px; }
+.vocab-row-he { font-size: 15px; font-weight: 500; direction: rtl; text-align: start; }
+body.lang-en .vocab-row-he { direction: ltr; }
+.vocab-row-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.vocab-row-en-wrap { display: flex; align-items: center; gap: 8px; }
+.vocab-row-en { font-size: 12px; color: var(--mid); transition: opacity .15s; direction: ltr; text-align: start; }
+.vocab-row-en.hidden { opacity: 0; pointer-events: none; position: absolute; }
+.vocab-row-toggle {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); font-size: 11px; transition: all .12s;
+}
+.vocab-row-toggle:hover { border-color: var(--black); color: var(--black); }
+.vocab-row-toggle .chev { display: inline-block; transition: transform .18s; }
+.vocab-row-toggle.open { background: var(--black); border-color: var(--black); color: #fff; }
+.vocab-row-toggle.open .chev { transform: rotate(180deg); }
+.vocab-row-delete {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); font-size: 16px; line-height: 1; transition: all .12s;
+}
+.vocab-row-delete:hover { border-color: #b33; color: #b33; }
+.vocab-row-pronounce {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); transition: all .12s;
+}
+.vocab-row-pronounce:hover { border-color: var(--black); color: var(--black); }
+.vocab-row-pronounce.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.vocab-expand { max-height: 0; overflow: hidden; opacity: 0; transition: max-height .25s cubic-bezier(.25,.8,.25,1), opacity .2s; }
+.vocab-expand.open { max-height: 260px; opacity: 1; }
+.vocab-expand-inner { padding: 0 0 16px; }
+.vocab-expand-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.vocab-expand-time { font-size: 10px; color: var(--mid); letter-spacing: .06em; direction: ltr; text-align: right; font-variant-numeric: tabular-nums; }
+.vocab-expand-text {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 16px; line-height: 1.9; direction: rtl; text-align: right;
+  background: var(--active-bg); border-radius: 6px; padding: 12px 14px;
+}
+.chunk-preview-hl { background: var(--black); color: #fff; border-radius: 3px; padding: 1px 5px; }
+/* currentColor (not a fixed color) so the underline reads correctly both on plain text (dark)
+   and nested inside .chunk-preview-hl's black background (white) without a separate override. */
+.chunk-preview-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
+
+/* WATCH VIEW */
+.watch-scroll { flex: 1; overflow-y: auto; }
+.watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
+.watch-head { padding-bottom: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; direction: rtl; text-align: start; user-select: text; -webkit-user-select: text; }
+body.lang-en .watch-head { direction: ltr; }
+.watch-title { font-size: 24px; font-weight: 600; line-height: 1.35; margin-bottom: 8px; }
+.watch-subtitle { font-size: 13px; color: var(--mid); margin-bottom: 16px; }
+.watch-p { font-size: 15px; line-height: 1.75; color: var(--black); margin: 0 0 12px; }
+.watch-p:last-child { margin-bottom: 0; }
+/* Three columns: video, Arabic transcript, translation transcript -- separate scrollable panels
+   rather than one paired block, so each can be read/scrolled on its own. Clicking a line in
+   either panel seeks the video and highlights + scrolls the matching line in both. */
+.watch-layout { display: flex; gap: 20px; align-items: flex-start; }
+.watch-video-wrap { position: relative; flex: 0 0 auto; width: 100%; max-width: 380px; }
+.watch-video { display: block; width: 100%; max-height: 58vh; border-radius: 8px; background: #000; }
+.watch-video-play-overlay {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 56px; height: 56px; border-radius: 50%; border: none; z-index: 7;
+  background: rgba(13,13,13,.72); color: #fff; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .12s, transform .12s;
+}
+.watch-video-play-overlay svg { fill: #fff; margin-left: 2px; }
+.watch-video-play-overlay:hover { background: rgba(13,13,13,.88); transform: translate(-50%, -50%) scale(1.06); }
+.watch-video-wrap.playing .watch-video-play-overlay { display: none; }
+/* Close/back-to-Home control, burned onto the video itself -- only shown once theater/expanded
+   mode is active, since that's the only state where the video covers the rest of the homepage
+   and the toolbar below can get crowded (see mobile toolbar rules). Physical top-right corner,
+   not RTL-mirrored, matching the other overlay controls (scrubber, timestamps) that stay LTR. */
+.watch-close-btn {
+  display: none; position: absolute; top: 12px; right: 12px; z-index: 8;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(13,13,13,.65); color: #fff; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .12s;
+}
+.watch-close-btn:hover { background: rgba(13,13,13,.88); }
+#view-watch.theater .watch-close-btn { display: flex; }
+/* Mirror image of the close button above: lets you re-enter expanded/theater mode from the
+   docked video once it's already playing (mobile-only -- desktop's toolbar theater button
+   already covers this, see @media block below). Without this, exiting theater on mobile while
+   the video keeps playing left no way back in short of pausing and pressing play again. */
+.watch-expand-btn {
+  display: none; position: absolute; top: 12px; right: 12px; z-index: 8;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: rgba(13,13,13,.55); color: #fff; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .12s;
+}
+.watch-expand-btn:hover { background: rgba(13,13,13,.8); }
+#view-watch.theater .watch-expand-btn { display: none; }
+/* Draggable scrub bar burned onto the bottom edge of the video itself (distinct from the
+   toolbar's scrubber below) -- .watch-video-scrubber-hit is the generous touch/click target;
+   .watch-video-scrubber-track is the visible bar, thickening slightly on hover/drag. A dark
+   scrim sits behind it so the (white) track/fill still reads over bright video frames. */
+.watch-video-scrubber-hit {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 26px; z-index: 6;
+  display: flex; align-items: flex-end; cursor: pointer; touch-action: none;
+  background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+}
+.watch-video-scrubber-track { position: relative; width: 100%; height: 5px; background: rgba(255,255,255,.45); transition: height .12s; }
+.watch-video-scrubber-hit:hover .watch-video-scrubber-track,
+.watch-video-scrubber-hit.dragging .watch-video-scrubber-track { height: 8px; }
+/* Anchored with position+left rather than plain flow width -- the app's RTL layout otherwise
+   flips which edge is "start", growing this fill from the opposite side from the toolbar's
+   .scrubber-fill below (which is absolute for the same reason) and from where the drag math
+   (always physical-left-is-0%) expects it. */
+.watch-video-scrubber-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: #fff; }
+.watch-transcript { flex: 1; min-width: 0; max-height: 58vh; overflow-y: auto; border: 1px solid var(--rule); border-radius: 8px; padding: 4px 0; user-select: none; -webkit-user-select: none; }
+.watch-cue { padding: 10px 16px; cursor: pointer; border-right: 3px solid transparent; color: var(--mid); transition: background .12s, color .12s; }
+.watch-cue:hover { background: var(--active-bg); }
+.watch-cue.active { background: var(--active-bg); border-right-color: var(--black); color: var(--black); font-weight: 500; }
+.watch-cue-ar { font-size: calc(14px * var(--watch-scale)); line-height: 1.85; transition: font-size .15s; }
+.watch-cue-tr { font-size: calc(14px * var(--watch-scale)); line-height: 1.75; transition: font-size .15s; }
+body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align: left; }
+.watch-word { display: inline; border-radius: 3px; padding: 2px 1px; }
+.watch-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
+.watch-word.selected { background: var(--black); color: #fff; }
+.watch-word.selected.live { box-shadow: none; }
+.watch-word.in-range { background: rgba(13,13,13,.13); }
+.watch-word.in-range.range-start, .watch-word.in-range.range-end { background: rgba(13,13,13,.22); }
+/* Highlights the specific translation words estimated to correspond to a selected Arabic
+   word/phrase (proportional-position mapping, not a real alignment -- see
+   linkWatchSelectionToTranslation in app.js). */
+.watch-word.tr-phrase-highlight { background: var(--black); color: #fff; }
+.watch-transcript.watch-tr-hidden { display: none; }
+
+/* Mobile-only overlay captions -- burned-in-looking (but real HTML/DOM) subtitle ribbon shown
+   directly on the video during mobile theater mode, instead of the separate scrolling columns
+   used on desktop. Hidden entirely outside that mode (see media query below). */
+.watch-mobile-captions { display: none; }
+.watch-mobile-cap-ar { color: #fff; font-size: calc(17px * var(--watch-scale)); line-height: 1.7; text-align: center; }
+.watch-mobile-cap-ar .watch-word.live { box-shadow: inset 0 -3px 0 0 #fff; }
+.watch-mobile-cap-tr { color: rgba(255,255,255,.75); font-size: calc(13px * var(--watch-scale)); line-height: 1.5; text-align: center; margin-top: 6px; }
+.watch-mobile-cap-tr.watch-tr-hidden { display: none; }
+.watch-tr-toggle-btn { width: auto; padding: 0 9px; font-size: 10px; font-weight: 700; letter-spacing: .02em; }
+.watch-tr-toggle-btn:not(.active) { opacity: .35; }
+
+/* Watch tab's bottom bar mirrors the Reader's reader-bottom (tray + audio-bar), same classes reused */
+.watch-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
+
+/* Theater/expanded mode: video + transcripts fill the whole view, no scrolling needed -- entered
+   automatically on play, or via the toolbar toggle. Head/intro text hides to reclaim the space. */
+#view-watch.theater .watch-scroll { overflow: hidden; display: flex; }
+#view-watch.theater .watch-wrap { max-width: none; width: 100%; padding: 16px 20px 0; height: 100%; display: flex; flex-direction: column; }
+#view-watch.theater .watch-head { display: none; }
+#view-watch.theater .watch-layout { flex: 1; min-height: 0; align-items: stretch; }
+#view-watch.theater .watch-video-wrap { height: 100%; width: auto; max-width: 38%; }
+#view-watch.theater .watch-video { height: 100%; width: auto; max-height: none; }
+#view-watch.theater .watch-transcript { height: 100%; max-height: none; }
+
+@media (max-width: 720px) {
+  /* Pre-play, the homepage reads like a normal scrollable page -- narrative intro, video at a
+     capped height, narrative outro -- same shape as desktop, just stacked into one column.
+     The transcript stays hidden here regardless; it only ever shows as karaoke captions burned
+     over the video, once playing (theater mode below), which is a separate full-screen layout
+     entered automatically on play and unaffected by these pre-play rules. */
+  .watch-wrap { width: 100%; padding: 20px 16px 40px; }
+  .watch-layout { flex-direction: column; }
+  .watch-video-wrap { width: 100%; max-width: 100%; margin: 0 0 4px; }
+  .watch-video { width: 100%; height: auto; max-height: 42vh; object-fit: contain; margin: 0 auto; }
+  .watch-transcript { display: none; }
+  .watch-expand-btn { display: flex; }
+  #view-watch.theater .watch-expand-btn { display: none; }
+
+  /* Mobile theater mode: video fills the whole view edge-to-edge (no wrap padding), with the
+     head/intro/outro swapped for karaoke captions burned over the video, so it reads as a real
+     full-screen player. Also hides the app's global header/tab bar (see body class toggle in
+     enterWatchTheater/exitWatchTheater, app.js) since .header lives outside #view-watch and
+     can't be reached by a selector scoped to it alone. */
+  #view-watch.theater .watch-wrap { padding: 0; }
+  #view-watch.theater .watch-video-wrap { width: 100%; max-width: 100%; height: 100%; margin: 0; }
+  #view-watch.theater .watch-video { width: 100%; height: 100%; max-height: none; object-fit: contain; }
+  #view-watch.theater .watch-mobile-captions {
+    display: block; position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 18px 16px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(0,0,0,.8), rgba(0,0,0,0));
+  }
+  body.watch-theater-active .header { display: none; }
+  .watch-close-btn { top: calc(12px + env(safe-area-inset-top)); }
+
+  /* Tighten gap/padding so all 7 controls (the theater toggle included) stay on-screen -- this
+     is what silently ate the theater/translation buttons before (they rendered off-canvas with
+     no scroll affordance to reach them). The theater button duplicates the corner expand/close
+     buttons burned onto the video, but users expect a fullscreen toggle in the control bar
+     itself too, so keep both -- the scrubber just renders narrower to make room. */
+  #watch-toolbar { gap: 6px; padding: 0 10px; }
+}
+
+/* ABOUT VIEW */
+.about-scroll { flex: 1; overflow-y: auto; }
+.about-wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 64px; user-select: text; -webkit-user-select: text; }
+.about-section { margin-bottom: 40px; }
+.about-eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mid); margin-bottom: 8px; }
+.about-heading { font-size: 20px; font-weight: 600; margin: 0 0 14px; color: var(--black); }
+.about-text { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 12px; }
+.about-text:last-child { margin-bottom: 0; }
+.about-source { margin-top: 8px; font-size: 12px; color: var(--mid); }
+.about-source a { color: var(--mid); text-decoration: underline; }
+.about-source a:hover { color: var(--black); }
+.watch-p a, .about-text a { color: var(--black); text-decoration: underline; text-underline-offset: 2px; }
+.watch-p a:hover, .about-text a:hover { color: var(--mid); }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(6px); background: var(--black); color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 4px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 99; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* AI-PROCESS doc modal -- keeps the long-form writeup readable inside the app itself (an iframe
+   onto its own standalone, self-styled page) instead of sending the reader out to an external
+   site. Direction is pinned ltr regardless of app language, since the doc itself is English prose. */
+.doc-modal-backdrop { position: fixed; inset: 0; background: rgba(13,13,13,.55); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .18s; }
+.doc-modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.doc-modal {
+  position: fixed; top: 4vh; left: 50%; direction: ltr;
+  width: min(760px, 92vw); height: min(88vh, 900px);
+  transform: translate(-50%, 8px);
+  background: #fff; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  z-index: 41; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
+  overflow: hidden;
+}
+.doc-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+.doc-modal-iframe { width: 100%; height: 100%; border: none; display: block; }
+.doc-modal-close {
+  position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%;
+  border: none; background: rgba(13,13,13,.68); color: #fff; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; z-index: 2; transition: background .12s;
+}
+.doc-modal-close:hover { background: rgba(13,13,13,.9); }
+@media (max-width: 600px) {
+  .doc-modal { top: 0; left: 0; width: 100%; height: 100%; border-radius: 0; transform: translateY(8px); }
+  .doc-modal.open { transform: translateY(0); }
+  .doc-modal-close { top: calc(10px + env(safe-area-inset-top)); }
+}
+
+/* ══════════════════════════ MOBILE (≤720px) ══════════════════════════ */
+@media (max-width: 720px) {
+  /* — header: swap the tab row for a hamburger + centered title, so Vocab/Verbs/About live in
+     the side menu instead of competing with the language switch for a narrow header — */
+  .header { display: flex; align-items: center; padding: 0 6px; gap: 4px; }
+  .header > .header-side:last-child { display: none; }
+  .header-side { flex-shrink: 0; }
+  .tabs { display: none; }
+  .hamburger-btn { display: flex; }
+  .mobile-header-title { display: block; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lang-switch-btn { font-size: 11px; padding: 4px 8px; }
+
+  /* — reader column: reclaim width, tighten spacing — */
+  .reader { padding: 24px 0 40px; }
+  .lesson-head { padding: 0 16px 24px; }
+  .lesson-title-ar { padding: 0 16px 4px; }
+  .lesson-location-ar { padding: 0 16px 20px; }
+  .chunk { padding: 14px 16px; }
+
+  /* — tray: float above the audio bar instead of squeezing scroll-area height, so the reader
+     keeps its full scroll room whether or not a translation is showing, and content that would
+     otherwise be squeezed (arabic | divider | gloss | save) stacks in a column instead. — */
+  .tray, .tray.open {
+    height: auto; max-height: min(64vh, 500px);
+  }
+  .tray {
+    position: absolute; left: 0; right: 0; bottom: 100%;
+    flex-direction: column;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    border-radius: 14px 14px 0 0; border-top: none; background: #fff;
+    box-shadow: 0 -6px 20px rgba(0,0,0,.14);
+    transform: translateY(14px); opacity: 0; pointer-events: none;
+    transition: transform .24s cubic-bezier(.25,.8,.25,1), opacity .2s;
+    z-index: 20;
+  }
+  .tray.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .tray-handle-row { display: flex; align-items: center; justify-content: center; position: relative; padding: 8px 12px 6px; flex-shrink: 0; touch-action: none; cursor: pointer; }
+  .tray-handle-bar { width: 36px; height: 4px; border-radius: 2px; background: var(--rule); transition: background .12s; }
+  .tray-handle-row:hover .tray-handle-bar { background: var(--mid); }
+  .tray-content { flex-direction: column; align-items: stretch; padding: 4px 18px 4px; gap: 6px; }
+  .tray-arabic, .tray-arabic.phrase { max-width: none; min-width: 0; }
+  .tray-arabic { font-size: 26px; line-height: 1.3; }
+  .tray-arabic.phrase { font-size: 17px; line-height: 1.5; }
+  .tray-divider { width: 100%; height: 1px; margin: 0; align-self: stretch; }
+  .tray-gloss { gap: 5px; }
+  .gloss-he { font-size: 18px; }
+  .tray-actions { flex-direction: row; padding: 6px 18px 12px; align-items: stretch; }
+  .tray-actions .save-btn { flex: 1; min-width: 0; }
+
+  /* — bigger touch targets for small icon buttons — */
+  .mute-btn { width: 36px; height: 36px; }
+  .vocab-row-toggle, .vocab-row-delete, .vocab-row-pronounce { width: 36px; height: 36px; }
+  .en-chip { padding: 6px 10px; }
+  .text-size-btn { width: 32px; height: 32px; }
+
+  /* — verbs view: the pill list fills the width in two columns; tapping a verb opens its
+     conjugation card as a bottom-sheet drawer over the list, same as the reader's translation
+     tray, instead of scrolling an inline panel into view — */
+  .verbs-inner { padding: 24px 14px 40px; }
+  .verbs-layout { flex-direction: column; gap: 20px; }
+  .verb-pills { width: 100%; max-height: none; overflow-y: visible; position: static; }
+  .verb-pill-row { grid-template-columns: repeat(2, 1fr); }
+  #verb-card {
+    position: fixed; left: 0; right: 0; bottom: 0; width: auto; z-index: 20;
+    max-height: min(70vh, 560px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+    border: none; border-radius: 14px 14px 0 0; background: #fff;
+    box-shadow: 0 -6px 20px rgba(0,0,0,.14);
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translateY(14px); opacity: 0; pointer-events: none;
+    transition: transform .24s cubic-bezier(.25,.8,.25,1), opacity .2s;
+  }
+  #verb-card.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .verb-card-head { padding: 4px 16px 14px; flex-wrap: wrap; gap: 12px; }
+  .verb-ar-main { font-size: 30px; }
+  .verb-derived, .verb-conj { padding: 14px 16px; }
+  .derived-row { gap: 16px; }
+  .conj-pronoun { padding-left: 14px; width: 64px; font-size: 11px; }
+  .conj-he { padding-left: 12px; font-size: 12px; }
+  .conj-ar { font-size: 18px; }
+  .conj-table td:last-child { display: none; }
+
+  /* — vocab: let the search bar take its own full-width row above the filter chips — */
+  .vocab-search { flex: 1 1 100%; }
+}
+
+/* Very narrow phones (e.g. compact Android widths ~320px) still overflow the header by a few
+   tens of px even after the 720px breakpoint's tightening — shave a bit more so all 4 tabs +
+   the language switch fit without relying on the .tabs overflow-x:auto fallback. */
+@media (max-width: 340px) {
+  .header { gap: 4px; padding: 0 8px; }
+  .tab { padding: 0 6px; font-size: 11.5px; }
+  .lang-switch-btn { padding: 3px 6px; font-size: 10.5px; }
+}

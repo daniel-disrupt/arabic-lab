@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building Arabic Lab with Agentic AI</title>
+<style>
+  :root { --black: #141414; --mid: #6b6b6b; --light: #9a9a9a; --rule: #e4e2dd; --bg-code: #f4f3f0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; direction: ltr; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--black); background: #fff;
+    line-height: 1.7; font-size: 16px;
+    padding: 40px 24px 80px;
+  }
+  .doc { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 27px; font-weight: 700; line-height: 1.3; margin: 0 0 10px; }
+  h2 { font-size: 20px; font-weight: 700; margin: 44px 0 14px; }
+  h3 { font-size: 16px; font-weight: 700; margin: 30px 0 10px; color: var(--black); }
+  p { margin: 0 0 16px; }
+  .intro { font-style: italic; color: var(--mid); margin: 0 0 20px; }
+  .lede { color: var(--mid); }
+  hr { border: none; border-top: 1px solid var(--rule); margin: 36px 0; }
+  a { color: var(--mid); text-decoration: underline; }
+  a:hover { color: var(--black); }
+  code { font-family: "SF Mono", Consolas, monospace; font-size: 13.5px; background: var(--bg-code); padding: 1px 5px; border-radius: 3px; }
+  ul, ol { margin: 0 0 16px; padding-left: 22px; }
+  li { margin-bottom: 10px; }
+  li:last-child { margin-bottom: 0; }
+  strong { font-weight: 700; }
+</style>
+</head>
+<body>
+<article class="doc">
+
+<h1>Building Arabic Lab with Agentic AI</h1>
+<p class="intro">A technical process log for people curious about agentic AI — what it's actually like to build something real with it, and where it earns its keep on a mission-driven, one-person project.</p>
+
+<p>This document is not the project spec (see <code>PROJECT.md</code> for the pipeline design and <code>SCHEMA.md</code> for the data model, both in the repo's <code>files/</code> folder). It's the story of <em>how</em> Arabic Lab actually got built — session by session, mistake by mistake — for readers who want to understand what working with agentic AI looks like in practice, not in a demo.</p>
+
+<p>The short version, already on the app's own About page: AI did most of the heavy lifting — transcription, translation, tashkīl, an AI voiceover, and all of the actual coding — while a human (me) chose the material, set the pedagogy, checked every translation, and made the judgment calls no model should be trusted with alone. This document is the long version.</p>
+
+<hr>
+
+<h2>1. Two different kinds of "AI" in this project</h2>
+<p>It's worth separating these, because they get lumped together in casual conversation but behave completely differently in practice:</p>
+<p><strong>Content-generation AI</strong> — used once per lesson, offline, to turn a raw recording into structured material: <code>faster-whisper</code> for transcription, an LLM for translation/tashkīl/simplification, OpenAI TTS for the voiceover. These are largely <em>single-shot</em> tools: you run them, you get an output, you review it.</p>
+<p><strong>Agentic coding AI</strong> (Claude Code) — used continuously, session after session, to actually build the web app: the reader, the tap-to-translate tray, the vocab/verb tools, the video player, every CSS breakpoint. This is <em>conversational and iterative</em>: you describe a problem or a goal in plain language, the agent reads the actual code, makes a change, and — critically — can verify its own change by launching the app and testing it, not just asserting that it works.</p>
+<p>The second kind is the more interesting one, and where most of the lessons below come from. But the pipeline is worth walking through first, because it sets up the core discipline that carries through everything else: <strong>AI output is always a draft until a human with domain knowledge signs off on it.</strong></p>
+
+<hr>
+
+<h2>2. The content pipeline</h2>
+
+<h3>Transcription</h3>
+<p>Input is a phone-recorded video of a real event — in this case, a ~7-minute protest speech in colloquial Palestinian Arabic. Audio gets pulled out at 16kHz mono (<code>ffmpeg -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le speech.wav</code>) and run through <code>faster-whisper</code>, model <code>large-v3</code>, language forced to <code>ar</code> (auto-detect wanders on noisy crowd audio) with a VAD filter to skip dead air.</p>
+<p>The raw transcript is a <em>draft, never final</em>. Dialectal speech gets mis-heard, sentences run on, some spans come out genuinely garbled. That's expected — Whisper (like most ASR) is trained overwhelmingly on Modern Standard Arabic and formal registers; colloquial Palestinian Arabic is a much smaller slice of its training distribution.</p>
+
+<h3>Editing — three passes, each further from the raw audio</h3>
+<ol>
+  <li><strong>Literal clean-up</strong> — fix obvious mis-hearings while preserving the spoken register (<code>الياقس/بيقس</code> → <code>اليأس</code>, <code>جنات الغزاز</code> → <code>حديقة الغزازوة</code>). Still the speaker's actual words, just legible.</li>
+  <li><strong>Tashkīl (vocalization)</strong> — add full diacritics reflecting <em>actual dialect pronunciation</em> (بِدّنا، إحنا، مِش، هلّق), not MSA voweling. Colloquial Arabic has no fixed orthography, so some of this is genuinely interpretive — which is exactly why it needs to be flagged, not silently presented as settled fact.</li>
+  <li><strong>Readability edition</strong> — smooth spoken syntax into essay prose while keeping the dialect intact. This is the version the Reader tab actually shows.</li>
+</ol>
+<p>The rule that governs all three passes, stated in the original project spec and enforced everywhere downstream: <strong>every pass moves the text further from what was literally said.</strong> The raw transcript and the reading edition are both kept, on purpose — the diff between them is itself a learning artifact. For reconstructed or uncertain spots, the recording is the only source of truth, and the job of the tooling is to surface uncertainty, not paper over it.</p>
+
+<h3>Voiceover</h3>
+<p>The Reader's audio isn't the original recording — it's synthesized from the final voweled text via OpenAI's TTS (<code>gpt-4o-mini-tts</code>), because the source audio has crowd noise and isn't segmented per-chunk. That decision came with an explicit, documented limitation: OpenAI's Arabic voices aren't dialect-specific, so the synthesized voice likely leans closer to MSA pronunciation than an authentic Palestinian accent. That trade-off is written directly into the generator script as a comment, not hidden — a small but deliberate act of not overselling what the tool can do.</p>
+<p>One thing this pipeline stage got <em>right</em> by construction: per-word timestamp alignment for karaoke-style highlighting is reliable here, because the audio was synthesized directly from the known text — there's no ASR guessing involved, just measuring. That's a good general pattern: <strong>push alignment problems to wherever you have ground truth</strong>, rather than trying to solve them against noisy real-world audio if you don't have to.</p>
+
+<h3>Where alignment against the <em>real</em> recording is unavoidable</h3>
+<p>The Watch tab plays the actual protest video, not synthesized audio, so its captions have to align to real ASR output. That pipeline runs <code>faster-whisper</code> with <code>word_timestamps=True</code> for per-word timing, then aligns those raw ASR words to the clean reading-edition text using <code>difflib</code>'s sequence matcher — critically, <strong>windowed per chunk</strong> rather than matched globally. A first attempt at global matching only hit 45.7% alignment, because a 7-minute speech re-uses common words (بدي, احنا, إنه) constantly and the matcher kept latching onto the wrong occurrence. Constraining the search to each chunk's known time window raised that to 65.1%, with zero out-of-order timestamps. The remaining ~35% — words that were rephrased or dropped during cleanup and have no literal spoken counterpart — simply don't get a timestamp. No interpolation, no faking it. That's the same anti-fabrication principle from the editing passes, showing up again in a completely different part of the pipeline.</p>
+
+<hr>
+
+<h2>3. Working with an agentic coding assistant</h2>
+<p>This is the part that's genuinely different from "using AI tools" in the single-shot sense above. A session with Claude Code doesn't look like typing a prompt and getting a finished file back. It looks like:</p>
+<ol>
+  <li><strong>You describe a problem in plain language</strong>, often vaguely, the way you'd describe it to a colleague — <em>"I don't see it on mobile,"</em> not a bug report with repro steps.</li>
+  <li><strong>The agent reads the actual code</strong> — not a memory of similar code, the literal current state of the files — to understand what's really there before proposing anything.</li>
+  <li><strong>When the cause isn't obvious from reading, it goes and checks</strong> — spins up a local server, drives a real headless browser at the actual viewport width in question, and measures. Guessing is cheap; a five-line script that prints real pixel coordinates is cheaper than being wrong.</li>
+  <li><strong>It makes the smallest change that fixes the actual cause</strong>, not a defensive rewrite of everything nearby.</li>
+  <li><strong>It verifies the fix the same way it found the bug</strong> — re-running the same measurement, this time expecting the opposite result — before reporting anything as done.</li>
+</ol>
+<p>That loop matters more than any individual line of code it writes. The value of an agentic tool isn't that it can write JavaScript — plenty of tools can do that. It's that it can <em>close the loop itself</em>: reproduce, fix, re-verify, without you having to be the one who catches every regression.</p>
+
+<h3>A concrete example of that loop, from this project</h3>
+<p>You reported: <em>"when I open up the video from the homepage, there's no way to exit the video, and I don't see a subtitle toggle."</em> Nothing in that description says <em>why</em>. The investigation:</p>
+<ul>
+  <li>Read the actual HTML/CSS for the video view, noticed a <code>theater</code> (fullscreen) mode that auto-triggers on play, and a control toolbar with eight buttons crammed into one row with no wrap and no overflow scrolling.</li>
+  <li>That's a hypothesis, not a diagnosis. So: spun up the app locally with <code>http-server</code>, drove it with Playwright at a real phone width (390px), and read out the actual bounding boxes of every toolbar button.</li>
+  <li>The two buttons you couldn't find were rendering at <code>x: -12</code> and <code>x: -62</code> — physically off the left edge of the screen. Not a logic bug, not a CSS typo — just too many controls for the available width, silently clipped with no visual indication anything was missing.</li>
+  <li>Fix: a dedicated close button burned directly onto the video (not competing for toolbar space), the translation toggle relocated to a row with actual room, and the redundant fullscreen button hidden on mobile specifically.</li>
+  <li>Verification: the same Playwright script, re-run, now asserting every control's <code>x</code> position is inside <code>[0, 390]</code> — not just eyeballing a screenshot and hoping.</li>
+</ul>
+<p>Two follow-up requests refined this further — restoring the fullscreen toggle to the toolbar <em>as well</em> once there was room, and wiring the phone's physical back button (via <code>history.pushState</code>/<code>popstate</code>) to close the fullscreen view instead of leaving the page entirely. Each one got the same treatment: reproduce with a real simulated back-navigation, confirm the failure, fix, confirm the fix, <em>then</em> say it's done.</p>
+
+<hr>
+
+<h2>4. Case studies: where this actually went wrong, and what that taught</h2>
+<p>The clean success stories are less instructive than the failures. Three from this project's history are worth walking through in full, because each one teaches something an "agentic AI is magic" narrative would skip.</p>
+
+<h3>The karaoke-highlighting saga (shipped twice, killed twice)</h3>
+<p>Word-level highlighting — the little bouncing-ball effect that tracks the currently-spoken word — is objectively the fanciest feature attempted here. It got built, using Whisper's <code>word_timestamps=True</code> against the real recording, aligned per-chunk with <code>difflib</code>. It shipped. Then it got killed, because it "visibly didn't match the spoken word" and was, in your words, "really distracting" — not almost-right, actually wrong in a way that hurt the reading experience.</p>
+<p>The response wasn't to tune the alignment harder. It was to drop to a coarser but <em>more trustworthy</em> signal: sentence-level highlighting, anchored to Whisper's segment-level timestamps (which are meaningfully more reliable than its per-word attention for dialectal speech — a documented limitation of the model, not a bug in this project's code). That version hit 89% coverage with zero out-of-order timestamps — genuinely better data than the word-level attempt.</p>
+<p><strong>It got killed too</strong> — not because the data was wrong this time, but because having a second highlight nested inside the already-highlighted active paragraph read as visual noise, regardless of how accurate it was. That's the real lesson: <strong>more accurate data does not automatically mean a better feature.</strong> The chunk-level highlight that survived both rounds was the simplest one, and it survived because a human sat with it and said "this doesn't feel right" twice, about two technically-improving iterations, for two completely different reasons (mistiming, then layering). No amount of model capability substitutes for that kind of taste-check.</p>
+
+<h3>The punctuation that silently disappeared</h3>
+<p>An early version of the reader tokenized the speech by hand — typing out each word as its own token. It worked, until you compared it closely against the approved, teacher-reviewed docx and noticed commas, periods, and colons were just missing from the app, along with one specific em-dash between two words in the middle of the speech. Nobody had <em>decided</em> to drop punctuation; the hand-typed word list simply never included it, and the rendering code for standalone punctuation tokens had a latent bug on top of that.</p>
+<p>The fix wasn't to patch in the missing marks by hand. It was to re-derive every token programmatically, straight from the source docx's paragraph text, and then run a structural sanity check — comparing the new machine-derived word sequence against the old hand-typed one, position by position, before trusting it (668 of 668 matched, once one regex bug in the ellipsis handling was found and fixed). <strong>Rebuilding from source beat hand-transcribing a second time</strong>, and the sanity check is what made it safe to trust the rebuild instead of just hoping it was right.</p>
+
+<h3>The binyan bug only a Hebrew/Arabic speaker would catch</h3>
+<p>Verbs were originally grouped in the Verbs tab by their closest Hebrew grammatical category (בניין). That's a reasonable UI decision — until you realize Hebrew only has seven of these categories and Arabic has ten, so four distinct Arabic verb forms (5, 6, 8, and 10) were silently collapsing into one shared bucket because they all <em>happen</em> to map loosely to the same Hebrew approximation. Technically nothing crashed; the app just quietly presented inaccurate linguistic structure. Nothing in the code would have flagged that as a bug — it took someone who actually knows both languages to notice the categories didn't feel right, and to know <em>why</em>: this was a domain-knowledge gap, not a software one. The fix — group by the actual Arabic form number (1–10), with the Hebrew approximation shown only as a secondary label — is a one-line reframing once someone points at the actual linguistic problem. No amount of code review catches a bug in a domain the reviewer doesn't understand.</p>
+
+<hr>
+
+<h2>5. What generalizes from all of this</h2>
+<p>Pulling the threads together, a few principles kept proving themselves across very different parts of the project — pipeline scripts, CSS layout bugs, and linguistic data alike:</p>
+<ul>
+  <li><strong>Treat every AI output as a draft with a visible "not yet reviewed" state</strong>, not as a finished artifact. This project's verb cards literally render a draft badge for anything not yet reviewed by a teacher — the discipline is baked into the UI, not just the process.</li>
+  <li><strong>Never let an interpolation quietly pass as fact.</strong> Missing timestamps stay missing rather than being guessed at. Uncertain transcription spans get flagged rather than smoothed over. This matters more, not less, for underserved dialects and niche subject matter — there's no large, authoritative reference corpus to silently fall back on if your own data goes wrong.</li>
+  <li><strong>Verify empirically, not by asking the model if it worked.</strong> The recurring pattern in every bug fix above was: reproduce with a real measurement (pixel coordinates, word-position diffs, alignment percentages), fix, then re-run the <em>same</em> measurement expecting the opposite result. An agent that tells you "this should work now" is not the same as an agent that shows you it does.</li>
+  <li><strong>Rebuilding from a trustworthy source beats patching a shaky one.</strong> Both the punctuation bug and the word-timing bugs got fixed by re-deriving data from its origin (the docx, the synthesized audio's own text) rather than hand-patching the derived artifact.</li>
+  <li><strong>Domain expertise is the part that doesn't automate.</strong> The binyan bug, the choice to keep Hebrew as the primary gloss language over English, the decision that a nested highlight reads as noise — none of that comes from writing better prompts. It comes from a human who actually knows the language, the learner, and the material sitting with the output and noticing when something is subtly off.</li>
+  <li><strong>Small, continuously-updated persistent memory beats re-explaining context every session.</strong> Hard-won, easy-to-relearn-the-hard-way lessons — "don't re-extract text from the PDF, the docx's XML is the reliable source," "use a real HTTP server that supports Range requests or audio seeking silently breaks in local testing" — get written down once and carried forward, instead of being rediscovered by trial and error in every new session.</li>
+</ul>
+
+<hr>
+
+<h2>6. Where this actually matters for mission-driven work</h2>
+<p>None of the above is unique to language learning. But it's worth being explicit about why agentic AI is a genuinely good fit for a project like this one specifically, rather than just a convenient way to avoid hiring a developer.</p>
+<p><strong>The economics change who gets to build things.</strong> A properly resourced team — a developer, a translator, a linguist, a voice actor, a UI designer — is simply not available for a personal study tool built around one politically significant speech in one specific dialect. Agentic AI collapses most of that team into a conversation one person can have in their spare time. That's not a shortcut around quality; it's the difference between this existing at all and not existing.</p>
+<p><strong>The mission and the engineering discipline turn out to be the same discipline.</strong> This project's whole premise is preserving and teaching a specific, undocumented, politically-loaded register of a marginalized dialect — the language of grief, accountability, and community organizing in Jaffa, spoken by people whose speech doesn't show up in formal corpora. Get the tashkīl wrong, or silently paper over an uncertain transcription, and you're not shipping a minor bug — you're teaching someone the wrong way to grieve publicly, or to demand accountability, in a language that matters to them and their community. The "never fabricate, always flag uncertainty" rule that shows up in every part of this pipeline isn't a generic software best practice borrowed from somewhere else. It's the actual ethical requirement of the mission, and it happens to also be good engineering. For work like this, that alignment is the whole point: the discipline the tool needs from you is the same discipline the mission needs from you.</p>
+<p><strong>Human judgment is the bottleneck you should protect, not remove.</strong> Every case study above is a moment where a human's specific knowledge — of the dialect, of the speaker, of what a highlight <em>feels</em> like when you're actually trying to read — caught something a general-purpose model had no way to catch on its own. Agentic AI is extremely good at execution: writing the alignment script, measuring the pixel coordinates, rebuilding the token list from source, running the sanity check. It is not a substitute for someone who knows the subject caring enough to notice when the output is subtly wrong. The projects where this kind of tooling adds the most value are the ones where a domain expert who isn't a professional developer can now act directly on their own expertise, instead of losing it in translation to someone else who has to build it for them.</p>
+
+<hr>
+
+<h2>7. If you want to try this yourself</h2>
+<p>A few practical starting points, distilled from the sessions above:</p>
+<ul>
+  <li><strong>Describe problems the way you'd describe them to a person</strong>, not the way you'd write a bug ticket. "I don't see it on mobile" is a perfectly good starting point — a competent agentic tool should be able to go find out why, not ask you to first diagnose it yourself.</li>
+  <li><strong>Ask to see the verification, not just the claim.</strong> If a fix is real, it should be checkable — a measurement, a test, a screenshot at the actual viewport size in question — not just an assurance.</li>
+  <li><strong>Keep a running memory of hard-won lessons</strong>, however small. The cumulative effect of never re-solving the same problem twice is bigger than any single clever prompt.</li>
+  <li><strong>Spend your own attention where your own expertise actually lives.</strong> Let the tool carry the mechanical weight — transcribing, aligning, writing boilerplate CSS — and save your time for the calls only you can make: does this sound right, does this feel right, is this actually true to what was said.</li>
+  <li><strong>Build the "this is a draft" signal into the product itself</strong>, not just your own process. If your users will ever see AI-generated content, give them the same visibility into its confidence that you'd want as the reviewer.</li>
+</ul>
+
+<p class="lede">The result, for this project, is a study tool that wouldn't have gotten built any other way — and that's really the argument for all of this: not that AI writes good code, but that it makes real, specific, personally-motivated projects like this one <em>reachable</em> by the person who actually cares about them.</p>
+
+</article>
+</body>
+</html>
