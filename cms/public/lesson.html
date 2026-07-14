@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Arabic Lab CMS — Lesson</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; color: #0D0D0D; }
+  a.back { color: #8A8A8A; font-size: 13px; text-decoration: none; }
+  h1 { font-size: 18px; margin: 6px 0 2px; }
+  .subtitle { color: #8A8A8A; font-size: 13px; margin-bottom: 24px; }
+  .status { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #F0EFE9; }
+  .status.published { background: #0D0D0D; color: #fff; }
+  section { border: 1px solid #E4E3E0; border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+  section h2 { font-size: 14px; margin-bottom: 4px; }
+  section .hint { color: #8A8A8A; font-size: 12px; margin-bottom: 10px; }
+  textarea { width: 100%; min-height: 90px; font-family: ui-monospace, Consolas, monospace; font-size: 12px; padding: 8px; border: 1px solid #E4E3E0; border-radius: 6px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row > * { flex: 1; }
+  button { padding: 7px 14px; border: none; border-radius: 6px; background: #0D0D0D; color: #fff; font-size: 13px; cursor: pointer; flex: none; }
+  button.secondary { background: #F0EFE9; color: #0D0D0D; }
+  .field-status { font-size: 12px; flex: none; min-width: 90px; text-align: right; }
+  .field-status.ok { color: #1a7f37; }
+  .field-status.err { color: #B3261E; }
+  input[type=file] { font-size: 13px; }
+  .media-current { font-size: 12px; color: #8A8A8A; margin-top: 4px; word-break: break-all; }
+  .publish-bar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #E4E3E0; padding: 16px 0; margin-top: 24px; display: flex; align-items: center; gap: 14px; }
+  #publish-btn { padding: 10px 22px; font-size: 14px; }
+  #publish-result { font-size: 13px; }
+</style>
+</head>
+<body>
+  <a class="back" href="/index.html">&larr; All lessons</a>
+  <h1 id="lesson-title">Loading…</h1>
+  <div class="subtitle" id="lesson-subtitle"></div>
+  <div><span class="status" id="lesson-status"></span></div>
+
+  <div id="json-fields"></div>
+
+  <section>
+    <h2>Media</h2>
+    <div class="hint">Uploaded here, copied into the repo alongside data.json on Publish.</div>
+    <div class="row" style="margin-bottom:14px">
+      <div>
+        <label>Video (.mp4)</label><br>
+        <input type="file" data-kind="video" accept="video/mp4">
+        <div class="media-current" id="media-video"></div>
+      </div>
+      <div>
+        <label>Voiceover (.mp3)</label><br>
+        <input type="file" data-kind="voiceover" accept="audio/mpeg">
+        <div class="media-current" id="media-voiceover"></div>
+      </div>
+      <div>
+        <label>Captions (.vtt)</label><br>
+        <input type="file" data-kind="captions" accept=".vtt">
+        <div class="media-current" id="media-captions"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="publish-bar">
+    <button id="publish-btn">Publish</button>
+    <span id="publish-result"></span>
+  </div>
+
+<script>
+const slug = new URLSearchParams(location.search).get('slug');
+if (!slug) location.href = '/index.html';
+
+const FIELDS = [
+  { key: 'chunks_json', label: 'Chunks (Reader tab)', hint: 'CHUNKS array — the reading-edition tokens per chunk.' },
+  { key: 'phrase_glosses_json', label: 'Phrase glosses', hint: 'PHRASE_GLOSSES array — idiom/proverb fallback glosses.' },
+  { key: 'vocab_json', label: 'Vocab seed', hint: 'SEED_VOCAB array — curated starter Vocab list.' },
+  { key: 'verbs_json', label: 'Verbs', hint: 'SAVED_VERBS array — Verbs tab entries.' },
+  { key: 'watch_captions_json', label: 'Watch captions', hint: 'WATCH_CAPTIONS array — running transcript/translation cues.' },
+  { key: 'voiceover_json', label: 'Voiceover', hint: '{ src, chunks, wordTimes } — AI voiceover timing data.' },
+  { key: 'content_json', label: 'Content', hint: '{ homeContent, introContent, aboutContent, headerGloss } — the lesson’s written framing.' },
+];
+
+let lesson = null;
+
+function renderFields() {
+  document.getElementById('json-fields').innerHTML = FIELDS.map(f => `
+    <section>
+      <h2>${f.label}</h2>
+      <div class="hint">${f.hint}</div>
+      <textarea id="field-${f.key}">${lesson[f.key] ? JSON.stringify(lesson[f.key], null, 2) : ''}</textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="secondary" data-save="${f.key}">Save</button>
+        <span class="field-status" id="status-${f.key}"></span>
+      </div>
+    </section>
+  `).join('');
+  document.querySelectorAll('[data-save]').forEach(btn => {
+    btn.addEventListener('click', () => saveField(btn.dataset.save));
+  });
+}
+
+async function saveField(key) {
+  const statusEl = document.getElementById('status-' + key);
+  statusEl.textContent = 'Saving…'; statusEl.className = 'field-status';
+  let value;
+  try { value = JSON.parse(document.getElementById('field-' + key).value || 'null'); }
+  catch (e) { statusEl.textContent = 'Invalid JSON: ' + e.message; statusEl.className = 'field-status err'; return; }
+  const res = await fetch(`/api/lessons/${slug}/json/${key}`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value),
+  });
+  const data = await res.json();
+  if (!res.ok) { statusEl.textContent = data.error || 'Save failed'; statusEl.className = 'field-status err'; return; }
+  lesson = data;
+  statusEl.textContent = 'Saved'; statusEl.className = 'field-status ok';
+}
+
+function renderMediaLabels() {
+  document.getElementById('media-video').textContent = lesson.video_asset_path ? 'Uploaded: ' + lesson.video_asset_path.split(/[\\/]/).pop() : 'Not uploaded yet';
+  document.getElementById('media-voiceover').textContent = lesson.voiceover_audio_path ? 'Uploaded: ' + lesson.voiceover_audio_path.split(/[\\/]/).pop() : 'Not uploaded yet';
+  document.getElementById('media-captions').textContent = lesson.captions_vtt_path ? 'Uploaded: ' + lesson.captions_vtt_path.split(/[\\/]/).pop() : 'Not uploaded yet';
+}
+
+document.querySelectorAll('input[type=file]').forEach(input => {
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(`/api/lessons/${slug}/media/${input.dataset.kind}`, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error || 'Upload failed'); return; }
+    lesson = data;
+    renderMediaLabels();
+  });
+});
+
+document.getElementById('publish-btn').addEventListener('click', async () => {
+  const resultEl = document.getElementById('publish-result');
+  resultEl.textContent = 'Publishing…';
+  const res = await fetch(`/api/lessons/${slug}/publish`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { resultEl.textContent = 'Failed: ' + (data.error || 'unknown error'); return; }
+  resultEl.textContent = data.pushed ? 'Published — pushed to master.' : 'No changes to publish.';
+  await load();
+});
+
+async function load() {
+  const res = await fetch(`/api/lessons/${slug}`);
+  lesson = await res.json();
+  if (!res.ok) { document.getElementById('lesson-title').textContent = 'Not found'; return; }
+  document.getElementById('lesson-title').textContent = lesson.title;
+  document.getElementById('lesson-subtitle').textContent = lesson.subtitle || '';
+  const statusEl = document.getElementById('lesson-status');
+  statusEl.textContent = lesson.status;
+  statusEl.className = 'status' + (lesson.status === 'published' ? ' published' : '');
+  renderFields();
+  renderMediaLabels();
+}
+
+load();
+</script>
+</body>
+</html>

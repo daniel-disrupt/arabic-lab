@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Arabic Lab CMS — Lessons</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; max-width: 760px; margin: 0 auto; padding: 32px 20px 64px; color: #0D0D0D; }
+  h1 { font-size: 18px; margin-bottom: 4px; }
+  .hint { color: #8A8A8A; font-size: 13px; margin-bottom: 28px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #E4E3E0; font-size: 14px; }
+  th { color: #8A8A8A; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  a { color: #0D0D0D; }
+  .status { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #F0EFE9; }
+  .status.published { background: #0D0D0D; color: #fff; }
+  form { border: 1px solid #E4E3E0; border-radius: 8px; padding: 20px; }
+  form h2 { font-size: 14px; margin-bottom: 14px; }
+  label { display: block; font-size: 12px; color: #8A8A8A; margin: 10px 0 4px; }
+  input { width: 100%; padding: 8px 10px; border: 1px solid #E4E3E0; border-radius: 6px; font-size: 14px; }
+  button { margin-top: 16px; padding: 9px 18px; border: none; border-radius: 6px; background: #0D0D0D; color: #fff; font-size: 14px; cursor: pointer; }
+  .error { color: #B3261E; font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <h1>Arabic Lab CMS</h1>
+  <div class="hint">Single-admin content pipeline: create a lesson, paste in its pre-processed pipeline output, publish it onto the live site.</div>
+
+  <table>
+    <thead><tr><th>Lesson</th><th>Status</th><th>Updated</th></tr></thead>
+    <tbody id="lesson-rows"></tbody>
+  </table>
+
+  <form id="create-form">
+    <h2>New lesson</h2>
+    <label for="slug">Slug (lowercase, hyphenated — used in the URL and file paths)</label>
+    <input id="slug" name="slug" placeholder="e.g. some-speech-2026" required>
+    <label for="title">Title</label>
+    <input id="title" name="title" placeholder="e.g. Someone's Speech" required>
+    <label for="subtitle">Subtitle</label>
+    <input id="subtitle" name="subtitle" placeholder="e.g. Some Place · Some Date">
+    <label for="dialect">Dialect</label>
+    <input id="dialect" name="dialect" placeholder="e.g. palestinian" value="palestinian">
+    <button type="submit">Create lesson</button>
+    <div class="error" id="create-error"></div>
+  </form>
+
+<script>
+async function loadLessons() {
+  const res = await fetch('/api/lessons');
+  const rows = await res.json();
+  document.getElementById('lesson-rows').innerHTML = rows.map(l => `
+    <tr>
+      <td><a href="/lesson.html?slug=${encodeURIComponent(l.slug)}">${l.title}</a></td>
+      <td><span class="status${l.status === 'published' ? ' published' : ''}">${l.status}</span></td>
+      <td>${new Date(l.updated_at).toLocaleString()}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="3">No lessons yet — create one below.</td></tr>';
+}
+
+document.getElementById('create-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errEl = document.getElementById('create-error');
+  errEl.textContent = '';
+  const body = {
+    slug: document.getElementById('slug').value.trim(),
+    title: document.getElementById('title').value.trim(),
+    subtitle: document.getElementById('subtitle').value.trim(),
+    dialect: document.getElementById('dialect').value.trim(),
+  };
+  const res = await fetch('/api/lessons', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!res.ok) { errEl.textContent = data.error || 'Failed to create lesson'; return; }
+  location.href = '/lesson.html?slug=' + encodeURIComponent(data.slug);
+});
+
+loadLessons();
+</script>
+</body>
+</html>

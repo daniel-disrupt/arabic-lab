@@ -9,3 +9,9 @@ abed project/
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# CMS backend (cms/) — node_modules and its local dev data (uploads, git working copy) never
+# belong in the repo. Secrets live in Railway env vars / a local .env, never committed.
+cms/node_modules/
+cms/.data/
+cms/.env

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Abed Abu Shehadeh, in his own words</title>
+<meta name="description" content="A language-learning tool built around a real protest speech in Jaffa — video, synced reading text, vocab and verbs, in Hebrew and English.">
+<meta property="og:title" content="Abed Abu Shehadeh, in his own words">
+<meta property="og:description" content="A language-learning tool built around a real protest speech in Jaffa — video, synced reading text, vocab and verbs, in Hebrew and English.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://daniel-disrupt.github.io/arabic-lab/">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <button class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Menu">
+    <svg width="19" height="14" viewBox="0 0 19 14"><rect width="19" height="2"/><rect y="6" width="19" height="2"/><rect y="12" width="19" height="2"/></svg>
+  </button>
+  <span class="mobile-header-title" id="mobile-header-title">Home</span>
+  <div class="header-side">
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-switch-btn" data-lang="he" onclick="setAppLang('he')">עברית</button>
+      <button class="lang-switch-btn" data-lang="en" onclick="setAppLang('en')">English</button>
+    </div>
+  </div>
+  <nav class="tabs">
+    <div class="tab active" id="tab-watch" onclick="switchTab('watch')">Home</div>
+    <div class="tab" id="tab-reader" onclick="switchTab('reader')">Reader</div>
+    <div class="tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</div>
+    <div class="tab" id="tab-verbs" onclick="switchTab('verbs')">Verbs</div>
+    <div class="tab" id="tab-about" onclick="switchTab('about')">About</div>
+  </nav>
+  <div class="header-side" aria-hidden="true"></div>
+</header>
+
+<!-- MOBILE SIDE MENU (hamburger drawer) -->
+<div class="menu-backdrop" id="menu-backdrop" onclick="closeMenu()"></div>
+<nav class="side-menu" id="side-menu">
+  <div class="side-menu-header">
+    <span class="side-menu-title">Arabic Lab</span>
+    <button class="side-menu-close" onclick="closeMenu()" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="side-menu-items">
+    <div class="side-menu-item active" id="menu-tab-watch" onclick="selectMenuTab('watch')">Home</div>
+    <div class="side-menu-item" id="menu-tab-reader" onclick="selectMenuTab('reader')">Reader</div>
+    <div class="side-menu-item" id="menu-tab-vocab" onclick="selectMenuTab('vocab')">Vocab</div>
+    <div class="side-menu-item" id="menu-tab-verbs" onclick="selectMenuTab('verbs')">Verbs</div>
+    <div class="side-menu-item" id="menu-tab-about" onclick="selectMenuTab('about')">About</div>
+  </div>
+</nav>
+
+<!-- READER VIEW -->
+<div class="view" id="view-reader">
+  <div class="scroll-area" id="scroll-area">
+    <main class="reader" id="reader">
+      <div class="lesson-head">
+        <h1 class="lesson-title" id="lesson-title" onclick="showHeaderGloss('title')">Abed Abu Shehadeh's Speech</h1>
+        <p class="lesson-intro" id="lesson-intro">This is a simplified version of the speech — the spoken Palestinian dialect of Jaffa, preserved, but cleaned up so it reads like an essay. It's fully voweled with tashkeel and accompanied by an AI voice in sync, to support pronunciation if you need it. Tap any word, or drag across a phrase, for its meaning, and save what you want to keep studying to Vocab.</p>
+      </div>
+      <div class="lesson-title-ar" id="lesson-title-ar" onclick="showHeaderGloss('title')">&#1603;َ&#1604;ِ&#1605;َ&#1577; &#1593;َ&#1576;ْ&#1583; &#1571;َ&#1576;ُ&#1608; &#1588;َ&#1581;َ&#1575;&#1583;َ&#1577;</div>
+      <div class="lesson-location-ar" id="lesson-location-ar" onclick="showHeaderGloss('location')">وقفة يافا — حديقة الغزازوة، ٢٨ حزيران ٢٠٢٦</div>
+    </main>
+  </div>
+  <div class="reader-bottom">
+    <div class="tray" id="tray">
+      <div class="tray-handle-row" id="tray-handle">
+        <div class="tray-handle-bar"></div>
+      </div>
+      <div class="tray-content">
+        <div class="tray-arabic" id="tray-ar"></div>
+        <div class="tray-divider"></div>
+        <div class="tray-gloss">
+          <div class="gloss-he" id="tray-he"></div>
+          <div class="tray-meta-row" id="tray-meta"></div>
+          <div class="gloss-en-wrap" id="gloss-en-wrap">
+            <button class="en-chip" id="en-chip" onclick="toggleEn(event)">EN &rsaquo;</button>
+            <span class="gloss-en hidden" id="tray-en"></span>
+          </div>
+        </div>
+      </div>
+      <div class="tray-actions">
+        <button class="save-btn" id="save-btn" onclick="handleSave(event)">Save word</button>
+      </div>
+    </div>
+    <div class="audio-toggle-row">
+      <button class="audio-toggle-btn on" id="audio-toggle-btn" onclick="toggleAudioMode()" title="Turn off to read without the player driving audio">Audio: On</button>
+      <div class="text-size-ctrl" id="text-size-ctrl">
+        <button class="text-size-btn" id="text-size-dec" onclick="adjustReaderScale(-1)" aria-label="Decrease text size">A&#8315;</button>
+        <span class="text-size-label" id="text-size-label">100%</span>
+        <button class="text-size-btn" id="text-size-inc" onclick="adjustReaderScale(1)" aria-label="Increase text size">A&#8314;</button>
+      </div>
+    </div>
+    <div class="audio-bar" id="audio-bar">
+      <audio id="audio-el" preload="metadata"></audio>
+      <button class="play-btn" id="play-btn" onclick="togglePlay()">
+        <svg id="play-icon" width="13" height="13" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
+      </button>
+      <span class="time-label" id="time-label">0:00 / 0:00</span>
+      <div class="scrubber" onclick="scrub(event)">
+        <div class="scrubber-fill" id="scrubber-fill" style="width:0%"></div>
+      </div>
+      <button class="speed-btn" onclick="cycleSpeed()">1&times;</button>
+      <button class="mute-btn" id="mute-btn" onclick="toggleMute()" title="Mute audio">
+        <svg id="mute-icon" width="15" height="14" viewBox="0 0 15 14" fill="none">
+          <path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/>
+          <path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- VOCAB VIEW -->
+<div class="view" id="view-vocab">
+  <div class="vocab-scroll">
+    <div class="vocab-inner">
+      <div class="vocab-header">
+        <span class="vocab-title" id="vocab-title">Saved Vocabulary</span>
+        <span class="vocab-count" id="vocab-count">0 items</span>
+      </div>
+      <div class="vocab-toolbar" id="vocab-toolbar">
+        <input type="text" id="vocab-search" class="vocab-search" dir="auto" placeholder="Search Arabic, Hebrew, English…" oninput="setVocabSearch(this.value)">
+        <div class="vocab-chip-group" id="vocab-type-chips">
+          <button class="vocab-chip active" data-filter="all" id="chip-all" onclick="setVocabTypeFilter('all')">All</button>
+          <button class="vocab-chip" data-filter="verb" id="chip-verb" onclick="setVocabTypeFilter('verb')">Verbs</button>
+          <button class="vocab-chip" data-filter="phrase" id="chip-phrase" onclick="setVocabTypeFilter('phrase')">Phrases</button>
+          <button class="vocab-chip" data-filter="other" id="chip-other" onclick="setVocabTypeFilter('other')">Other words</button>
+        </div>
+        <select id="vocab-sort" class="vocab-sort" onchange="setVocabSort(this.value)">
+          <option value="speech" id="sort-speech">Order in speech</option>
+          <option value="alpha" id="sort-alpha">Alphabetical (Arabic)</option>
+          <option value="recent" id="sort-recent">Recently added</option>
+        </select>
+      </div>
+      <div class="vocab-empty" id="vocab-empty">No words or phrases saved yet — tap a word or drag across a phrase in the Reader, then Save.</div>
+      <div class="vocab-list" id="vocab-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VERBS VIEW -->
+<div class="view" id="view-verbs">
+  <div class="verbs-scroll" id="verbs-scroll">
+    <div class="verbs-inner">
+      <div class="verbs-header">
+        <span class="verbs-title" id="verbs-title">Verbs in this lesson</span>
+        <span class="verbs-count" id="verbs-count"></span>
+      </div>
+      <div class="verbs-layout">
+        <div class="verb-pills" id="verb-pills"></div>
+        <div class="verb-card" id="verb-card"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WATCH VIEW -->
+<div class="view active" id="view-watch">
+  <div class="watch-scroll">
+    <div class="watch-wrap">
+      <div class="watch-head">
+        <h1 class="watch-title" id="watch-title">Abed Abu Shehadeh, in his own words</h1>
+        <div class="watch-subtitle" id="watch-subtitle">Ghazaza Park, Jaffa &middot; June 28, 2026</div>
+        <div class="watch-intro-group" id="watch-intro"></div>
+      </div>
+      <div class="watch-layout">
+        <div class="watch-video-wrap">
+          <video class="watch-video" id="watch-video" playsinline preload="metadata">
+            <source id="watch-video-source" type="video/mp4">
+            <track id="watch-captions" kind="subtitles" srclang="ar" label="العربية">
+          </video>
+          <button class="watch-close-btn" id="watch-close-btn" onclick="exitWatchTheater()" title="Exit expanded view" aria-label="Close video, back to Home">
+            <svg width="13" height="13" viewBox="0 0 13 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="1" x2="12" y2="12"/><line x1="12" y1="1" x2="1" y2="12"/></svg>
+          </button>
+          <button class="watch-expand-btn" id="watch-expand-btn" onclick="enterWatchTheater()" title="Expand" aria-label="Expand video to fullscreen">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 5V1H5"/><path d="M13 5V1H9"/><path d="M1 9V13H5"/><path d="M13 9V13H9"/>
+            </svg>
+          </button>
+          <button class="watch-video-play-overlay" id="watch-video-play-overlay" onclick="toggleWatchPlay()" aria-label="Play video">
+            <svg width="24" height="24" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
+          </button>
+          <div class="watch-video-scrubber-hit" id="watch-video-scrubber-hit">
+            <div class="watch-video-scrubber-track">
+              <div class="watch-video-scrubber-fill" id="watch-video-scrubber-fill"></div>
+            </div>
+          </div>
+          <div class="watch-mobile-captions" id="watch-mobile-captions">
+            <div class="watch-mobile-cap-ar" id="watch-mobile-cap-ar"></div>
+            <div class="watch-mobile-cap-tr" id="watch-mobile-cap-tr"></div>
+          </div>
+        </div>
+        <div class="watch-transcript" id="watch-transcript-ar"></div>
+        <div class="watch-transcript watch-transcript-tr-panel" id="watch-transcript-tr"></div>
+      </div>
+    </div>
+  </div>
+  <div class="watch-bottom">
+    <div class="audio-toggle-row">
+      <div class="text-size-ctrl" id="watch-text-size-ctrl">
+        <button class="text-size-btn" id="watch-text-size-dec" onclick="adjustWatchScale(-1)" aria-label="Decrease text size">A&#8315;</button>
+        <span class="text-size-label" id="watch-text-size-label">100%</span>
+        <button class="text-size-btn" id="watch-text-size-inc" onclick="adjustWatchScale(1)" aria-label="Increase text size">A&#8314;</button>
+      </div>
+      <button class="mute-btn watch-tr-toggle-btn active" id="watch-tr-toggle-btn" onclick="toggleWatchTranslationVisible()" title="Hide translation">
+        <span aria-hidden="true">HE/EN</span>
+      </button>
+    </div>
+    <div class="audio-bar" id="watch-toolbar">
+      <button class="mute-btn skip-btn" id="watch-skip-back-btn" onclick="skipWatch(-5)" title="Back 5 seconds" aria-label="Back 5 seconds">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><polygon points="7,1 7,11 0.5,6"/><polygon points="13.5,1 13.5,11 7,6"/></svg>
+      </button>
+      <button class="play-btn" id="watch-play-btn" onclick="toggleWatchPlay()">
+        <svg id="watch-play-icon" width="13" height="13" viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
+      </button>
+      <button class="mute-btn skip-btn" id="watch-skip-fwd-btn" onclick="skipWatch(5)" title="Forward 5 seconds" aria-label="Forward 5 seconds">
+        <svg width="14" height="12" viewBox="0 0 14 12" fill="currentColor"><polygon points="7,1 7,11 13.5,6"/><polygon points="0.5,1 0.5,11 7,6"/></svg>
+      </button>
+      <span class="time-label" id="watch-time-label">0:00 / 0:00</span>
+      <div class="scrubber" id="watch-scrubber">
+        <div class="scrubber-fill" id="watch-scrubber-fill" style="width:0%"></div>
+      </div>
+      <button class="speed-btn" id="watch-speed-btn" onclick="cycleWatchSpeed()">1&times;</button>
+      <button class="mute-btn" id="watch-mute-btn" onclick="toggleWatchMute()" title="Mute audio">
+        <svg id="watch-mute-icon" width="15" height="14" viewBox="0 0 15 14" fill="none">
+          <path d="M1 5H3.5L7 2V12L3.5 9H1V5Z" fill="currentColor"/>
+          <path d="M10 4.5C11 5.5 11 8.5 10 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="mute-btn" id="watch-theater-btn" onclick="toggleWatchTheater()" title="Expand">
+        <svg id="watch-theater-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 5V1H5"/><path d="M13 5V1H9"/><path d="M1 9V13H5"/><path d="M13 9V13H9"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT VIEW -->
+<div class="view" id="view-about">
+  <div class="about-scroll">
+    <div class="about-wrap">
+      <div class="about-inner" id="about-inner"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- AI-PROCESS DOC MODAL (opened from the About tab, keeps the reader inside the app) -->
+<div class="doc-modal-backdrop" id="doc-modal-backdrop" onclick="closeAiProcessDoc()"></div>
+<div class="doc-modal" id="doc-modal">
+  <button class="doc-modal-close" id="doc-modal-close" onclick="closeAiProcessDoc()" aria-label="Close">
+    <svg width="14" height="14" viewBox="0 0 13 13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="1" y1="1" x2="12" y2="12"/><line x1="12" y1="1" x2="1" y2="12"/></svg>
+  </button>
+  <iframe class="doc-modal-iframe" id="doc-modal-iframe" title="Building Arabic Lab with Agentic AI"></iframe>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
