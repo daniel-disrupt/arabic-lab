@@ -107,4 +107,27 @@ function publishLesson(lesson) {
   return { pushed: true, bundle };
 }
 
-module.exports = { publishLesson, buildBundle, ensureRepo };
+// Mirror image of publishLesson: removes the lesson's directory and manifest entry from the
+// repo, commits, and pushes. The CMS's own record of the lesson (Postgres row, uploaded media)
+// is untouched -- this only takes it down off the public site, it doesn't delete it here.
+function unpublishLesson(lesson) {
+  ensureRepo();
+  const dir = repoDir();
+  const lessonDir = path.join(dir, 'app', 'lessons', lesson.slug);
+  if (fs.existsSync(lessonDir)) fs.rmSync(lessonDir, { recursive: true, force: true });
+
+  const manifestPath = path.join(dir, 'app', 'lessons', 'manifest.json');
+  let manifest = [];
+  if (fs.existsSync(manifestPath)) manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  const next = manifest.filter((l) => l.slug !== lesson.slug);
+  fs.writeFileSync(manifestPath, JSON.stringify(next, null, 2) + '\n');
+
+  git(['add', 'app/lessons']);
+  const status = git(['status', '--porcelain']);
+  if (!status.trim()) return { pushed: false, reason: 'no changes (already unpublished)' };
+  git(['commit', '-m', 'Unpublish lesson: ' + lesson.slug]);
+  git(['push', 'origin', 'master']);
+  return { pushed: true };
+}
+
+module.exports = { publishLesson, unpublishLesson, buildBundle, ensureRepo };

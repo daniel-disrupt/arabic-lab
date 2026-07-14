@@ -89,6 +89,19 @@ async function markPublished(slug) {
   return normalizeRow(rows[0]);
 }
 
+async function markUnpublished(slug) {
+  const { rows } = await query(
+    `UPDATE lessons SET status = 'draft', updated_at = now() WHERE slug = $1 RETURNING *`,
+    [slug]
+  );
+  return normalizeRow(rows[0]);
+}
+
+async function deleteLesson(slug) {
+  const { rows } = await query('DELETE FROM lessons WHERE slug = $1 RETURNING *', [slug]);
+  return rows[0] ? normalizeRow(rows[0]) : null;
+}
+
 module.exports = {
   JSON_FIELDS,
   MEDIA_COLUMNS,
@@ -98,4 +111,6 @@ module.exports = {
   updateLessonJson,
   updateLessonMediaPath,
   markPublished,
+  markUnpublished,
+  deleteLesson,
 };

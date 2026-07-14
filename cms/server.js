@@ -8,10 +8,11 @@ const multer = require('multer');
 const { basicAuth } = require('./src/auth');
 const db = require('./src/db');
 const lessons = require('./src/lessons');
-const { publishLesson } = require('./src/publish');
+const { publishLesson, unpublishLesson, buildBundle, ensureRepo } = require('./src/publish');
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '.data');
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
+const REPO_APP_DIR = path.join(DATA_DIR, 'repo', 'app');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 const upload = multer({ dest: UPLOAD_DIR });
 
@@ -65,6 +66,91 @@ app.post('/api/lessons/:slug/publish', async (req, res) => {
     res.status(500).json({ error: err.message, stderr: err.stderr ? err.stderr.toString() : undefined });
   }
 });
+
+app.post('/api/lessons/:slug/unpublish', async (req, res) => {
+  try {
+    const lesson = await lessons.getLesson(req.params.slug);
+    if (!lesson) return res.status(404).json({ error: 'not found' });
+    if (lesson.status !== 'published') return res.status(400).json({ error: 'lesson is not currently published' });
+    const result = unpublishLesson(lesson);
+    if (result.pushed) await lessons.markUnpublished(req.params.slug);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message, stderr: err.stderr ? err.stderr.toString() : undefined });
+  }
+});
+
+// Deleting a still-published lesson takes it down off the live site first -- never leaves
+// public content behind with no CMS record backing it.
+app.delete('/api/lessons/:slug', async (req, res) => {
+  try {
+    const lesson = await lessons.getLesson(req.params.slug);
+    if (!lesson) return res.status(404).json({ error: 'not found' });
+    if (lesson.status === 'published') {
+      const result = unpublishLesson(lesson);
+      if (!result.pushed && result.reason !== 'no changes (already unpublished)') {
+        return res.status(500).json({ error: 'failed to unpublish before delete', result });
+      }
+    }
+    for (const p of [lesson.video_asset_path, lesson.voiceover_audio_path, lesson.captions_vtt_path]) {
+      if (p) { try { fs.unlinkSync(p); } catch { /* already gone, fine */ } }
+    }
+    await lessons.deleteLesson(req.params.slug);
+    res.json({ deleted: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ─────────────── PREVIEW ───────────────
+   Serves the real public app/ shell (lesson.html, js/app.js, css/style.css -- straight from
+   this service's own git working copy, the same one publish uses) but with its data/media
+   fetches redirected to live CMS content instead of committed repo files -- so a lesson shows
+   exactly as it will once published, including edits that were never actually published. Gated
+   by the same Basic Auth as everything else in this app; never reachable by a real site visitor.
+   These routes are registered BEFORE the static mount so they take precedence for any slug,
+   published or not. */
+app.get('/preview/app/lessons/manifest.json', async (req, res, next) => {
+  try {
+    const all = await lessons.listLessons();
+    res.json(all.map((l) => ({ slug: l.slug, title: l.title, subtitle: l.subtitle || '' })));
+  } catch (err) { next(err); }
+});
+
+app.get('/preview/app/lessons/:slug/data.json', async (req, res, next) => {
+  try {
+    const lesson = await lessons.getLesson(req.params.slug);
+    if (!lesson) return res.status(404).json({ error: 'not found' });
+    const bundle = buildBundle(lesson);
+    if (lesson.video_asset_path) bundle.meta.videoPath = 'video/' + path.basename(lesson.video_asset_path);
+    if (lesson.captions_vtt_path) bundle.meta.captionsPath = 'video/' + path.basename(lesson.captions_vtt_path);
+    if (lesson.voiceover_audio_path) bundle.voiceover.src = 'audio/voiceover/' + path.basename(lesson.voiceover_audio_path);
+    res.json(bundle);
+  } catch (err) { next(err); }
+});
+
+app.get('/preview/app/lessons/:slug/video/:file', async (req, res) => {
+  const lesson = await lessons.getLesson(req.params.slug);
+  const isCaptions = req.params.file.endsWith('.vtt');
+  const filePath = isCaptions ? lesson?.captions_vtt_path : lesson?.video_asset_path;
+  if (!filePath || !fs.existsSync(filePath)) return res.status(404).end();
+  res.sendFile(filePath);
+});
+
+app.get('/preview/app/lessons/:slug/audio/voiceover/:file', async (req, res) => {
+  const lesson = await lessons.getLesson(req.params.slug);
+  if (!lesson?.voiceover_audio_path || !fs.existsSync(lesson.voiceover_audio_path)) return res.status(404).end();
+  res.sendFile(lesson.voiceover_audio_path);
+});
+
+app.use('/preview/app', async (req, res, next) => {
+  try {
+    if (!fs.existsSync(path.join(REPO_APP_DIR, '..', '.git'))) ensureRepo();
+    next();
+  } catch (err) { res.status(500).json({ error: 'preview unavailable: ' + err.message }); }
+}, express.static(REPO_APP_DIR));
 
 const PORT = process.env.PORT || 3000;
 db.init()

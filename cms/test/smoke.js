@@ -32,9 +32,12 @@ function setupFakeRemote() {
 
   // Seed the remote with a minimal but realistic app/ tree, mirroring the real repo's shape
   // after Part 1's refactor, so publish's manifest-merge logic has something real to merge into.
+  // The stub lesson.html stands in for the real app shell -- enough to prove /preview/app's
+  // static mount (and its lazy first-clone) actually serves files from this working copy.
   const seedDir = path.join(WORKDIR, 'seed');
   fs.mkdirSync(path.join(seedDir, 'app', 'lessons'), { recursive: true });
   fs.writeFileSync(path.join(seedDir, 'app', 'lessons', 'manifest.json'), '[]\n');
+  fs.writeFileSync(path.join(seedDir, 'app', 'lesson.html'), '<!doctype html><title>stub shell</title>');
   git(['init', '-b', 'master'], seedDir);
   git(['config', 'user.name', 'Seed'], seedDir);
   git(['config', 'user.email', 'seed@test.local'], seedDir);
@@ -133,14 +136,33 @@ async function main() {
       assert(res.ok, 'media upload failed for ' + kind + ': ' + JSON.stringify(data));
     }
 
-    // 5. publish
+    // 5. preview -- BEFORE publishing, proves preview reflects live draft content, not the repo
+    const previewData = await jsonFetch(BASE + '/preview/app/lessons/fixture-lesson/data.json');
+    assert(previewData.chunks[0].text[0].w === 'مرحبا', 'preview data.json does not reflect unpublished draft content');
+    assert(previewData.meta.videoPath === 'video/fixture-lesson-video.mp4', 'preview data.json missing uploaded media path: ' + previewData.meta.videoPath);
+
+    const previewManifest = await jsonFetch(BASE + '/preview/app/lessons/manifest.json');
+    assert(previewManifest.some((l) => l.slug === 'fixture-lesson'), 'preview manifest should include unpublished lessons too');
+
+    const previewShellRes = await fetch(BASE + '/preview/app/lesson.html', { headers: { Authorization: AUTH_HEADER } });
+    const previewShellText = await previewShellRes.text();
+    assert(previewShellRes.ok && previewShellText.includes('stub shell'), 'preview did not serve the real app shell from the repo working copy');
+
+    const previewVideoRes = await fetch(BASE + '/preview/app/lessons/fixture-lesson/video/v.mp4', { headers: { Authorization: AUTH_HEADER } });
+    assert((await previewVideoRes.text()) === 'fake video bytes', 'preview did not stream the uploaded (unpublished) video file');
+    const previewCaptionsRes = await fetch(BASE + '/preview/app/lessons/fixture-lesson/video/c.vtt', { headers: { Authorization: AUTH_HEADER } });
+    assert((await previewCaptionsRes.text()).includes('WEBVTT'), 'preview did not stream the uploaded (unpublished) captions file');
+    const previewAudioRes = await fetch(BASE + '/preview/app/lessons/fixture-lesson/audio/voiceover/a.mp3', { headers: { Authorization: AUTH_HEADER } });
+    assert((await previewAudioRes.text()) === 'fake audio bytes', 'preview did not stream the uploaded (unpublished) voiceover file');
+
+    // 6. publish
     const publishRes = await jsonFetch(BASE + '/api/lessons/fixture-lesson/publish', { method: 'POST', body: '{}' });
     assert(publishRes.pushed === true, 'publish did not report pushed:true: ' + JSON.stringify(publishRes));
 
     const afterPublish = await jsonFetch(BASE + '/api/lessons/fixture-lesson');
     assert(afterPublish.status === 'published', 'lesson status not updated to published after publish');
 
-    // 6. verify the fake remote actually received the commit with correct content
+    // 7. verify the fake remote actually received the commit with correct content
     const checkoutDir = path.join(WORKDIR, 'checkout');
     git(['clone', REMOTE_DIR, checkoutDir]);
     const dataJsonPath = path.join(checkoutDir, 'app', 'lessons', 'fixture-lesson', 'data.json');
@@ -163,11 +185,59 @@ async function main() {
     const log = git(['log', '--oneline'], checkoutDir);
     assert(log.includes('Publish lesson: fixture-lesson'), 'commit message missing from log:\n' + log);
 
+    // 8. unpublish -- guard: refuses on a lesson that was never published
+    const neverPublished = await jsonFetch(BASE + '/api/lessons', {
+      method: 'POST', body: JSON.stringify({ slug: 'never-published', title: 'Never Published' }),
+    });
+    const unpublishGuardRes = await fetch(BASE + '/api/lessons/' + neverPublished.slug + '/unpublish', { method: 'POST', headers: { Authorization: AUTH_HEADER } });
+    assert(unpublishGuardRes.status === 400, 'unpublishing a draft-only lesson should 400, got ' + unpublishGuardRes.status);
+
+    // 9. unpublish fixture-lesson for real -- repo/manifest cleaned up, status reverts to draft
+    const unpublishRes = await jsonFetch(BASE + '/api/lessons/fixture-lesson/unpublish', { method: 'POST', body: '{}' });
+    assert(unpublishRes.pushed === true, 'unpublish did not report pushed:true: ' + JSON.stringify(unpublishRes));
+    const afterUnpublish = await jsonFetch(BASE + '/api/lessons/fixture-lesson');
+    assert(afterUnpublish.status === 'draft', 'lesson status should revert to draft after unpublish');
+
+    git(['pull'], checkoutDir);
+    assert(!fs.existsSync(path.join(checkoutDir, 'app', 'lessons', 'fixture-lesson')), 'lesson directory should be removed from the repo after unpublish');
+    const manifestAfterUnpublish = JSON.parse(fs.readFileSync(path.join(checkoutDir, 'app', 'lessons', 'manifest.json'), 'utf8'));
+    assert(manifestAfterUnpublish.length === 0, 'manifest.json should be empty after unpublishing the only lesson: ' + JSON.stringify(manifestAfterUnpublish));
+    const logAfterUnpublish = git(['log', '--oneline'], checkoutDir);
+    assert(logAfterUnpublish.includes('Unpublish lesson: fixture-lesson'), 'unpublish commit message missing from log:\n' + logAfterUnpublish);
+
+    // 10. delete an already-unpublished (draft) lesson -- also cleans up its uploaded media files
+    const beforeDelete = await jsonFetch(BASE + '/api/lessons/fixture-lesson');
+    const uploadedPaths = [beforeDelete.video_asset_path, beforeDelete.voiceover_audio_path, beforeDelete.captions_vtt_path];
+    assert(uploadedPaths.every((p) => p && fs.existsSync(p)), 'expected uploaded media files to exist before delete');
+
+    const deleteRes = await fetch(BASE + '/api/lessons/fixture-lesson', { method: 'DELETE', headers: { Authorization: AUTH_HEADER } });
+    assert(deleteRes.ok, 'delete request failed: ' + deleteRes.status);
+    const afterDeleteRes = await fetch(BASE + '/api/lessons/fixture-lesson', { headers: { Authorization: AUTH_HEADER } });
+    assert(afterDeleteRes.status === 404, 'lesson should 404 after delete');
+    assert(uploadedPaths.every((p) => !fs.existsSync(p)), 'uploaded media files should be removed on delete');
+
+    // 11. delete a still-PUBLISHED lesson -- should auto-unpublish (take it down) before deleting the record
+    await jsonFetch(BASE + '/api/lessons', { method: 'POST', body: JSON.stringify({ slug: 'publish-then-delete', title: 'Publish Then Delete' }) });
+    await jsonFetch(BASE + '/api/lessons/publish-then-delete/json/chunks_json', { method: 'PUT', body: JSON.stringify([{ start: 0, end: 1, label: '0:00', text: [] }]) });
+    const secondPublish = await jsonFetch(BASE + '/api/lessons/publish-then-delete/publish', { method: 'POST', body: '{}' });
+    assert(secondPublish.pushed === true, 'second lesson did not publish: ' + JSON.stringify(secondPublish));
+
+    const deleteWhilePublishedRes = await fetch(BASE + '/api/lessons/publish-then-delete', { method: 'DELETE', headers: { Authorization: AUTH_HEADER } });
+    assert(deleteWhilePublishedRes.ok, 'delete-while-published request failed: ' + deleteWhilePublishedRes.status);
+
+    git(['pull'], checkoutDir);
+    assert(!fs.existsSync(path.join(checkoutDir, 'app', 'lessons', 'publish-then-delete')), 'delete-while-published should have taken the lesson down off the live site too');
+    const manifestFinal = JSON.parse(fs.readFileSync(path.join(checkoutDir, 'app', 'lessons', 'manifest.json'), 'utf8'));
+    assert(manifestFinal.length === 0, 'manifest.json should be empty after deleting the only remaining (published) lesson: ' + JSON.stringify(manifestFinal));
+
     console.log('ALL SMOKE TESTS PASSED');
     console.log(' - auth enforced (401 without credentials)');
     console.log(' - lesson created, 7 JSON fields round-tripped');
     console.log(' - 3 media files uploaded and copied into the published repo');
+    console.log(' - preview served live draft content (data.json, manifest, media, app shell) before publish');
     console.log(' - publish pushed a commit to the fake remote with correct data.json + manifest.json');
+    console.log(' - unpublish refuses on a never-published lesson, and correctly tears down a published one');
+    console.log(' - delete removes the DB row + uploaded media, and auto-unpublishes a still-live lesson first');
   } finally {
     server.kill();
   }
