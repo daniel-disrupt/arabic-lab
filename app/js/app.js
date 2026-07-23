@@ -198,16 +198,171 @@ function applyAppLang() {
   renderVerbsView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
+
+/* ─────────────── TRANSLITERATION (ARABIC → HEBREW/LATIN LETTERS) ───────────────
+   Locked conventions: files/TRANSLITERATION.md. Mechanical per-letter pass over the already-
+   voweled Arabic text -- tashkeel already encodes real pronunciation (incl. shadda), so both
+   engines walk it letter-by-letter rather than needing a separately-authored field per word.
+   Hebrew dialect judgment calls (ق as ק, ج as ג׳, ث/ذ/ظ collapsed) and English style choices
+   (digraphs, capitalized emphatics H/S/D/T, apostrophe shared by ع/ء) are flagged in that doc --
+   tweak the maps below if real Jaffa audio says otherwise. */
+let scriptMode = localStorage.getItem('arabicLabScript') || 'ar'; // 'ar' | 'translit-he' | 'translit-en'
+const TRANSLIT_SUN_LETTERS = new Set(['ت','ث','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ل','ن']);
+const TRANSLIT_SUKUN = 'ْ';
+const TRANSLIT_SHADDA = 'ّ';
+
+const TRANSLIT_CONSONANTS = {
+  'ا':{letter:'א'}, 'ب':{letter:'ב'}, 'ت':{letter:'ת'}, 'ث':{letter:'ת'},
+  'ج':{letter:'ג',mod:'׳'}, 'ح':{letter:'ח'}, 'خ':{letter:'ח',mod:'׳'},
+  'د':{letter:'ד'}, 'ذ':{letter:'ד'}, 'ر':{letter:'ר'}, 'ز':{letter:'ז'},
+  'س':{letter:'ס'}, 'ش':{letter:'ש'}, 'ص':{letter:'צ'}, 'ض':{letter:'צ',mod:'׳'},
+  'ط':{letter:'ט'}, 'ظ':{letter:'צ',mod:'׳'}, 'ع':{letter:'ע'}, 'غ':{letter:'ע',mod:'׳'},
+  'ف':{letter:'פ'}, 'ق':{letter:'ק'}, 'ك':{letter:'כ'}, 'ل':{letter:'ל'},
+  'م':{letter:'מ'}, 'ن':{letter:'נ'}, 'ه':{letter:'ה'}, 'و':{letter:'ו'},
+  'ي':{letter:'י'}, 'ء':{letter:'א'}, 'آ':{letter:'א'}, 'أ':{letter:'א'},
+  'ؤ':{letter:'א'}, 'إ':{letter:'א'}, 'ئ':{letter:'א'},
+  'ة':{letter:'ה'}, // ة ta marbuta -- overridden to ת in construct state below
+  'ى':{letter:'י'}, // ى alif maksura
+};
+const TRANSLIT_VOWEL_MARKS = {
+  'َ':'ַ', 'ُ':'ֻ', 'ِ':'ִ', // fatha/damma/kasra -> patach/qubuts/hiriq
+  'ً':'ַ', 'ٌ':'ֻ', 'ٍ':'ִ', // tanwin -> same, case ending dropped (not pronounced in dialect)
+};
+const TRANSLIT_PUNCT = { '،':',', '؟':'?', '؛':';' };
+
+function transliterateArabicHebrew(str) {
+  if (!str) return str;
+  const units = [];
+  for (const ch of str) {
+    if (ch === TRANSLIT_SUKUN || ch === TRANSLIT_SHADDA || TRANSLIT_VOWEL_MARKS[ch]) {
+      if (units.length) units[units.length - 1].marks.push(ch);
+      continue;
+    }
+    units.push({ base: ch, marks: [] });
+  }
+  let out = '';
+  for (let i = 0; i < units.length; i++) {
+    const u = units[i];
+    // Silent lam of the definite article: لْ immediately before an assimilating sun letter
+    // that itself carries shadda (e.g. اَلشَّمْس "ash-shams") -- written but not pronounced.
+    if (u.base === 'ل' && u.marks.includes(TRANSLIT_SUKUN)) {
+      const next = units[i + 1];
+      if (next && TRANSLIT_SUN_LETTERS.has(next.base) && next.marks.includes(TRANSLIT_SHADDA)) continue;
+    }
+    if (TRANSLIT_PUNCT[u.base]) { out += TRANSLIT_PUNCT[u.base]; continue; }
+    const entry = TRANSLIT_CONSONANTS[u.base];
+    if (!entry) { out += u.base; continue; } // space/Latin/digits/other punctuation -- passthrough
+    const vowelMark = u.marks.find(m => TRANSLIT_VOWEL_MARKS[m]);
+    const niqqud = vowelMark ? TRANSLIT_VOWEL_MARKS[vowelMark] : '';
+    const mod = entry.mod || '';
+    const letter = (u.base === 'ة' && vowelMark) ? 'ת' : entry.letter;
+    out += u.marks.includes(TRANSLIT_SHADDA) ? (letter + mod + letter + niqqud + mod) : (letter + niqqud + mod);
+  }
+  return out;
+}
+
+const TRANSLIT_EN_CONSONANTS = {
+  'ا':{letter:'a'}, 'ب':{letter:'b'}, 'ت':{letter:'t'}, 'ث':{letter:'t'},
+  'ج':{letter:'j'}, 'ح':{letter:'H'}, 'خ':{letter:'kh'},
+  'د':{letter:'d'}, 'ذ':{letter:'d'}, 'ر':{letter:'r'}, 'ز':{letter:'z'},
+  'س':{letter:'s'}, 'ش':{letter:'sh'}, 'ص':{letter:'S'}, 'ض':{letter:'D'},
+  'ط':{letter:'T'}, 'ظ':{letter:'D'}, 'ع':{letter:"'"}, 'غ':{letter:'gh'},
+  'ف':{letter:'f'}, 'ق':{letter:'q'}, 'ك':{letter:'k'}, 'ل':{letter:'l'},
+  'م':{letter:'m'}, 'ن':{letter:'n'}, 'ه':{letter:'h'}, 'و':{letter:'w'},
+  'ي':{letter:'y'}, 'ء':{letter:"'"}, 'آ':{letter:"'"}, 'أ':{letter:"'"},
+  'ؤ':{letter:"'"}, 'إ':{letter:"'"}, 'ئ':{letter:"'"},
+  'ة':{letter:''}, // ta marbuta pause -- dropped; overridden to 't' in construct state below
+  'ى':{letter:'y'},
+};
+const TRANSLIT_EN_VOWEL_MARKS = {
+  'َ':'a', 'ُ':'u', 'ِ':'i', // fatha/damma/kasra
+  'ً':'a', 'ٌ':'u', 'ٍ':'i', // tanwin -> same, case ending dropped (not pronounced in dialect)
+};
+const TRANSLIT_EN_LONG = { 'ُ':{ch:'و',long:'oo'}, 'ِ':{ch:'ي',long:'ee'} }; // damma+و / kasra+ي -> long vowel, not consonant
+const TRANSLIT_EN_PUNCT = { '،':',', '؟':'?', '؛':';' };
+
+function transliterateArabicEnglish(str) {
+  if (!str) return str;
+  const units = [];
+  for (const ch of str) {
+    if (ch === TRANSLIT_SUKUN || ch === TRANSLIT_SHADDA || TRANSLIT_EN_VOWEL_MARKS[ch]) {
+      if (units.length) units[units.length - 1].marks.push(ch);
+      continue;
+    }
+    units.push({ base: ch, marks: [] });
+  }
+  let out = '';
+  for (let i = 0; i < units.length; i++) {
+    const u = units[i];
+    if (u.base === 'ل' && u.marks.includes(TRANSLIT_SUKUN)) {
+      const next = units[i + 1];
+      if (next && TRANSLIT_SUN_LETTERS.has(next.base) && next.marks.includes(TRANSLIT_SHADDA)) continue;
+    }
+    // Matres lectionis: damma+و or kasra+ي with no vowel of its own on the و/ي itself
+    // is a long vowel, not the consonant w/y -- replace the short vowel just emitted
+    // with its long form and skip emitting "w"/"y".
+    const prev = units[i - 1];
+    const longInfo = prev && TRANSLIT_EN_LONG[prev.marks.find(m => TRANSLIT_EN_VOWEL_MARKS[m])];
+    if (longInfo && longInfo.ch === u.base && !u.marks.find(m => TRANSLIT_EN_VOWEL_MARKS[m])) {
+      out = out.slice(0, -1) + longInfo.long; // drop the short vowel char just appended for prev, replace with long form
+      continue;
+    }
+    if (TRANSLIT_EN_PUNCT[u.base]) { out += TRANSLIT_EN_PUNCT[u.base]; continue; }
+    const entry = TRANSLIT_EN_CONSONANTS[u.base];
+    if (!entry) { out += u.base; continue; }
+    const vowelMark = u.marks.find(m => TRANSLIT_EN_VOWEL_MARKS[m]);
+    const vowel = vowelMark ? TRANSLIT_EN_VOWEL_MARKS[vowelMark] : '';
+    const letter = (u.base === 'ة' && vowelMark) ? 't' : entry.letter;
+    out += u.marks.includes(TRANSLIT_SHADDA) ? (letter + letter + vowel) : (letter + vowel);
+  }
+  return out;
+}
+
+function arText(s) {
+  if (scriptMode === 'translit-he') return transliterateArabicHebrew(s);
+  if (scriptMode === 'translit-en') return transliterateArabicEnglish(s);
+  return s;
+}
+function scriptDir() { return scriptMode === 'translit-en' ? 'ltr' : 'rtl'; }
+function setScriptMode(mode) {
+  scriptMode = mode;
+  localStorage.setItem('arabicLabScript', mode);
+  applyScriptMode();
+}
+function applyScriptMode() {
+  const dir = scriptDir();
+  document.body.classList.toggle('translit-mode', scriptMode !== 'ar');
+  document.body.classList.toggle('translit-en-mode', scriptMode === 'translit-en');
+  document.querySelectorAll('.script-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.script === scriptMode));
+  wordEls.forEach(({ el, data }) => { el.textContent = arText(data.w); el.dir = dir; });
+  chunkEls.forEach((div) => { const p = div.querySelector('p'); if (p) p.dir = dir; }); // paragraph-level dir so word order re-renders LTR/RTL as a whole, not just per-word
+  watchWordEls.forEach((el, i) => { el.textContent = arText(watchWordData[i].w); el.dir = dir; });
+  watchArCueEls.forEach((div) => { div.dir = dir; });
+  if (document.getElementById('lesson-title-ar')) { const e = document.getElementById('lesson-title-ar'); e.textContent = arText(lessonTitleArOriginal); e.dir = dir; }
+  if (document.getElementById('lesson-location-ar')) { const e = document.getElementById('lesson-location-ar'); e.textContent = arText(lessonLocationArOriginal); e.dir = dir; }
+  renderMobileCueOverlay(activeWatchCueIdx);
+  renderVocabView();
+  renderVerbsView();
+  if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
+}
+
+// #lesson-title-ar/#lesson-location-ar are hardcoded per-lesson markup in lesson.html, not
+// populated by JS -- capture the pristine Arabic once so applyScriptMode() can re-derive
+// (rather than re-fetch) their text on every toggle, same static-element pattern as audioEl above.
+const lessonTitleArOriginal = document.getElementById('lesson-title-ar') ? document.getElementById('lesson-title-ar').textContent : '';
+const lessonLocationArOriginal = document.getElementById('lesson-location-ar') ? document.getElementById('lesson-location-ar').textContent : '';
+
 function rootMetaHtml(root, sharedRoot) {
   if (!root) return '';
+  const rootHtml = '<span dir="' + scriptDir() + '">' + arText(root) + '</span>';
   if (appLang === 'en') {
     return sharedRoot
-      ? '<div class="gloss-root"><span class="root-dot"></span>Shared root &middot; ' + root + '</div>'
-      : '<div class="gloss-root" style="opacity:.4">Root &middot; ' + root + '</div>';
+      ? '<div class="gloss-root"><span class="root-dot"></span>Shared root &middot; ' + rootHtml + '</div>'
+      : '<div class="gloss-root" style="opacity:.4">Root &middot; ' + rootHtml + '</div>';
   }
   return sharedRoot
-    ? '<div class="gloss-root"><span class="root-dot"></span>שורש משותף &middot; ' + root + '</div>'
-    : '<div class="gloss-root" style="opacity:.4">שורש &middot; ' + root + '</div>';
+    ? '<div class="gloss-root"><span class="root-dot"></span>שורש משותף &middot; ' + rootHtml + '</div>'
+    : '<div class="gloss-root" style="opacity:.4">שורש &middot; ' + rootHtml + '</div>';
 }
 function phraseTypeBadgeHtml(type) {
   if (!type) return '';
@@ -284,6 +439,20 @@ function selectMenuTab(name) {
   closeMenu();
 }
 
+/* ─────────────── HEADER SETTINGS MENU (site language + learning alphabet) ─────────────── */
+// Collapsed behind one icon so the tabs keep visual primacy in the header -- these are
+// rarely-changed preferences, not something toggled every few seconds, so one extra tap/click
+// to reach them is a good trade for not competing with the main nav for space.
+function toggleSettingsMenu() {
+  document.getElementById('settings-btn').classList.toggle('open');
+  document.getElementById('settings-menu').classList.toggle('open');
+}
+function closeSettingsMenu() {
+  document.getElementById('settings-btn').classList.remove('open');
+  document.getElementById('settings-menu').classList.remove('open');
+}
+initOutsideTapClose(document.body, (target) => !target.closest('.settings-wrap'), closeSettingsMenu);
+
 /* ─────────────── AI-PROCESS DOC MODAL ─────────────── */
 // The iframe's src is only set on open (not eagerly in the HTML) so the doc page isn't fetched
 // until someone actually asks to read it.
@@ -333,6 +502,7 @@ function buildReader() {
       }
     });
     const p = document.createElement('p');
+    p.dir = scriptDir(); // word order in chunk.text already matches spoken order -- flipping dir alone re-renders it LTR/RTL correctly
     const startIdx = gi;
     let sentenceSpan = document.createElement('span');
     sentenceSpan.className = 'sentence';
@@ -341,7 +511,7 @@ function buildReader() {
       if (word.sep !== undefined) { sentenceSpan.appendChild(document.createTextNode(word.sep + ' ')); return; }
       if (word.sentT !== undefined) sentenceEls.push({ el: sentenceSpan, t: word.sentT });
       const span = document.createElement('span');
-      span.className = 'word'; span.textContent = word.w; span.dataset.idx = gi;
+      span.className = 'word'; span.textContent = arText(word.w); span.dir = scriptDir(); span.dataset.idx = gi;
       wordEls.push({ el: span, data: word, globalIdx: gi++ });
       sentenceSpan.appendChild(span);
       if (word.punct) sentenceSpan.appendChild(document.createTextNode(word.punct));
@@ -488,7 +658,8 @@ function ciForIdx(idx) { const r = chunkRanges.find(r => idx>=r.startIdx && idx<
 function commitWord(idx) {
   clearSelection();
   const {el,data} = wordEls[idx]; el.classList.add('selected');
-  document.getElementById('tray-ar').textContent = data.w;
+  document.getElementById('tray-ar').textContent = arText(data.w);
+  document.getElementById('tray-ar').dir = scriptDir();
   document.getElementById('tray-ar').className = 'tray-arabic';
   document.getElementById('tray-he').textContent = appLang === 'en' ? (data.en||'') : data.he;
   document.getElementById('tray-en').textContent = data.en||'';
@@ -500,8 +671,9 @@ function commitWord(idx) {
 function commitPhrase(lo, hi) {
   wordEls.forEach(({el,globalIdx:gi}) => { el.classList.toggle('in-range',gi>=lo&&gi<=hi); el.classList.remove('range-start','range-end','selected'); });
   const phrase = wordEls.slice(lo,hi+1).map(w=>w.data.w).join(' ');
-  const pws = wordEls.slice(lo,hi+1).map(w=>w.data.w);
-  document.getElementById('tray-ar').textContent = phrase;
+  const pws = wordEls.slice(lo,hi+1).map(w=>w.data.w); // raw Arabic, unaffected by scriptMode -- used for PHRASE_GLOSSES key matching
+  document.getElementById('tray-ar').textContent = arText(phrase);
+  document.getElementById('tray-ar').dir = scriptDir();
   document.getElementById('tray-ar').className = 'tray-arabic phrase';
   let gloss = null;
   for (const pg of PHRASE_GLOSSES) { if (pg.keys.filter(k=>pws.includes(k)).length >= Math.min(2,pg.keys.length)) { gloss=pg; break; } }
@@ -533,7 +705,8 @@ function showHeaderGloss(key) {
   const g = HEADER_GLOSS[key];
   if (!g) return;
   clearSelection();
-  document.getElementById('tray-ar').textContent = g.ar;
+  document.getElementById('tray-ar').textContent = arText(g.ar);
+  document.getElementById('tray-ar').dir = scriptDir();
   document.getElementById('tray-ar').className = key === 'location' ? 'tray-arabic phrase' : 'tray-arabic';
   document.getElementById('tray-he').textContent = appLang === 'en' ? g.en : g.he;
   document.getElementById('tray-en').textContent = g.en;
@@ -824,7 +997,7 @@ function renderVerbsView() {
     label.className = 'verb-group-header' + (isCollapsed ? ' collapsed' : '');
     let titleHtml;
     const waznPattern = formNum !== UNSORTED ? WAZN_PATTERNS[formNum] : null;
-    const waznHtml = waznPattern ? '<span class="verb-group-wazn">&nbsp;·&nbsp;' + waznPattern + '</span>' : '';
+    const waznHtml = waznPattern ? '<span class="verb-group-wazn" dir="' + scriptDir() + '">&nbsp;·&nbsp;' + arText(waznPattern) + '</span>' : '';
     if (formNum === UNSORTED) {
       titleHtml = appLang === 'en' ? 'Unclassified' : 'טרם סווג';
     } else if (appLang === 'en') {
@@ -843,7 +1016,7 @@ function renderVerbsView() {
     sorted.forEach(v => {
       const btn = document.createElement('button');
       btn.className = 'verb-pill' + (v.id===activeVerbId?' active':'');
-      btn.innerHTML = '<span class="verb-pill-ar">'+v.arDisplay+'</span><span class="verb-pill-root">'+(v.root||'')+'</span>';
+      btn.innerHTML = '<span class="verb-pill-ar" dir="'+scriptDir()+'">'+arText(v.arDisplay)+'</span><span class="verb-pill-root" dir="'+scriptDir()+'">'+arText(v.root||'')+'</span>';
       btn.onclick = () => {
         activeVerbId=v.id; activeConjTab='present'; renderVerbsView();
         if (window.matchMedia('(max-width:720px)').matches) openVerbDrawer();
@@ -866,16 +1039,17 @@ function renderVerbsView() {
     : { past:'עָבָר', present:'הוֹוֶה', imperative:'צִיווּי' };
 
   const binyanHtml = verb.formNum
-    ? '<span class="binyan-badge-ar">' + WAZN_PATTERNS[verb.formNum] + '</span>'
+    ? '<span class="binyan-badge-ar" dir="' + scriptDir() + '">' + arText(WAZN_PATTERNS[verb.formNum]) + '</span>'
       + '<span style="font-weight:700;margin-right:6px;font-size:13px">&nbsp;·&nbsp;'+verb.formNum+'</span>'
     : '<span style="opacity:.5">' + (isEn ? 'Unclassified' : 'טרם סווג') + '</span>';
+  const rootSpan = verb.root ? '<span dir="' + scriptDir() + '">' + arText(verb.root) + '</span>' : '';
   const rootTagHtml = isEn
-    ? (verb.root ? 'Root ' + verb.root : 'Root — not yet identified')
-    : (verb.root ? 'שורש '+verb.root : 'שורש — טרם זוהה');
+    ? (verb.root ? 'Root ' + rootSpan : 'Root — not yet identified')
+    : (verb.root ? 'שורש '+rootSpan : 'שורש — טרם זוהה');
   // English mode is a deliberately thinner card: dialect notes, participle, and masdar only
   // exist as Hebrew data today (verbs-data.js has no English fields for them), so rather than
   // show a half-Hebrew "English" card, those sections are omitted entirely until backfilled.
-  const arSubHtml = verb.arDisplay + (!isEn && verb.dialectNote ? ' &mdash; <span style="color:var(--mid)">'+verb.dialectNote+'</span>' : '');
+  const arSubHtml = arText(verb.arDisplay) + (!isEn && verb.dialectNote ? ' &mdash; <span style="color:var(--mid)">'+verb.dialectNote+'</span>' : '');
   const glossHtml = isEn
     ? `<div class="verb-gloss-he" style="margin-top:12px">${verb.gloss_en || ''}</div>`
     : `<div class="verb-gloss-he" style="margin-top:12px">${verb.gloss_he}</div>
@@ -893,15 +1067,15 @@ function renderVerbsView() {
           <div style="font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--mid);margin-bottom:6px;text-transform:uppercase">בינוני הפועל</div>
           <div style="display:flex;gap:16px;flex-wrap:wrap">
             <div class="derived-item">
-              <div class="derived-ar">${verb.participle.m}</div>
+              <div class="derived-ar" dir="${scriptDir()}">${arText(verb.participle.m)}</div>
               <div class="derived-sub">זכר</div>
             </div>
             <div class="derived-item">
-              <div class="derived-ar">${verb.participle.f}</div>
+              <div class="derived-ar" dir="${scriptDir()}">${arText(verb.participle.f)}</div>
               <div class="derived-sub">נקבה</div>
             </div>
             <div class="derived-item">
-              <div class="derived-ar">${verb.participle.pl}</div>
+              <div class="derived-ar" dir="${scriptDir()}">${arText(verb.participle.pl)}</div>
               <div class="derived-sub">רבים</div>
             </div>
           </div>
@@ -912,7 +1086,7 @@ function renderVerbsView() {
         ${verb.masdar ? `
         <div class="derived-item">
           <div style="font-size:10px;font-weight:700;letter-spacing:.07em;color:var(--mid);margin-bottom:6px;text-transform:uppercase">שם פעולה</div>
-          <div class="derived-ar">${verb.masdar.ar}</div>
+          <div class="derived-ar" dir="${scriptDir()}">${arText(verb.masdar.ar)}</div>
           <div class="derived-sub">${verb.masdar.he}</div>
         </div>
         ` : ''}
@@ -927,12 +1101,12 @@ function renderVerbsView() {
       <table class="conj-table">
         ${verb.conj[activeConjTab].map(row => isEn ? `
           <tr>
-            <td class="conj-ar">${row.ar}</td>
+            <td class="conj-ar" dir="${scriptDir()}">${arText(row.ar)}</td>
             <td class="conj-pronoun">${PRONOUN_EN[row.pronoun] || row.pronoun}</td>
           </tr>
         ` : `
           <tr>
-            <td class="conj-ar">${row.ar}</td>
+            <td class="conj-ar" dir="${scriptDir()}">${arText(row.ar)}</td>
             <td class="conj-he">${row.he}</td>
             <td class="conj-pronoun">${row.pronoun}</td>
             ${row.context ? `<td class="conj-context">${row.context}</td>` : '<td></td>'}
@@ -948,8 +1122,8 @@ function renderVerbsView() {
     </div>
     <div class="verb-card-head">
       <div class="verb-card-ar">
-        <div class="verb-ar-main">${verb.ar}</div>
-        <div class="verb-ar-sub">${arSubHtml}</div>
+        <div class="verb-ar-main" dir="${scriptDir()}">${arText(verb.ar)}</div>
+        <div class="verb-ar-sub" dir="${scriptDir()}">${arSubHtml}</div>
         ${glossHtml}
       </div>
       <div class="verb-card-meta">
@@ -1027,7 +1201,7 @@ function renderVocabView() {
     return `
       <div class="vocab-item">
         <div class="vocab-card-head">
-          <div class="vocab-row-ar${v.type==='phrase'?' phrase':''}">${v.ar}</div>
+          <div class="vocab-row-ar${v.type==='phrase'?' phrase':''}" dir="${scriptDir()}">${arText(v.ar)}</div>
           <div class="vocab-card-actions">
             <button class="vocab-row-toggle${isOpen?' open':''}" title="${t('showSourceLine')}" onclick="toggleVocabExpand(${i})"><span class="chev">&#9662;</span></button>
             <button class="vocab-row-delete" title="${t('removeFromVocab')}" onclick="removeVocabItem(event, ${i})">&times;</button>
@@ -1044,7 +1218,7 @@ function renderVocabView() {
               <div class="vocab-expand-time">${VOICEOVER_CHUNKS[v.ci].label}</div>
               <button class="vocab-row-pronounce" title="${t('playPassage')}" onclick="playVocabPassage(event, ${i})">${PRONOUNCE_ICON_SVG}</button>
             </div>
-            <p class="vocab-expand-text">${renderChunkPreview(v.ci, v.ar)}</p>
+            <p class="vocab-expand-text" dir="${scriptDir()}">${renderChunkPreview(v.ci, v.ar)}</p>
           </div>
         </div>
       </div>
@@ -1093,7 +1267,7 @@ function renderChunkPreview(ci, targetAr) {
     if (t.sep !== undefined) return t.sep;
     wi++;
     const isMatch = matchStart >= 0 && wi >= matchStart && wi < matchStart + targetWords.length;
-    const text = t.w + (t.punct || '');
+    const text = arText(t.w) + (t.punct || ''); // punct never transliterated, matching logic above stays on raw t.w
     const span = '<span class="chunk-preview-word" data-gi="' + (chunkStartGi + wi) + '">' + text + '</span>';
     return isMatch ? '<mark class="chunk-preview-hl">'+span+'</mark>' : span;
   }).join(' ');
@@ -1137,6 +1311,7 @@ let watchTrCueEls = [];
 let watchTrWordsByCue = []; // per cue index: array of translation word spans
 let activeWatchCueIdx = -1;
 let watchWordEls = [];
+let watchWordData = []; // parallel to watchWordEls: pristine source word object, so applyScriptMode() can re-derive text on toggle
 let watchCueOfWordIdx = []; // parallel to watchWordEls: which cue index each word belongs to
 let watchCueWordRanges = []; // per cue: {startIdx, endIdx} into watchWordEls/watchCueOfWordIdx
 let watchTimedWords = [];
@@ -1149,6 +1324,7 @@ function buildWatchTranscript() {
   arPanel.innerHTML = '';
   trPanel.innerHTML = '';
   watchWordEls = [];
+  watchWordData = [];
   watchCueOfWordIdx = [];
   watchCueWordRanges = [];
   watchTimedWords = [];
@@ -1162,16 +1338,19 @@ function buildWatchTranscript() {
   watchArCueEls = WATCH_CAPTIONS.map((cue, ci) => {
     const div = document.createElement('div');
     div.className = 'watch-cue watch-cue-ar';
+    div.dir = scriptDir(); // word order in cue.words already matches spoken order -- flipping dir alone re-renders it LTR/RTL correctly
     const startIdx = watchWordEls.length;
     cue.words.forEach((wd) => {
       const span = document.createElement('span');
       span.className = 'watch-word';
-      span.textContent = wd.w;
+      span.textContent = arText(wd.w);
+      span.dir = scriptDir();
       span.dataset.widx = watchWordEls.length;
       div.appendChild(span);
       div.appendChild(document.createTextNode(' '));
       const wi = watchWordEls.length;
       watchWordEls.push(span);
+      watchWordData.push(wd);
       watchCueOfWordIdx.push(ci);
       if (wd.t !== undefined) watchTimedWords.push({ idx: wi, t: wd.t });
     });
@@ -1580,6 +1759,7 @@ function initLesson(bundle) {
   initOutsideTapClose('verbs-scroll', (target) => !target.closest('.verb-pill') && !target.closest('.verb-card'), closeVerbDrawer);
   renderVerbsView();
   applyAppLang();
+  applyScriptMode();
 }
 
 const lessonSlug = new URLSearchParams(location.search).get('slug');

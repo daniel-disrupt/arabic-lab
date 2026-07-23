@@ -20,9 +20,31 @@
   </button>
   <span class="mobile-header-title" id="mobile-header-title">Home</span>
   <div class="header-side">
-    <div class="lang-switch" id="lang-switch">
-      <button class="lang-switch-btn" data-lang="he" onclick="setAppLang('he')">עברית</button>
-      <button class="lang-switch-btn" data-lang="en" onclick="setAppLang('en')">English</button>
+    <div class="settings-wrap">
+      <button class="settings-btn" id="settings-btn" onclick="toggleSettingsMenu()" aria-label="Site language and learning alphabet settings" title="Site language and learning alphabet settings">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M3 12h18"/>
+          <path d="M12 3c2.4 2.5 3.8 5.6 3.8 9s-1.4 6.5-3.8 9c-2.4-2.5-3.8-5.6-3.8-9s1.4-6.5 3.8-9z"/>
+        </svg>
+      </button>
+      <div class="settings-menu" id="settings-menu">
+        <div class="switch-group" id="lang-switch-group" title="Interface and gloss language">
+          <span class="switch-label">Site language</span>
+          <div class="lang-switch" id="lang-switch">
+            <button class="lang-switch-btn" data-lang="he" onclick="setAppLang('he')">עברית</button>
+            <button class="lang-switch-btn" data-lang="en" onclick="setAppLang('en')">English</button>
+          </div>
+        </div>
+        <div class="switch-group" id="script-switch-group" title="Which alphabet the Arabic lesson content (Reader/Vocab/Verbs) is shown in">
+          <span class="switch-label">Learning alphabet</span>
+          <div class="script-switch" id="script-switch">
+            <button class="script-switch-btn active" data-script="ar" onclick="setScriptMode('ar')">العربية</button>
+            <button class="script-switch-btn" data-script="translit-he" onclick="setScriptMode('translit-he')">תעתיק</button>
+            <button class="script-switch-btn" data-script="translit-en" onclick="setScriptMode('translit-en')">EN</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <nav class="tabs">
