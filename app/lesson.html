@@ -30,18 +30,18 @@
       </button>
       <div class="settings-menu" id="settings-menu">
         <div class="switch-group" id="lang-switch-group" title="Interface and gloss language">
-          <span class="switch-label">Site language</span>
+          <span class="switch-label" data-label="site-lang">Site language</span>
           <div class="lang-switch" id="lang-switch">
             <button class="lang-switch-btn" data-lang="he" onclick="setAppLang('he')">עברית</button>
             <button class="lang-switch-btn" data-lang="en" onclick="setAppLang('en')">English</button>
           </div>
         </div>
         <div class="switch-group" id="script-switch-group" title="Which alphabet the Arabic lesson content (Reader/Vocab/Verbs) is shown in">
-          <span class="switch-label">Learning alphabet</span>
+          <span class="switch-label" data-label="learning-alphabet">Learning alphabet</span>
           <div class="script-switch" id="script-switch">
             <button class="script-switch-btn active" data-script="ar" onclick="setScriptMode('ar')">العربية</button>
             <button class="script-switch-btn" data-script="translit-he" onclick="setScriptMode('translit-he')">תעתיק</button>
-            <button class="script-switch-btn" data-script="translit-en" onclick="setScriptMode('translit-en')">EN</button>
+            <button class="script-switch-btn" data-script="translit-en" onclick="setScriptMode('translit-en')">Transliteration</button>
           </div>
         </div>
       </div>
@@ -70,6 +70,28 @@
     <div class="side-menu-item" id="menu-tab-vocab" onclick="selectMenuTab('vocab')">Vocab</div>
     <div class="side-menu-item" id="menu-tab-verbs" onclick="selectMenuTab('verbs')">Verbs</div>
     <div class="side-menu-item" id="menu-tab-about" onclick="selectMenuTab('about')">About</div>
+  </div>
+  <!-- Same controls as the desktop header's settings popover -- kept here instead on mobile since
+       that popover anchors to the header button's position, which sits too close to the mobile
+       screen edge and pushed the panel off-canvas. No id's on this copy (see #settings-menu's) to
+       avoid duplicate-id markup; app.js targets both copies via class selectors, not id, so
+       whichever copy is on-screen at a given width stays in sync automatically. -->
+  <div class="side-menu-settings">
+    <div class="switch-group" title="Interface and gloss language">
+      <span class="switch-label" data-label="site-lang">Site language</span>
+      <div class="lang-switch">
+        <button class="lang-switch-btn" data-lang="he" onclick="setAppLang('he')">עברית</button>
+        <button class="lang-switch-btn" data-lang="en" onclick="setAppLang('en')">English</button>
+      </div>
+    </div>
+    <div class="switch-group" title="Which alphabet the Arabic lesson content (Reader/Vocab/Verbs) is shown in">
+      <span class="switch-label" data-label="learning-alphabet">Learning alphabet</span>
+      <div class="script-switch">
+        <button class="script-switch-btn active" data-script="ar" onclick="setScriptMode('ar')">العربية</button>
+        <button class="script-switch-btn" data-script="translit-he" onclick="setScriptMode('translit-he')">תעתיק</button>
+        <button class="script-switch-btn" data-script="translit-en" onclick="setScriptMode('translit-en')">Transliteration</button>
+      </div>
+    </div>
   </div>
 </nav>
 

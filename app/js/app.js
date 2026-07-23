@@ -120,6 +120,7 @@ const STRINGS = {
     enterTheater: 'Expand', exitTheater: 'Exit expanded view',
     hideTranslation: 'Hide translation', showTranslation: 'Show translation',
     playPassage: 'Play this passage',
+    siteLanguageLabel: 'Site language', learningAlphabetLabel: 'Learning alphabet',
   },
   he: {
     vocabTitle: 'אוצר מילים שמור',
@@ -145,6 +146,7 @@ const STRINGS = {
     enterTheater: 'הרחבה', exitTheater: 'יציאה מתצוגה מורחבת',
     hideTranslation: 'הסתר תרגום', showTranslation: 'הצג תרגום',
     playPassage: 'נגן את הקטע הזה',
+    siteLanguageLabel: 'שפת האתר', learningAlphabetLabel: 'אלפבית הלימוד',
   },
 };
 function t(key) { return STRINGS[appLang][key]; }
@@ -192,6 +194,8 @@ function applyAppLang() {
   document.getElementById('mute-btn').title = audioEl.muted ? t('unmuteAudio') : t('muteAudio');
   updateWatchTheaterIcon();
   document.querySelectorAll('.chunk-time').forEach(el => el.title = t('jumpToAudio'));
+  document.querySelectorAll('[data-label="site-lang"]').forEach(el => el.textContent = t('siteLanguageLabel'));
+  document.querySelectorAll('[data-label="learning-alphabet"]').forEach(el => el.textContent = t('learningAlphabetLabel'));
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // avoid a stale mixed-language tray after switching mid-selection (header-gloss trays have no currentSelectionCtx)
   applyWatchTranslationLang();
   renderVocabView();
