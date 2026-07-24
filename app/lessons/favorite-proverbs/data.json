@@ -15,6 +15,7 @@
     {
       "id": "ma-bhukkak-illa-dufrak",
       "order": 1,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -58,11 +59,16 @@
           "he": "הציפורן שלך",
           "en": "your fingernail"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "il-ird-bi-en",
       "order": 2,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -106,11 +112,17 @@
           "he": "צבי",
           "en": "gazelle"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2,
+        1
       ]
     },
     {
       "id": "id-la-halha-ma",
       "order": 3,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -154,11 +166,16 @@
           "he": "מוחאת כף",
           "en": "claps"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "il-bab-illi-bijilak",
       "order": 4,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -224,11 +241,17 @@
           "he": "ותנוח",
           "en": "and rest"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        3,
+        2
       ]
     },
     {
       "id": "baad-ma-shab-wadduh",
       "order": 5,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -279,11 +302,16 @@
           "he": "לבית הספר (כותאב)",
           "en": "to the (Qur'anic) school"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2
       ]
     },
     {
       "id": "ij-jar-abl-id",
       "order": 6,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -320,11 +348,16 @@
           "he": "הבית",
           "en": "the house"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "jarak-il-arib-wala",
       "order": 7,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -375,11 +408,17 @@
           "he": "הרחוק",
           "en": "the far/distant one"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "tit-tit-zayy-ma",
       "order": 8,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -451,11 +490,17 @@
           "he": "באת",
           "en": "you came (f.)"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        3,
+        3
       ]
     },
     {
       "id": "illi-ido-bil-mayy",
       "order": 9,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -527,11 +572,17 @@
           "he": "באש",
           "en": "in the fire"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        3
       ]
     },
     {
       "id": "dukhul-il-hammam-mish",
       "order": 10,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -582,11 +633,17 @@
           "he": "יציאה ממנו",
           "en": "leaving it"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "ya-dakhil-ben-il",
       "order": 11,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -666,11 +723,18 @@
           "he": "הצחנה שלה",
           "en": "its stink"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "il-haki-mish-zayy",
       "order": 12,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -714,11 +778,17 @@
           "he": "הראייה",
           "en": "seeing"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2,
+        1
       ]
     },
     {
       "id": "tizen-b-libas",
       "order": 13,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -748,11 +818,16 @@
           "he": "בתחתון אחד",
           "en": "in one pair of underwear"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "illi-biddo-yilab-ma",
       "order": 14,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -818,11 +893,17 @@
           "he": "השריטות שלו",
           "en": "its scratching"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        2
       ]
     },
     {
       "id": "il-irsh-il-abyad",
       "order": 15,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -873,11 +954,17 @@
           "he": "השחור",
           "en": "the black"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "zayy-is-samake-bass",
       "order": 16,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -943,11 +1030,18 @@
           "he": "מת",
           "en": "it dies"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "isal-mijarrib-wala-tisal",
       "order": 17,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -998,11 +1092,17 @@
           "he": "חכם",
           "en": "a wise/learned one"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "id-dinya-dawwara",
       "order": 18,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1032,11 +1132,16 @@
           "he": "מסתובבת",
           "en": "spins/turns"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "yom-ilak-w-yom",
       "order": 19,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1080,11 +1185,16 @@
           "he": "נגדך",
           "en": "against you"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "kill-takhira-fiha-khira",
       "order": 20,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1128,11 +1238,16 @@
           "he": "טובה",
           "en": "a good/blessing"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "is-sabir-miftah-il",
       "order": 21,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -1169,11 +1284,16 @@
           "he": "להקלה",
           "en": "to relief/deliverance"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "ta-yiji-is-sabi",
       "order": 22,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -1231,11 +1351,16 @@
           "he": "הנביא",
           "en": "the prophet"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        3
       ]
     },
     {
       "id": "umr-ish-shai-baa",
       "order": 23,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1272,11 +1397,16 @@
           "he": "נשאר / ארוך",
           "en": "endures/remains"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "hatt-rasak-ben-ir",
       "order": 24,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -1348,11 +1478,16 @@
           "he": "הראשים",
           "en": "of heads"
         }
+      ],
+      "scrambleChunks": [
+        4,
+        4
       ]
     },
     {
       "id": "min-barra-rukham-w",
       "order": 25,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1410,11 +1545,16 @@
           "he": "פיח",
           "en": "soot"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        3
       ]
     },
     {
       "id": "min-barra-tasha-tasha",
       "order": 26,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1486,11 +1626,16 @@
           "he": "ממולא",
           "en": "stuffed"
         }
+      ],
+      "scrambleChunks": [
+        4,
+        4
       ]
     },
     {
       "id": "tihki-ma-it-tanjara",
       "order": 27,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1541,11 +1686,16 @@
           "he": "הקדרה",
           "en": "the cauldron"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2
       ]
     },
     {
       "id": "il-haki-ilik-ya",
       "order": 28,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1610,11 +1760,16 @@
           "he": "שכנה",
           "en": "neighbor"
         }
+      ],
+      "scrambleChunks": [
+        4,
+        3
       ]
     },
     {
       "id": "illi-ma-byirif-yirus",
       "order": 29,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1679,11 +1834,16 @@
           "he": "עקומה",
           "en": "crooked"
         }
+      ],
+      "scrambleChunks": [
+        4,
+        3
       ]
     },
     {
       "id": "il-haraka-baraka",
       "order": 30,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1713,11 +1873,16 @@
           "he": "ברכה",
           "en": "blessing"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "ala-add-lihafak-midd",
       "order": 31,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1768,11 +1933,16 @@
           "he": "רגליך",
           "en": "your legs"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2
       ]
     },
     {
       "id": "illi-fat-mat",
       "order": 32,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -1809,11 +1979,16 @@
           "he": "מת",
           "en": "is dead"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "il-hitan-ilha-widan",
       "order": 33,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1850,11 +2025,16 @@
           "he": "אוזניים",
           "en": "ears"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "bedit-il-yom-ahsan",
       "order": 34,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1912,11 +2092,17 @@
           "he": "של מחר",
           "en": "of tomorrow"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "usfur-bil-id-wala",
       "order": 35,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1974,11 +2160,17 @@
           "he": "העץ",
           "en": "the tree"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "is-sahib-illi-ma",
       "order": 36,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2051,11 +2243,17 @@
           "he": "הועיל",
           "en": "was useful"
         }
+      ],
+      "scrambleChunks": [
+        4,
+        1,
+        3
       ]
     },
     {
       "id": "ija-ykahhilha-amaha",
       "order": 37,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -2092,11 +2290,16 @@
           "he": "עיוור אותה",
           "en": "he blinded her"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "illi-ija-min-ger",
       "order": 38,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -2175,11 +2378,16 @@
           "he": "צער",
           "en": "regret"
         }
+      ],
+      "scrambleChunks": [
+        5,
+        4
       ]
     },
     {
       "id": "mithl-il-itta-btakul",
       "order": 39,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2230,11 +2438,17 @@
           "he": "ומתכחשת",
           "en": "and denies"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "il-biss-bokil-ashah",
       "order": 40,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2271,11 +2485,16 @@
           "he": "ארוחתו",
           "en": "its dinner"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "khudh-il-asile-w",
       "order": 41,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -2326,11 +2545,16 @@
           "he": "המחצלת",
           "en": "the straw mat"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        3
       ]
     },
     {
       "id": "tanjara-w-laat-gataha",
       "order": 42,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2367,11 +2591,16 @@
           "he": "את מכסהו",
           "en": "its lid"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "btifrah-lal-id-wil",
       "order": 43,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -2415,11 +2644,16 @@
           "he": "עבר / הלך",
           "en": "has gone"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "rayih-a-l-hajj",
       "order": 44,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -2470,11 +2704,16 @@
           "he": "חוזרים",
           "en": "are returning"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2
       ]
     },
     {
       "id": "min-kuthr-it-tabbakhin",
       "order": 45,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -2525,11 +2764,16 @@
           "he": "התבשיל",
           "en": "the dish"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2
       ]
     },
     {
       "id": "il-id-illi-btiti",
       "order": 46,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2601,6 +2845,11 @@
           "he": "לוקחת",
           "en": "takes"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        3
       ]
     }
   ],

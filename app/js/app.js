@@ -1838,7 +1838,21 @@ document.addEventListener('keydown', (e) => {
    Each proverb is its own self-contained card -- unlike the Reader's one continuous chunked
    text, proverbs are unrelated sayings, so there's no shared "essay" to flow through. Tapping a
    card expands the shared "explain it" block (literal meaning / idiomatic meaning / usage
-   scenario) -- the same renderer is reused verbatim by the Flashcards tab's back face. */
+   scenario) -- the same renderer is reused verbatim by the Flashcards tab's back face.
+
+   The list is grouped under theme headers (each proverb tagged "theme" in data.json) rather than
+   left as one long undifferentiated scroll of 46 cards -- order within a theme still follows the
+   source collection's own sequence. PROVERB_THEME_ORDER is the display order of the groups; a
+   proverb whose theme key isn't in this list (or has none) falls into a trailing "Other" group
+   instead of silently disappearing. */
+const PROVERB_THEME_ORDER = [
+  { key: 'self',      en: 'Self-Reliance & Practical Wisdom', he: 'עצמאות וחוכמת חיים' },
+  { key: 'company',   en: 'Company & Generosity',             he: 'חברה ונדיבות' },
+  { key: 'seeing',     en: 'Reading Between the Lines',        he: 'לקרוא בין השורות' },
+  { key: 'fortune',    en: 'Fortune’s Wheel',                  he: 'גלגל המזל' },
+  { key: 'timing',     en: 'Patience & Timing',                he: 'סבלנות ותזמון' },
+  { key: 'risk',       en: 'Risk & Consequence',               he: 'סיכון ותוצאה' },
+];
 let expandedProverbIds = new Set();
 function toggleProverbExpand(id) {
   if (expandedProverbIds.has(id)) expandedProverbIds.delete(id); else expandedProverbIds.add(id);
@@ -1880,10 +1894,7 @@ function proverbExplainHtml(p) {
     row(labels.usage, usage) +
     '</div>';
 }
-function renderProverbsView() {
-  const list = document.getElementById('proverbs-list');
-  if (!list) return;
-  list.innerHTML = PROVERBS.map(p => {
+function proverbCardHtml(p) {
     const expanded = expandedProverbIds.has(p.id);
     const hasAudio = !!(p.audio && p.audio.src);
     return '<div class="proverb-card' + (expanded ? ' expanded' : '') + '">' +
@@ -1896,6 +1907,26 @@ function renderProverbsView() {
       '</div>' +
       (expanded ? proverbExplainHtml(p) : '') +
     '</div>';
+}
+function renderProverbsView() {
+  const list = document.getElementById('proverbs-list');
+  if (!list) return;
+  const en = appLang === 'en';
+  const groups = PROVERB_THEME_ORDER.map(t => ({ theme: t, proverbs: [] }));
+  const groupByKey = new Map(groups.map(g => [g.theme.key, g]));
+  const other = { theme: { key: 'other', en: 'Other', he: 'שונות' }, proverbs: [] };
+  PROVERBS.forEach(p => {
+    const g = groupByKey.get(p.theme);
+    (g || other).proverbs.push(p);
+  });
+  if (other.proverbs.length) groups.push(other);
+
+  list.innerHTML = groups.filter(g => g.proverbs.length).map(g => {
+    const heading = '<div class="proverb-theme-head">' +
+      '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+      '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+    '</div>';
+    return heading + g.proverbs.map(proverbCardHtml).join('');
   }).join('');
 }
 
@@ -2158,12 +2189,16 @@ function renderFillBlankView() {
     '</div>';
 }
 /* ─────────────── WORD-SCRAMBLE TAB ───────────────
-   The proverb's words are shuffled into a tile pool; tap them in the correct order to rebuild
-   the sentence. Checked per-tap, not per-attempt: tapping the correct next word locks it into
-   the "built so far" area (a real state change, worth a full re-render); tapping a wrong one just
-   flashes that tile red and leaves it in the pool to try again -- no re-render, no lockout, so a
-   wrong guess never costs progress or forces a restart. Tiles are index-based (not text-based)
-   since a proverb can repeat the same word twice (e.g. "اللي...اللي" in illi-ido-bil-mayy).
+   The proverb is grouped into a few multi-word CHUNKS (scrambleChunks: an array of chunk sizes
+   authored per proverb, e.g. [2,3,2] -- natural phrase/clause groupings, not one tile per word;
+   reconstructing word-by-word turned out to be a much harder puzzle than intended). Chunks
+   shuffle into a tile pool; tap them in the correct order to rebuild the sentence. Checked
+   per-tap, not per-attempt: the correct next chunk locks into the "built so far" area (a real
+   state change, worth a full re-render); a wrong tap just flashes that tile red and stays in the
+   pool -- no re-render, no lockout, so a wrong guess never costs progress or forces a restart.
+   Chunks are tracked by their 0-based position (0..chunkCount-1), which is already their correct
+   order by construction, so "the next expected chunk" is simply scramblePlaced.length -- no
+   separate lookup array needed the way word-level indices required.
    Same shuffled-deck-per-entry + arrow-key paging as Flashcards/Fill-in-the-Blank, and the same
    book/lightbulb icon reveal for the payoff once solved. */
 let scrambleOrder = [];
@@ -2172,17 +2207,32 @@ let scrambleTileOrder = [];
 let scramblePlaced = [];
 let scrambleShowLiteral = false;
 let scrambleShowMeaning = false;
-function scrambleWordIndices(p) {
-  return p.arWords.map((t, i) => i).filter((i) => p.arWords[i].sep === undefined);
+// [startIdx, endIdx] (inclusive) into arWords for each chunk -- falls back to one word per chunk
+// if a proverb somehow lacks scrambleChunks, rather than crashing.
+function scrambleChunkRanges(p) {
+  const sizes = p.scrambleChunks || p.arWords.map(() => 1);
+  const ranges = [];
+  let start = 0;
+  sizes.forEach((size) => { ranges.push([start, start + size - 1]); start += size; });
+  return ranges;
+}
+function scrambleChunkText(p, ci, useTranslit) {
+  const [s, e] = scrambleChunkRanges(p)[ci];
+  const parts = [];
+  for (let i = s; i <= e; i++) {
+    const tok = p.arWords[i];
+    parts.push((useTranslit ? preferredTranslit(tok.w) : arText(tok.w)) + (tok.punct || ''));
+  }
+  return parts.join(' ');
 }
 function setupScrambleCard() {
   const p = PROVERBS[scrambleOrder[scrambleIdx]];
-  const wordIndices = scrambleWordIndices(p);
-  scrambleTileOrder = shuffleArray(wordIndices);
-  // For very short proverbs (2-3 words) a random shuffle has a real chance of landing back on
-  // the original order, which reads as "not scrambled at all" -- reshuffle once more if so.
-  if (scrambleTileOrder.length > 1 && scrambleTileOrder.every((v, i) => v === wordIndices[i])) {
-    scrambleTileOrder = shuffleArray(wordIndices);
+  const chunkIndices = scrambleChunkRanges(p).map((_, i) => i);
+  scrambleTileOrder = shuffleArray(chunkIndices);
+  // For proverbs with only 2-3 chunks, a random shuffle has a real chance of landing back on the
+  // original order, which reads as "not scrambled at all" -- reshuffle once more if so.
+  if (scrambleTileOrder.length > 1 && scrambleTileOrder.every((v, i) => v === chunkIndices[i])) {
+    scrambleTileOrder = shuffleArray(chunkIndices);
   }
   scramblePlaced = [];
   scrambleShowLiteral = false;
@@ -2210,12 +2260,9 @@ function toggleScrambleReveal(which) {
   document.getElementById('scramble-reveal-' + which).classList.toggle('open', show);
   document.querySelector('.scramble-icon-row [data-sc-btn="' + which + '"]').classList.toggle('active', show);
 }
-function handleScrambleTap(wi, btnEl) {
-  const p = PROVERBS[scrambleOrder[scrambleIdx]];
-  const wordIndices = scrambleWordIndices(p);
-  const expected = wordIndices[scramblePlaced.length];
-  if (wi === expected) {
-    scramblePlaced.push(wi);
+function handleScrambleTap(ci, btnEl) {
+  if (ci === scramblePlaced.length) {
+    scramblePlaced.push(ci);
     renderScrambleView();
   } else {
     btnEl.classList.add('wrong');
@@ -2235,19 +2282,19 @@ function renderScrambleView() {
   const dir = scriptDir();
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
 
-  const wordIndices = scrambleWordIndices(p);
-  const solved = scramblePlaced.length === wordIndices.length;
+  const chunkCount = scrambleChunkRanges(p).length;
+  const solved = scramblePlaced.length === chunkCount;
 
   const builtHtml = scramblePlaced.length
-    ? scramblePlaced.map((wi) => '<span class="proverb-word">' + arText(p.arWords[wi].w) + '</span>' + (p.arWords[wi].punct || '')).join(' ')
-    : '<span class="scramble-built-empty">' + (en ? 'Tap the words in order' : 'הקישו על המילים לפי הסדר') + '</span>';
+    ? scramblePlaced.map((ci) => '<span class="proverb-word">' + scrambleChunkText(p, ci, false) + '</span>').join(' ')
+    : '<span class="scramble-built-empty">' + (en ? 'Tap the pieces in order' : 'הקישו על החלקים לפי הסדר') + '</span>';
   const builtTranslit = scramblePlaced.length
-    ? scramblePlaced.map((wi) => preferredTranslit(p.arWords[wi].w) + (p.arWords[wi].punct || '')).join(' ')
+    ? scramblePlaced.map((ci) => scrambleChunkText(p, ci, true)).join(' ')
     : '';
 
   const poolHtml = scrambleTileOrder
-    .filter((wi) => !scramblePlaced.includes(wi))
-    .map((wi) => '<button class="scramble-tile" onclick="handleScrambleTap(' + wi + ', this)">' + arText(p.arWords[wi].w) + '</button>')
+    .filter((ci) => !scramblePlaced.includes(ci))
+    .map((ci) => '<button class="scramble-tile" onclick="handleScrambleTap(' + ci + ', this)">' + scrambleChunkText(p, ci, false) + '</button>')
     .join('');
 
   let payoffHtml = '';
