@@ -68,7 +68,13 @@ body.lang-en .mobile-header-title { direction: ltr; }
   display: flex; align-items: center; justify-content: center; transition: all .12s;
 }
 .side-menu-close:hover { background: var(--active-bg); color: var(--black); }
-.side-menu-items { flex: 1; display: flex; flex-direction: column; padding: 8px 0; overflow-y: auto; }
+/* flex:0 1 auto (not flex:1) -- with only 5 short nav items this list is far shorter than the
+   drawer itself; letting it grow to fill the remaining height left a large dead gap floating
+   above the settings section on real phone heights. Hugging its own content instead means
+   settings sits directly below the last item, and any leftover space trails harmlessly at the
+   very bottom of the drawer instead of splitting the content in two. overflow-y:auto is kept for
+   if the nav list ever grows long enough to need its own scroll independent of the drawer. */
+.side-menu-items { flex: 0 1 auto; display: flex; flex-direction: column; padding: 8px 0; overflow-y: auto; }
 .side-menu-item {
   padding: 14px 20px; font-size: 15px; font-weight: 500; color: var(--black);
   cursor: pointer; border-right: 3px solid transparent; text-align: right;
@@ -76,8 +82,8 @@ body.lang-en .mobile-header-title { direction: ltr; }
 }
 .side-menu-item.active { border-right-color: var(--black); background: var(--active-bg); font-weight: 700; }
 .side-menu-item:hover:not(.active) { background: var(--active-bg); }
-/* Pinned below the nav items (side-menu-items grows to fill remaining space above it) so the
-   settings read as a distinct, secondary section rather than more nav items. */
+/* Sits directly below the nav items now (see .side-menu-items above) rather than being pinned
+   to the drawer's bottom edge -- reads as a distinct, secondary section via the border-top alone. */
 .side-menu-settings {
   flex-shrink: 0; display: flex; flex-direction: column; gap: 10px;
   padding: 14px 20px; border-top: 1px solid var(--rule);
@@ -875,6 +881,10 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
   .vocab-row-toggle, .vocab-row-delete, .vocab-row-pronounce { width: 36px; height: 36px; }
   .en-chip { padding: 6px 10px; }
   .text-size-btn { width: 32px; height: 32px; }
+  /* speed-btn sits directly beside mute-btn in both the reader audio-bar and watch toolbar --
+     left at its desktop padding it rendered noticeably shorter (22px) than mute-btn's bumped
+     36px right next to it in the same row. */
+  .speed-btn { padding: 9px 10px; }
 
   /* — verbs view: the pill list fills the width in two columns; tapping a verb opens its
      conjugation card as a bottom-sheet drawer over the list, same as the reader's translation
