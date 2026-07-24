@@ -2005,10 +2005,14 @@ function shuffleArray(arr) {
 let fillblankIdx = 0;
 let fillblankChoiceOrder = [];
 let fillblankSelectedIdx = null;
+let fillblankShowLiteral = false;
+let fillblankShowMeaning = false;
 function setupFillBlankCard() {
   const p = PROVERBS[fillblankIdx];
   fillblankChoiceOrder = shuffleArray(p.blankChoices);
   fillblankSelectedIdx = null;
+  fillblankShowLiteral = false;
+  fillblankShowMeaning = false;
 }
 function goToFillBlank(delta) {
   const next = fillblankIdx + delta;
@@ -2023,6 +2027,14 @@ function selectFillBlankChoice(orderIdx) {
   fillblankSelectedIdx = orderIdx;
   renderFillBlankView();
 }
+// Same non-destructive class-toggle approach as toggleFlashcardReveal -- these fire AFTER the
+// answer-lock render already happened, so the icon row/reveal panels are already in the DOM;
+// toggling them must not re-render the whole card or the reveal loses its animation again.
+function toggleFillBlankReveal(which) {
+  const show = which === 'literal' ? (fillblankShowLiteral = !fillblankShowLiteral) : (fillblankShowMeaning = !fillblankShowMeaning);
+  document.getElementById('fillblank-reveal-' + which).classList.toggle('open', show);
+  document.querySelector('.fillblank-icon-row [data-fb-btn="' + which + '"]').classList.toggle('active', show);
+}
 function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
   if (!el) return;
@@ -2035,6 +2047,8 @@ function renderFillBlankView() {
   const answered = fillblankSelectedIdx != null;
   const correctWord = p.blankChoices[0];
   const dir = scriptDir();
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+  const proseDir = en ? 'ltr' : 'rtl';
 
   const sentenceHtml = p.arWords.map((tok, i) => {
     if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
@@ -2043,6 +2057,13 @@ function renderFillBlankView() {
       return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '">' + shown + '</span>' + (tok.punct || '');
     }
     return '<span class="proverb-word">' + arText(tok.w) + '</span>' + (tok.punct || '');
+  }).join(' ');
+  // Mirrors the sentence's own blanking -- the transliteration must not give away the answer
+  // before it's picked, so it masks the same word rather than transliterating the full phrase.
+  const translitLine = p.arWords.map((tok, i) => {
+    if (tok.sep !== undefined) return tok.sep;
+    if (i === p.blankIdx) return (answered ? preferredTranslit(correctWord) : '____') + (tok.punct || '');
+    return preferredTranslit(tok.w) + (tok.punct || '');
   }).join(' ');
 
   const choicesHtml = fillblankChoiceOrder.map((choice, i) => {
@@ -2058,6 +2079,26 @@ function renderFillBlankView() {
     ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
     : '';
 
+  // Payoff after answering: icon buttons (same book/lightbulb pattern as Flashcards) rather than
+  // dumping both the literal breakdown and the full explanation at once -- a learner who just
+  // wants to confirm they got it right isn't forced past a wall of text to reach Next.
+  let payoffHtml = '';
+  if (answered) {
+    const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+    const meaningText = en ? p.enGloss : p.heGloss;
+    const revealPanel = (which, show, label, text) =>
+      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="fillblank-reveal-' + which + '">' +
+        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
+      '</div>';
+    payoffHtml =
+      '<div class="flashcard-icon-row fillblank-icon-row">' +
+        '<button class="flashcard-icon-btn' + (fillblankShowLiteral ? ' active' : '') + '" data-fb-btn="literal" onclick="toggleFillBlankReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (fillblankShowMeaning ? ' active' : '') + '" data-fb-btn="meaning" onclick="toggleFillBlankReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+      '</div>' +
+      revealPanel('literal', fillblankShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      revealPanel('meaning', fillblankShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+  }
+
   el.innerHTML =
     '<div class="flashcard-progress">' + (fillblankIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
     '<div class="flashcard">' +
@@ -2065,9 +2106,10 @@ function renderFillBlankView() {
         ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
         : '') +
       '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
+      '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
       '<div class="fillblank-choices">' + choicesHtml + '</div>' +
       feedback +
-      (answered ? proverbExplainHtml(p) : '') +
+      payoffHtml +
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (fillblankIdx === 0 ? ' disabled' : '') + ' onclick="goToFillBlank(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +

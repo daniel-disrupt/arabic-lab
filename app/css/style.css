@@ -594,6 +594,7 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .fillblank-choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
 .fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
 .fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
+.fillblank-icon-row { margin-top: 16px; }
 
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
