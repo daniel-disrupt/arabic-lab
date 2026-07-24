@@ -100,6 +100,56 @@ guessing involved, just measuring. That's a good general pattern: **push
 alignment problems to wherever you have ground truth**, rather than trying to
 solve them against noisy real-world audio if you don't have to.
 
+### Transliteration (תעתיק)
+
+A separate feature from the pipeline above, added later: a script toggle lets a
+learner switch Reader/Vocab/Verbs text out of Arabic script entirely, into
+either Hebrew letters (תעתיק) or English/Latin letters. This isn't an LLM
+guessing at pronunciation on the fly — it's a fixed per-letter mapping table,
+walked mechanically over the already-voweled Arabic text, so the same tashkīl
+that drives pronunciation also drives the transliteration.
+
+The Hebrew letter and niqqud conventions were designed by researching a real
+existing precedent rather than inventing one from scratch: **Madrasa** (מדרסה,
+[milon.madrasafree.com](https://milon.madrasafree.com)), a spoken-Arabic
+dictionary built for Hebrew speakers. Its public [transliteration
+guide](https://milon.madrasafree.com/guide.asp) — and live dictionary entries
+checked against it directly in a browser — documents its own consonant table,
+niqqud conventions, and how it marks gemination and the definite article. That
+source is where several concrete choices adopted here came from:
+
+- **Gemination (shadda)** marked with a single letter plus the actual Arabic
+  shadda mark reused on top of it (e.g. דّ), not a doubled letter, after the
+  first version of this feature drew the feedback that it read as "too
+  dense." (First pass here used a Hebrew dagesh instead, on the assumption
+  that "some Hebrew-native diacritic marking gemination" was close enough —
+  wrong: inspecting Madrasa's actual live dictionary entries character by
+  character, not just their guide page's illustrative table, showed the
+  dagesh only shows up in that one hand-typed example; the real data
+  consistently borrows the Arabic mark itself.)
+- **The definite article's silent lam** (ال before a sun letter) kept visible
+  in parentheses — `(ל)` — rather than dropped outright, matching how Madrasa
+  shows a written-but-unpronounced letter.
+- The consonant table itself (ج→ג׳, ح→ח, خ→ח׳, ص→צ, ض→צ׳, ط→ט, ع→ע, غ→ע׳, ق→ק)
+  was cross-checked against Madrasa's own table and matched, confirming
+  choices already made independently in this project's own design doc.
+
+One piece is original to this project, not copied from Madrasa: detecting the
+dialectal *ay→e* / *aw→o* diphthong collapse (بَيْت → בֵּית "beit", not the
+literal-but-wrong בַּית) by pattern-matching a fatha followed by a silent
+glide in the already-voweled source text — the same "mechanical pass over
+real tashkīl" principle as everything else in this pipeline, just extended to
+a case Madrasa's own guide documents but this project had to derive rules for
+itself.
+
+Same discipline as the rest of this document applies here too: the
+Hebrew-letter convention is a curated design choice, cross-checked against a
+real published source, not an authoritative linguistic standard. The open
+dialect judgment calls — ق as ק vs. a glottal-stop-honest alternative, ج as ג׳
+vs ז׳, ث/ذ/ظ collapsed to ת/ד/צ׳ — are tracked in `TRANSLITERATION.md`
+alongside this file, flagged the same way every other interpretive step in
+this project is flagged, rather than presented as settled.
+
 ### Where alignment against the *real* recording is unavoidable
 
 The Watch tab plays the actual protest video, not synthesized audio, so its
