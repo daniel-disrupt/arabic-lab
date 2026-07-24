@@ -153,6 +153,11 @@ function t(key) { return STRINGS[appLang][key]; }
 function setAppLang(lang) {
   appLang = lang;
   localStorage.setItem('arabicLabLang', lang);
+  // Someone choosing an English interface is very unlikely to want Arabic script or a Hebrew
+  // transliteration as their default learning alphabet -- English transliteration is the
+  // sensible default to switch them to. Only fires on selecting English, not the reverse: a
+  // manual script choice while in Hebrew mode is left alone when switching back to Hebrew.
+  if (lang === 'en' && scriptMode !== 'translit-en') setScriptMode('translit-en');
   applyAppLang();
 }
 function applyAppLang() {
