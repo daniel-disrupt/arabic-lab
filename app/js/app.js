@@ -464,8 +464,11 @@ function switchTab(name) {
   if (name === 'vocab') renderVocabView();
   if (name === 'about') renderAboutView();
   if (name === 'proverbs') renderProverbsView();
-  if (name === 'flashcards') renderFlashcardsView();
-  if (name === 'fillblank') renderFillBlankView();
+  // Reshuffle the deck order fresh on every entry into these tabs (not on incidental re-renders
+  // from a language/script toggle, and not per Prev/Next step) so returning to the tab surfaces
+  // a different run through the set instead of always starting at proverb #1.
+  if (name === 'flashcards') { shuffleFlashcardDeck(); renderFlashcardsView(); }
+  if (name === 'fillblank') { shuffleFillBlankDeck(); renderFillBlankView(); }
   if (name === 'scramble') renderScrambleView();
 }
 
@@ -1816,6 +1819,17 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { skipWatch(-5); e.preventDefault(); }
   else if (e.key === 'ArrowRight') { skipWatch(5); e.preventDefault(); }
 });
+// Left/right arrow paging for Flashcards/Fill-in-the-Blank. The app is RTL-mirrored throughout
+// (see the Overall design note at the top of style.css), so Prev always renders on the physical
+// RIGHT and Next on the physical LEFT regardless of appLang -- mapping ArrowRight->Prev and
+// ArrowLeft->Next points each key toward the button actually sitting on that side of the screen.
+document.addEventListener('keydown', (e) => {
+  if (activeTabName !== 'flashcards' && activeTabName !== 'fillblank') return;
+  if (e.target.closest('input, textarea, [contenteditable]')) return;
+  const goTo = activeTabName === 'flashcards' ? goToFlashcard : goToFillBlank;
+  if (e.key === 'ArrowLeft') { goTo(1); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { goTo(-1); e.preventDefault(); }
+});
 
 /* ─────────────── PROVERBS TAB (browsable list, standalone units) ───────────────
    Each proverb is its own self-contained card -- unlike the Reader's one continuous chunked
@@ -1903,13 +1917,32 @@ function stubViewHtml() {
    element (toggleFlashcardReveal / handleFlashcardWordTap), it does NOT re-render the card --
    that's what made the earlier version feel like it was jumping: a full innerHTML rebuild on
    every click has no starting height to transition from, so the layout just snaps. */
+// Shared by Flashcards and Fill-in-the-Blank -- both browse PROVERBS through a shuffled index
+// order rather than the source docx order, and reshuffle fresh every time the tab is (re)entered
+// (see switchTab()), not on every render or every Prev/Next step.
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let flashcardOrder = [];
 let flashcardIdx = 0;
 let flashcardShowLiteral = false;
 let flashcardShowMeaning = false;
 let flashcardWordTrayGi = null;
+function shuffleFlashcardDeck() {
+  flashcardOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  flashcardIdx = 0;
+  flashcardShowLiteral = false;
+  flashcardShowMeaning = false;
+  flashcardWordTrayGi = null;
+}
 function goToFlashcard(delta) {
   const next = flashcardIdx + delta;
-  if (next < 0 || next >= PROVERBS.length) return;
+  if (next < 0 || next >= flashcardOrder.length) return;
   flashcardIdx = next;
   flashcardShowLiteral = false;
   flashcardShowMeaning = false;
@@ -1924,7 +1957,7 @@ function toggleFlashcardReveal(which) {
 }
 function handleFlashcardWordTap(e, gi) {
   e.stopPropagation();
-  const p = PROVERBS[flashcardIdx];
+  const p = PROVERBS[flashcardOrder[flashcardIdx]];
   const trayEl = document.getElementById('flashcard-word-tray');
   document.querySelectorAll('#flashcard-words .proverb-word-clickable.tapped').forEach(w => w.classList.remove('tapped'));
   if (flashcardWordTrayGi === gi) { flashcardWordTrayGi = null; trayEl.classList.remove('open'); return; }
@@ -1949,8 +1982,9 @@ function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
   if (!el) return;
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
-  if (flashcardIdx >= PROVERBS.length) flashcardIdx = 0;
-  const p = PROVERBS[flashcardIdx];
+  if (!flashcardOrder.length) shuffleFlashcardDeck();
+  if (flashcardIdx >= flashcardOrder.length) flashcardIdx = 0;
+  const p = PROVERBS[flashcardOrder[flashcardIdx]];
   const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const plainText = p.arWords.map(t => t.w).join(' ');
@@ -1984,7 +2018,7 @@ function renderFlashcardsView() {
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn"' + (flashcardIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === flashcardOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
     '</div>';
 }
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
@@ -1994,21 +2028,22 @@ function renderFlashcardsView() {
    mid-attempt don't reshuffle the buttons out from under the learner. Follows the global
    scriptMode toggle like the Proverbs list (unlike Flashcards' front, which deliberately doesn't)
    -- this is a reading/recall exercise, not specifically an Arabic-script drill. */
-function shuffleArray(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+let fillblankOrder = [];
 let fillblankIdx = 0;
 let fillblankChoiceOrder = [];
 let fillblankSelectedIdx = null;
 let fillblankShowLiteral = false;
 let fillblankShowMeaning = false;
+// Reshuffles the whole deck order and jumps back to its first card -- see shuffleFlashcardDeck's
+// sibling comment above; called from switchTab() on every fresh entry into this tab, not on
+// every render or Prev/Next step.
+function shuffleFillBlankDeck() {
+  fillblankOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  fillblankIdx = 0;
+  setupFillBlankCard();
+}
 function setupFillBlankCard() {
-  const p = PROVERBS[fillblankIdx];
+  const p = PROVERBS[fillblankOrder[fillblankIdx]];
   fillblankChoiceOrder = shuffleArray(p.blankChoices);
   fillblankSelectedIdx = null;
   fillblankShowLiteral = false;
@@ -2016,7 +2051,7 @@ function setupFillBlankCard() {
 }
 function goToFillBlank(delta) {
   const next = fillblankIdx + delta;
-  if (next < 0 || next >= PROVERBS.length) return;
+  if (next < 0 || next >= fillblankOrder.length) return;
   fillblankIdx = next;
   stopPronunciation();
   setupFillBlankCard();
@@ -2039,9 +2074,10 @@ function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
   if (!el) return;
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
-  if (fillblankIdx >= PROVERBS.length) fillblankIdx = 0;
+  if (!fillblankOrder.length) shuffleFillBlankDeck();
+  if (fillblankIdx >= fillblankOrder.length) fillblankIdx = 0;
   if (!fillblankChoiceOrder.length) setupFillBlankCard();
-  const p = PROVERBS[fillblankIdx];
+  const p = PROVERBS[fillblankOrder[fillblankIdx]];
   const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const answered = fillblankSelectedIdx != null;
@@ -2115,7 +2151,7 @@ function renderFillBlankView() {
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (fillblankIdx === 0 ? ' disabled' : '') + ' onclick="goToFillBlank(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn"' + (fillblankIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (fillblankIdx === fillblankOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
     '</div>';
 }
 function renderScrambleView() {
