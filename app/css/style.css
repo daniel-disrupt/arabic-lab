@@ -509,11 +509,9 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 }
 .proverb-theme-head:not(:first-child) { margin-top: 18px; }
 .proverb-theme-name { font-size: 18px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; color: var(--black); }
-.proverb-theme-meta { display: flex; align-items: center; gap: 6px; }
-.proverb-theme-count { font-size: 13px; color: var(--mid); font-variant-numeric: tabular-nums; }
-/* Only shown while the group is collapsed -- see PROVERBS TAB render note in app.js -- a taste of
-   what's inside so picking a topic doesn't mean tapping in blind. Left to wrap (no ellipsis) since
-   the card is now narrow rather than a full-width single line. */
+/* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
+   doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
+   ellipsis) since the card is narrow rather than a full-width single line. */
 .proverb-theme-teaser { font-size: 15px; font-style: italic; color: var(--mid); }
 .proverb-theme-chev { flex-shrink: 0; color: var(--mid); font-size: 14px; transform: rotate(90deg); transition: transform .18s; }
 .proverb-theme-head.open .proverb-theme-chev { transform: rotate(-90deg); }

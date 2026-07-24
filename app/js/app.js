@@ -1996,11 +1996,8 @@ function renderProverbsView() {
     const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
     const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
         '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
-        '<div class="proverb-theme-meta">' +
-          '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
-          '<span class="proverb-theme-chev">›</span>' +
-        '</div>' +
-        (isOpen ? '' : '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>') +
+        '<span class="proverb-theme-chev">›</span>' +
+        '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>' +
     '</div>';
     return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');
