@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <title>Arabic Lab</title>
@@ -13,12 +13,21 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --black: #0D0D0D; --mid: #8A8A8A; --rule: #E4E3E0; --active-bg: #F0EFE9; }
   html, body { min-height: 100%; background: #fff; color: var(--black); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
-  .lib-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
-  .lib-header { margin-bottom: 40px; }
+  /* Page frame stays physically fixed regardless of language. The switch is pinned to a fixed
+     corner (outside normal flow) so it never travels, and the title/subtitle are centered so
+     flipping their direction/alignment (via body.lang-en below) changes how the text reads in
+     place instead of yanking it from one edge of the screen to the other. */
+  .lib-wrap { position: relative; max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  .lib-header { text-align: center; margin-bottom: 40px; }
   .lib-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
-  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; }
+  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; }
+  body.lang-en .lib-subtitle { direction: ltr; }
+  .lang-switch { position: absolute; top: 48px; right: 24px; display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; }
+  .lang-switch-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--mid); padding: 5px 12px; border-radius: 13px; cursor: pointer; transition: background .12s, color .12s; }
+  .lang-switch-btn.active { background: var(--black); color: #fff; }
   .lib-list { display: flex; flex-direction: column; gap: 14px; }
-  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; }
+  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; direction: rtl; text-align: right; }
+  body.lang-en .lib-card { direction: ltr; text-align: left; }
   .lib-card:hover { background: var(--active-bg); border-color: var(--black); }
   .lib-card-title { font-size: 16px; font-weight: 600; }
   .lib-card-subtitle { font-size: 13px; color: var(--mid); margin-top: 4px; }
@@ -29,30 +38,92 @@
 
 <div class="lib-wrap">
   <div class="lib-header">
-    <div class="lib-title">Arabic Lab</div>
-    <div class="lib-subtitle">Real spoken Palestinian Arabic, turned into study material — pick a lesson.</div>
+    <div>
+      <div class="lib-title">Arabic Lab</div>
+      <div class="lib-subtitle" id="lib-subtitle"></div>
+    </div>
+    <div class="lang-switch" id="lang-switch">
+      <button class="lang-switch-btn" data-lang="he" onclick="setSiteLang('he')">עברית</button>
+      <button class="lang-switch-btn" data-lang="en" onclick="setSiteLang('en')">English</button>
+    </div>
   </div>
   <div class="lib-list" id="lib-list"></div>
-  <div class="lib-empty" id="lib-empty" style="display:none">No lessons published yet.</div>
+  <div class="lib-empty" id="lib-empty" style="display:none"></div>
 </div>
 
 <script>
+// Same localStorage key app.js reads on lesson.html (see `appLang` there) -- picking a language
+// here is what makes it the default the moment a lesson opens, no separate wiring needed.
+const SITE_STRINGS = {
+  he: {
+    subtitle: 'ערבית מדוברת אמיתית, הפכה לחומר לימוד — בחרו שיעור.',
+    empty: 'עדיין לא פורסמו שיעורים.',
+    error: 'לא ניתן היה לטעון את השיעורים.',
+  },
+  en: {
+    subtitle: 'Real spoken Palestinian Arabic, turned into study material — pick a lesson.',
+    empty: 'No lessons published yet.',
+    error: 'Could not load lessons.',
+  },
+};
+let siteLang = localStorage.getItem('arabicLabLang') || 'he';
+let loadedLessons = null; // populated once the manifest fetch resolves; re-rendered on language change
+
+// Card title/subtitle in the manifest may be a plain string (untranslated content) or an
+// {en, he} object -- fall back to whichever language is available if the current one is missing.
+function localize(field) {
+  if (field == null) return '';
+  if (typeof field === 'string') return field;
+  return field[siteLang] || field.en || field.he || '';
+}
+
+function renderLessonList() {
+  const list = document.getElementById('lib-list');
+  if (!loadedLessons || !loadedLessons.length) return;
+  list.innerHTML = loadedLessons.map(l => `
+    <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
+      <div class="lib-card-title">${localize(l.title)}</div>
+      <div class="lib-card-subtitle">${localize(l.subtitle)}</div>
+    </a>
+  `).join('');
+}
+
+function applySiteLang() {
+  document.body.classList.toggle('lang-en', siteLang === 'en');
+  document.getElementById('lib-subtitle').textContent = SITE_STRINGS[siteLang].subtitle;
+  document.querySelectorAll('.lang-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === siteLang));
+  const emptyEl = document.getElementById('lib-empty');
+  if (emptyEl.dataset.state) emptyEl.textContent = SITE_STRINGS[siteLang][emptyEl.dataset.state];
+  renderLessonList();
+}
+
+function setSiteLang(lang) {
+  siteLang = lang;
+  localStorage.setItem('arabicLabLang', lang);
+  applySiteLang();
+}
+
+applySiteLang();
+
 fetch('lessons/manifest.json')
   .then(r => r.json())
   .then(lessons => {
-    const list = document.getElementById('lib-list');
-    if (!lessons.length) { document.getElementById('lib-empty').style.display = 'block'; return; }
-    list.innerHTML = lessons.map(l => `
-      <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
-        <div class="lib-card-title">${l.title}</div>
-        <div class="lib-card-subtitle">${l.subtitle || ''}</div>
-      </a>
-    `).join('');
+    if (!lessons.length) {
+      const emptyEl = document.getElementById('lib-empty');
+      emptyEl.dataset.state = 'empty';
+      emptyEl.textContent = SITE_STRINGS[siteLang].empty;
+      emptyEl.style.display = 'block';
+      return;
+    }
+    loadedLessons = lessons;
+    renderLessonList();
   })
   .catch(err => {
     console.error('Failed to load lesson manifest', err);
-    document.getElementById('lib-empty').textContent = 'Could not load lessons.';
-    document.getElementById('lib-empty').style.display = 'block';
+    const emptyEl = document.getElementById('lib-empty');
+    emptyEl.dataset.state = 'error';
+    emptyEl.textContent = SITE_STRINGS[siteLang].error;
+    emptyEl.style.display = 'block';
   });
 </script>
 </body>
