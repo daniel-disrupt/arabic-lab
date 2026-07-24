@@ -526,30 +526,44 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 /* ── FLASHCARDS TAB ── */
 .flashcard-progress { text-align: center; font-size: 12px; color: var(--mid); letter-spacing: .04em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
 .flashcard {
-  border: 1px solid var(--rule); border-radius: 14px; background: #fff;
-  min-height: 220px; padding: 28px 22px; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-  transition: border-color .12s;
+  border: 1px solid var(--rule); border-radius: 16px; background: #fff;
+  min-height: 420px; padding: 48px 32px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px;
 }
-.flashcard:hover { border-color: var(--black); }
-.flashcard-front { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
-.flashcard-front-controls { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-.flashcard-words { font-size: 22px; }
-/* The card front is always real Arabic script regardless of the global learning-alphabet toggle
-   (see proverbWordsHtml's forceArabic param) -- these two overrides win over the general
-   .proverb-words translit-mode/translit-en-mode rules (same specificity, declared later) so the
-   font/direction don't flip just because the rest of the app is in a transliteration mode. */
+.flashcard-words { font-size: 40px; line-height: 1.6; }
+/* The card is always real Arabic script regardless of the global learning-alphabet toggle (see
+   proverbWordsHtml's forceArabic param) -- these two overrides win over the general .proverb-words
+   translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
+   don't flip just because the rest of the app is in a transliteration mode. */
 body.translit-mode .flashcard-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
 body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
-.flashcard-translit-btn {
-  font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 6px 12px; border-radius: 14px;
-  border: 1px solid var(--rule); background: transparent; color: var(--mid); cursor: pointer; transition: all .12s;
+.proverb-word-clickable { cursor: pointer; transition: background .1s; }
+.proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
+.proverb-word-clickable.tapped { background: var(--black); color: #fff; border-radius: 4px; }
+.flashcard-translit-line { font-size: 20px; color: var(--mid); }
+.flashcard-word-tray {
+  font-size: 15px; background: var(--active-bg); border-radius: 8px; padding: 10px 16px;
+  max-width: 100%;
 }
-.flashcard-translit-btn:hover { border-color: var(--black); color: var(--black); }
-.flashcard-peek-line { font-size: 14px; color: var(--mid); direction: ltr; }
-.flashcard-tap-hint { font-size: 11px; color: var(--light); margin-top: 4px; }
-.flashcard-back { width: 100%; text-align: start; }
-.flashcard-back .proverb-explain { margin-top: 0; border-top: none; padding-top: 0; }
+.flashcard-controls { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.flashcard-play-btn {
+  flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); transition: all .12s;
+}
+.flashcard-play-btn:hover { border-color: var(--black); color: var(--black); }
+.flashcard-play-btn.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.flashcard-play-btn svg { width: 18px; height: 18px; }
+.flashcard-action-btn {
+  font-size: 13px; font-weight: 600; padding: 10px 18px; border-radius: 20px;
+  border: 1px solid var(--rule); background: transparent; color: var(--black); cursor: pointer; transition: all .12s;
+}
+.flashcard-action-btn:hover { border-color: var(--black); }
+.flashcard-action-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
+.flashcard-reveal { width: 100%; text-align: start; padding-top: 12px; border-top: 1px solid var(--rule); }
+.flashcard-reveal-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); margin-bottom: 4px; }
+.flashcard-reveal-text { font-size: 16px; line-height: 1.6; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 .flashcard-nav-btn {
   flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;

@@ -36,7 +36,25 @@
       "enGloss": "Only you truly look after your own needs — rely on yourself.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "לא / כלום",
+          "en": "nothing/not"
+        },
+        {
+          "he": "מגרד אותך",
+          "en": "scratches you"
+        },
+        {
+          "he": "אלא / חוץ מ",
+          "en": "except/but"
+        },
+        {
+          "he": "הציפורן שלך",
+          "en": "your fingernail"
+        }
+      ]
     },
     {
       "id": "il-ird-bi-en",
@@ -62,7 +80,25 @@
       "enGloss": "Everyone thinks their own is beautiful; love blinds judgment.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הקוף",
+          "en": "the monkey"
+        },
+        {
+          "he": "בעין",
+          "en": "in the eye of"
+        },
+        {
+          "he": "אמו",
+          "en": "his mother"
+        },
+        {
+          "he": "צבי",
+          "en": "gazelle"
+        }
+      ]
     },
     {
       "id": "id-la-halha-ma",
@@ -88,7 +124,25 @@
       "enGloss": "Nothing gets done alone; it takes cooperation (or two to tango).",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "יד",
+          "en": "a hand"
+        },
+        {
+          "he": "לבדה",
+          "en": "alone/by itself"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "מוחאת כף",
+          "en": "claps"
+        }
+      ]
     },
     {
       "id": "il-bab-illi-bijilak",
@@ -124,7 +178,37 @@
       "enGloss": "Cut off the source of your troubles and you'll have peace.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הדלת",
+          "en": "the door"
+        },
+        {
+          "he": "ש-",
+          "en": "that/which"
+        },
+        {
+          "he": "בא אליך",
+          "en": "comes to you"
+        },
+        {
+          "he": "ממנה",
+          "en": "from it"
+        },
+        {
+          "he": "הרוח",
+          "en": "the wind"
+        },
+        {
+          "he": "סגור אותה",
+          "en": "close it"
+        },
+        {
+          "he": "ותנוח",
+          "en": "and rest"
+        }
+      ]
     },
     {
       "id": "baad-ma-shab-wadduh",
@@ -153,7 +237,29 @@
       "enGloss": "Doing something far too late; teaching an old dog new tricks.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "אחרי",
+          "en": "after"
+        },
+        {
+          "he": "ש-",
+          "en": "that"
+        },
+        {
+          "he": "הזדקן/השׂיב",
+          "en": "he went gray"
+        },
+        {
+          "he": "שלחו אותו",
+          "en": "they sent him"
+        },
+        {
+          "he": "לבית הספר (כותאב)",
+          "en": "to the (Qur'anic) school"
+        }
+      ]
     },
     {
       "id": "ij-jar-abl-id",
@@ -176,7 +282,21 @@
       "enGloss": "Check who your neighbors are before you pick the home.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "השכן",
+          "en": "the neighbor"
+        },
+        {
+          "he": "לפני",
+          "en": "before"
+        },
+        {
+          "he": "הבית",
+          "en": "the house"
+        }
+      ]
     },
     {
       "id": "jarak-il-arib-wala",
@@ -205,7 +325,29 @@
       "enGloss": "The one close by who shows up beats blood relations far away.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "שכנך",
+          "en": "your neighbor"
+        },
+        {
+          "he": "הקרוב",
+          "en": "the near/close one"
+        },
+        {
+          "he": "ולא",
+          "en": "rather than"
+        },
+        {
+          "he": "אחיך",
+          "en": "your brother"
+        },
+        {
+          "he": "הרחוק",
+          "en": "the far/distant one"
+        }
+      ]
     },
     {
       "id": "tit-tit-zayy-ma",
@@ -243,7 +385,41 @@
       "enGloss": "A lot of effort and you end up exactly where you started.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "טית (קריאה קצבית)",
+          "en": "teet (rhythmic exclamation)"
+        },
+        {
+          "he": "טית",
+          "en": "teet"
+        },
+        {
+          "he": "כמו",
+          "en": "like/just as"
+        },
+        {
+          "he": "ש-",
+          "en": "that/as"
+        },
+        {
+          "he": "הלכת",
+          "en": "you went (f.)"
+        },
+        {
+          "he": "כמו",
+          "en": "like/just as"
+        },
+        {
+          "he": "ש-",
+          "en": "that/as"
+        },
+        {
+          "he": "באת",
+          "en": "you came (f.)"
+        }
+      ]
     },
     {
       "id": "illi-ido-bil-mayy",
@@ -281,7 +457,41 @@
       "enGloss": "The comfortable onlooker can't feel what the sufferer feels.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מי ש-",
+          "en": "the one who"
+        },
+        {
+          "he": "ידו",
+          "en": "his hand"
+        },
+        {
+          "he": "במים",
+          "en": "in the water"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "כמו",
+          "en": "like"
+        },
+        {
+          "he": "מי ש-",
+          "en": "the one who"
+        },
+        {
+          "he": "ידו",
+          "en": "his hand"
+        },
+        {
+          "he": "באש",
+          "en": "in the fire"
+        }
+      ]
     },
     {
       "id": "dukhul-il-hammam-mish",
@@ -310,7 +520,29 @@
       "enGloss": "Getting into something is easy; getting out is the hard part.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "כניסה",
+          "en": "entering"
+        },
+        {
+          "he": "המרחץ",
+          "en": "the bathhouse"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "כמו",
+          "en": "like"
+        },
+        {
+          "he": "יציאה ממנו",
+          "en": "leaving it"
+        }
+      ]
     },
     {
       "id": "ya-dakhil-ben-il",
@@ -352,7 +584,45 @@
       "enGloss": "Meddle in others' private quarrels and you'll only get grief.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הו / אתה",
+          "en": "o/you"
+        },
+        {
+          "he": "נכנס",
+          "en": "entering/stepping"
+        },
+        {
+          "he": "בין",
+          "en": "between"
+        },
+        {
+          "he": "הבצל",
+          "en": "the onion"
+        },
+        {
+          "he": "וקליפתה",
+          "en": "and its peel"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "פוגע בך",
+          "en": "befalls you"
+        },
+        {
+          "he": "אלא",
+          "en": "except"
+        },
+        {
+          "he": "הצחנה שלה",
+          "en": "its stink"
+        }
+      ]
     },
     {
       "id": "il-haki-mish-zayy",
@@ -378,7 +648,25 @@
       "enGloss": "Hearing about something isn't the same as seeing it yourself.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הדיבור",
+          "en": "talking"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "כמו",
+          "en": "like"
+        },
+        {
+          "he": "הראייה",
+          "en": "seeing"
+        }
+      ]
     },
     {
       "id": "tizen-b-libas",
@@ -398,7 +686,17 @@
       "enGloss": "Two people joined at the hip — inseparable, always together.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "שני אחוריים",
+          "en": "two backsides"
+        },
+        {
+          "he": "בתחתון אחד",
+          "en": "in one pair of underwear"
+        }
+      ]
     },
     {
       "id": "illi-biddo-yilab-ma",
@@ -434,7 +732,37 @@
       "enGloss": "If you take on something risky, accept the consequences.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מי ש-",
+          "en": "whoever"
+        },
+        {
+          "he": "רוצה",
+          "en": "wants"
+        },
+        {
+          "he": "לשחק",
+          "en": "to play"
+        },
+        {
+          "he": "עם",
+          "en": "with"
+        },
+        {
+          "he": "החתול",
+          "en": "the cat"
+        },
+        {
+          "he": "סובל / נושא",
+          "en": "bears/endures"
+        },
+        {
+          "he": "השריטות שלו",
+          "en": "its scratching"
+        }
+      ]
     },
     {
       "id": "il-irsh-il-abyad",
@@ -463,7 +791,29 @@
       "enGloss": "Save now; the money you put aside helps on your worst day.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הגרוש / המטבע",
+          "en": "the penny/coin"
+        },
+        {
+          "he": "הלבן",
+          "en": "the white"
+        },
+        {
+          "he": "מועיל",
+          "en": "is useful"
+        },
+        {
+          "he": "ביום",
+          "en": "on the day"
+        },
+        {
+          "he": "השחור",
+          "en": "the black"
+        }
+      ]
     },
     {
       "id": "zayy-is-samake-bass",
@@ -499,7 +849,37 @@
       "enGloss": "Someone who can't survive outside their own element.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "כמו",
+          "en": "like"
+        },
+        {
+          "he": "הדג",
+          "en": "the fish"
+        },
+        {
+          "he": "ברגע ש-",
+          "en": "as soon as"
+        },
+        {
+          "he": "יוצא",
+          "en": "it exits"
+        },
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "המים",
+          "en": "the water"
+        },
+        {
+          "he": "מת",
+          "en": "it dies"
+        }
+      ]
     },
     {
       "id": "isal-mijarrib-wala-tisal",
@@ -528,7 +908,29 @@
       "enGloss": "Experience beats theory — ask someone who's actually done it.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "שאל",
+          "en": "ask"
+        },
+        {
+          "he": "מנוסה",
+          "en": "an experienced one"
+        },
+        {
+          "he": "ולא",
+          "en": "rather than"
+        },
+        {
+          "he": "תשאל",
+          "en": "ask"
+        },
+        {
+          "he": "חכם",
+          "en": "a wise/learned one"
+        }
+      ]
     },
     {
       "id": "id-dinya-dawwara",
@@ -548,7 +950,17 @@
       "enGloss": "Fortunes rotate; today's high is tomorrow's low, and vice versa.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "העולם",
+          "en": "the world"
+        },
+        {
+          "he": "מסתובבת",
+          "en": "spins/turns"
+        }
+      ]
     },
     {
       "id": "yom-ilak-w-yom",
@@ -574,7 +986,25 @@
       "enGloss": "Some days you win, some you lose — that's life.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "יום",
+          "en": "a day"
+        },
+        {
+          "he": "לך",
+          "en": "for you"
+        },
+        {
+          "he": "ויום",
+          "en": "and a day"
+        },
+        {
+          "he": "נגדך",
+          "en": "against you"
+        }
+      ]
     },
     {
       "id": "kill-takhira-fiha-khira",
@@ -600,7 +1030,25 @@
       "enGloss": "Delays often turn out to be blessings in disguise.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "כל",
+          "en": "every"
+        },
+        {
+          "he": "עיכוב",
+          "en": "delay"
+        },
+        {
+          "he": "בה",
+          "en": "in it"
+        },
+        {
+          "he": "טובה",
+          "en": "a good/blessing"
+        }
+      ]
     },
     {
       "id": "is-sabir-miftah-il",
@@ -623,7 +1071,21 @@
       "enGloss": "Hold on patiently and things will open up.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הסבלנות",
+          "en": "patience"
+        },
+        {
+          "he": "מפתח",
+          "en": "the key"
+        },
+        {
+          "he": "להקלה",
+          "en": "to relief/deliverance"
+        }
+      ]
     },
     {
       "id": "ta-yiji-is-sabi",
@@ -655,7 +1117,33 @@
       "enGloss": "Keep busy with filler until the thing you're waiting for finally shows up.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "עד",
+          "en": "until"
+        },
+        {
+          "he": "יגיע",
+          "en": "comes"
+        },
+        {
+          "he": "הילד",
+          "en": "the boy"
+        },
+        {
+          "he": "נתפלל",
+          "en": "we pray"
+        },
+        {
+          "he": "על",
+          "en": "upon"
+        },
+        {
+          "he": "הנביא",
+          "en": "the prophet"
+        }
+      ]
     },
     {
       "id": "umr-ish-shai-baa",
@@ -678,7 +1166,21 @@
       "enGloss": "The troublesome ones somehow always survive/stick around.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "החיים",
+          "en": "the life"
+        },
+        {
+          "he": "של הרשע",
+          "en": "of the rascal"
+        },
+        {
+          "he": "נשאר / ארוך",
+          "en": "endures/remains"
+        }
+      ]
     },
     {
       "id": "hatt-rasak-ben-ir",
@@ -716,7 +1218,41 @@
       "enGloss": "Go along with the crowd and share their fate.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "שים",
+          "en": "put"
+        },
+        {
+          "he": "ראשך",
+          "en": "your head"
+        },
+        {
+          "he": "בין",
+          "en": "among"
+        },
+        {
+          "he": "הראשים",
+          "en": "the heads"
+        },
+        {
+          "he": "ואמור",
+          "en": "and say"
+        },
+        {
+          "he": "הו",
+          "en": "o"
+        },
+        {
+          "he": "חותך / קוצץ",
+          "en": "chopper/cutter"
+        },
+        {
+          "he": "הראשים",
+          "en": "of heads"
+        }
+      ]
     },
     {
       "id": "min-barra-rukham-w",
@@ -748,7 +1284,33 @@
       "enGloss": "Looks polished on the surface, a mess underneath.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "מבחוץ",
+          "en": "outside"
+        },
+        {
+          "he": "שיש",
+          "en": "marble"
+        },
+        {
+          "he": "ומ-",
+          "en": "and from"
+        },
+        {
+          "he": "מבפנים",
+          "en": "inside"
+        },
+        {
+          "he": "פיח",
+          "en": "soot"
+        }
+      ]
     },
     {
       "id": "min-barra-tasha-tasha",
@@ -786,7 +1348,41 @@
       "enGloss": "Blunter, funnier version: flashy exterior hiding a rotten interior.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "מבחוץ",
+          "en": "outside"
+        },
+        {
+          "he": "מקושט",
+          "en": "decked out"
+        },
+        {
+          "he": "מקושט",
+          "en": "decked out"
+        },
+        {
+          "he": "ומ-",
+          "en": "and from"
+        },
+        {
+          "he": "מבפנים",
+          "en": "inside"
+        },
+        {
+          "he": "חרא",
+          "en": "filth"
+        },
+        {
+          "he": "ממולא",
+          "en": "stuffed"
+        }
+      ]
     },
     {
       "id": "tihki-ma-it-tanjara",
@@ -815,7 +1411,29 @@
       "enGloss": "Word travels fast; say it to one and everyone knows.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "תדבר",
+          "en": "you talk"
+        },
+        {
+          "he": "עם",
+          "en": "to/with"
+        },
+        {
+          "he": "הסיר",
+          "en": "the pot"
+        },
+        {
+          "he": "שומעת אותך",
+          "en": "hears you"
+        },
+        {
+          "he": "הקדרה",
+          "en": "the cauldron"
+        }
+      ]
     },
     {
       "id": "il-haki-ilik-ya",
@@ -850,7 +1468,37 @@
       "enGloss": "Say something to one person meaning it for another who's listening.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הדברים",
+          "en": "the talk/words"
+        },
+        {
+          "he": "אלייך",
+          "en": "are for you"
+        },
+        {
+          "he": "הו",
+          "en": "o"
+        },
+        {
+          "he": "כלה",
+          "en": "daughter-in-law"
+        },
+        {
+          "he": "אבל תקשיבי",
+          "en": "but listen"
+        },
+        {
+          "he": "הו",
+          "en": "o"
+        },
+        {
+          "he": "שכנה",
+          "en": "neighbor"
+        }
+      ]
     },
     {
       "id": "illi-ma-byirif-yirus",
@@ -885,7 +1533,37 @@
       "enGloss": "Blaming circumstances for your own shortcomings.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מי ש-",
+          "en": "the one who"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "יודע",
+          "en": "knows how"
+        },
+        {
+          "he": "לרקוד",
+          "en": "to dance"
+        },
+        {
+          "he": "אומר",
+          "en": "says"
+        },
+        {
+          "he": "הרצפה",
+          "en": "the floor"
+        },
+        {
+          "he": "עקומה",
+          "en": "crooked"
+        }
+      ]
     },
     {
       "id": "il-haraka-baraka",
@@ -905,7 +1583,17 @@
       "enGloss": "Keep moving and doing — activity brings good things.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "התנועה",
+          "en": "movement"
+        },
+        {
+          "he": "ברכה",
+          "en": "blessing"
+        }
+      ]
     },
     {
       "id": "ala-add-lihafak-midd",
@@ -934,7 +1622,29 @@
       "enGloss": "Live within your means; don't overreach.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "לפי",
+          "en": "according to"
+        },
+        {
+          "he": "מידת",
+          "en": "the size of"
+        },
+        {
+          "he": "השמיכה שלך",
+          "en": "your blanket"
+        },
+        {
+          "he": "פשוט",
+          "en": "stretch"
+        },
+        {
+          "he": "רגליך",
+          "en": "your legs"
+        }
+      ]
     },
     {
       "id": "illi-fat-mat",
@@ -957,7 +1667,21 @@
       "enGloss": "Let the past go; it's over and done with.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מה ש-",
+          "en": "what"
+        },
+        {
+          "he": "עבר",
+          "en": "has passed"
+        },
+        {
+          "he": "מת",
+          "en": "is dead"
+        }
+      ]
     },
     {
       "id": "il-hitan-ilha-widan",
@@ -980,7 +1704,21 @@
       "enGloss": "Careful what you say — someone may be listening.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הקירות",
+          "en": "the walls"
+        },
+        {
+          "he": "יש להן",
+          "en": "have"
+        },
+        {
+          "he": "אוזניים",
+          "en": "ears"
+        }
+      ]
     },
     {
       "id": "bedit-il-yom-ahsan",
@@ -1012,7 +1750,33 @@
       "enGloss": "A bird in the hand is worth two in the bush.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "ביצה",
+          "en": "an egg"
+        },
+        {
+          "he": "של היום",
+          "en": "of today"
+        },
+        {
+          "he": "עדיפה",
+          "en": "better"
+        },
+        {
+          "he": "מ-",
+          "en": "than"
+        },
+        {
+          "he": "תרנגולת",
+          "en": "a hen"
+        },
+        {
+          "he": "של מחר",
+          "en": "of tomorrow"
+        }
+      ]
     },
     {
       "id": "usfur-bil-id-wala",
@@ -1044,7 +1808,33 @@
       "enGloss": "The Arabic 'bird in hand': what you hold beats bigger uncertain prospects.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "ציפור",
+          "en": "a bird"
+        },
+        {
+          "he": "ביד",
+          "en": "in the hand"
+        },
+        {
+          "he": "ולא",
+          "en": "rather than"
+        },
+        {
+          "he": "עשר",
+          "en": "ten"
+        },
+        {
+          "he": "על",
+          "en": "on"
+        },
+        {
+          "he": "העץ",
+          "en": "the tree"
+        }
+      ]
     },
     {
       "id": "is-sahib-illi-ma",
@@ -1083,7 +1873,41 @@
       "enGloss": "A true friend shows up when things get tough.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "החבר",
+          "en": "the friend"
+        },
+        {
+          "he": "ש-",
+          "en": "who"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "מועיל",
+          "en": "is useful"
+        },
+        {
+          "he": "בצרה",
+          "en": "in hardship"
+        },
+        {
+          "he": "מעולם",
+          "en": "ever"
+        },
+        {
+          "he": "לא",
+          "en": "not"
+        },
+        {
+          "he": "הועיל",
+          "en": "was useful"
+        }
+      ]
     },
     {
       "id": "ija-ykahhilha-amaha",
@@ -1106,7 +1930,21 @@
       "enGloss": "Tried to help and only made things far worse.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "בא",
+          "en": "he came"
+        },
+        {
+          "he": "לאפר את עיניה",
+          "en": "to line her eyes with kohl"
+        },
+        {
+          "he": "עיוור אותה",
+          "en": "he blinded her"
+        }
+      ]
     },
     {
       "id": "illi-ija-min-ger",
@@ -1147,7 +1985,45 @@
       "enGloss": "Easy come, easy go.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מה ש-",
+          "en": "what"
+        },
+        {
+          "he": "בא",
+          "en": "came"
+        },
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "בלי",
+          "en": "without"
+        },
+        {
+          "he": "מאמץ",
+          "en": "effort"
+        },
+        {
+          "he": "הולך",
+          "en": "leaves"
+        },
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "בלי",
+          "en": "without"
+        },
+        {
+          "he": "צער",
+          "en": "regret"
+        }
+      ]
     },
     {
       "id": "mithl-il-itta-btakul",
@@ -1176,7 +2052,29 @@
       "enGloss": "Ungrateful — takes the favor then acts like it never happened.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "כמו",
+          "en": "like"
+        },
+        {
+          "he": "החתולה",
+          "en": "the cat"
+        },
+        {
+          "he": "אוכלת",
+          "en": "eats"
+        },
+        {
+          "he": "ארוחתה",
+          "en": "its dinner"
+        },
+        {
+          "he": "ומתכחשת",
+          "en": "and denies"
+        }
+      ]
     },
     {
       "id": "il-biss-bokil-ashah",
@@ -1199,7 +2097,21 @@
       "enGloss": "Short local form: the ingrate who takes the favor and forgets it.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "החתול",
+          "en": "the cat"
+        },
+        {
+          "he": "אוכל",
+          "en": "eats"
+        },
+        {
+          "he": "ארוחתו",
+          "en": "its dinner"
+        }
+      ]
     },
     {
       "id": "khudh-il-asile-w",
@@ -1228,7 +2140,29 @@
       "enGloss": "Good character matters more than wealth.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "קח",
+          "en": "take/marry"
+        },
+        {
+          "he": "בעלת השורשים הטובים",
+          "en": "the well-rooted one"
+        },
+        {
+          "he": "ותישן",
+          "en": "and sleep"
+        },
+        {
+          "he": "על",
+          "en": "on"
+        },
+        {
+          "he": "המחצלת",
+          "en": "the straw mat"
+        }
+      ]
     },
     {
       "id": "tanjara-w-laat-gataha",
@@ -1251,7 +2185,21 @@
       "enGloss": "Two people perfectly matched — often two of a kind.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "סיר",
+          "en": "a pot"
+        },
+        {
+          "he": "ומצא",
+          "en": "and found"
+        },
+        {
+          "he": "את מכסהו",
+          "en": "its lid"
+        }
+      ]
     },
     {
       "id": "btifrah-lal-id-wil",
@@ -1277,7 +2225,25 @@
       "enGloss": "Getting excited for something that's already passed.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "אתה שמח",
+          "en": "you rejoice"
+        },
+        {
+          "he": "לחג",
+          "en": "for the holiday"
+        },
+        {
+          "he": "והחג",
+          "en": "and the holiday"
+        },
+        {
+          "he": "עבר / הלך",
+          "en": "has gone"
+        }
+      ]
     },
     {
       "id": "rayih-a-l-hajj",
@@ -1306,7 +2272,29 @@
       "enGloss": "Hopelessly out of step — starting just as everyone else finishes.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "הולך",
+          "en": "going"
+        },
+        {
+          "he": "ל-",
+          "en": "to"
+        },
+        {
+          "he": "החאג' (עלייה לרגל)",
+          "en": "the pilgrimage"
+        },
+        {
+          "he": "והאנשים",
+          "en": "and the people"
+        },
+        {
+          "he": "חוזרים",
+          "en": "are returning"
+        }
+      ]
     },
     {
       "id": "min-kuthr-it-tabbakhin",
@@ -1335,7 +2323,29 @@
       "enGloss": "Too many cooks spoil the broth.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "מ-",
+          "en": "from"
+        },
+        {
+          "he": "ריבוי",
+          "en": "too many"
+        },
+        {
+          "he": "הטבחים",
+          "en": "the cooks"
+        },
+        {
+          "he": "נשרפת",
+          "en": "burns"
+        },
+        {
+          "he": "התבשיל",
+          "en": "the dish"
+        }
+      ]
     },
     {
       "id": "il-id-illi-btiti",
@@ -1373,7 +2383,41 @@
       "enGloss": "It's better to be the giver than the receiver.",
       "blankIdx": null,
       "blankChoices": null,
-      "audio": null
+      "audio": null,
+      "wordGlosses": [
+        {
+          "he": "היד",
+          "en": "the hand"
+        },
+        {
+          "he": "ש-",
+          "en": "that"
+        },
+        {
+          "he": "נותנת",
+          "en": "gives"
+        },
+        {
+          "he": "טובה יותר",
+          "en": "better"
+        },
+        {
+          "he": "מ-",
+          "en": "than"
+        },
+        {
+          "he": "היד",
+          "en": "the hand"
+        },
+        {
+          "he": "ש-",
+          "en": "that"
+        },
+        {
+          "he": "לוקחת",
+          "en": "takes"
+        }
+      ]
     }
   ],
   "aboutContent": {

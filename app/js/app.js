@@ -1829,13 +1829,18 @@ function toggleProverbExpand(id) {
 // matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
 // forceArabic bypasses the global scriptMode toggle and always renders raw Arabic -- used by
 // Flashcards, whose front face is deliberately always the Arabic-script recall challenge
-// regardless of the site's current learning-alphabet setting.
-function proverbWordsHtml(p, forceArabic) {
+// regardless of the site's current learning-alphabet setting. clickableWords wires each word up
+// to handleFlashcardWordTap (also Flashcards-only -- the Proverbs list's own card-tap-to-expand
+// would otherwise conflict with a per-word click).
+function proverbWordsHtml(p, forceArabic, clickableWords) {
   let gi = 0;
   return p.arWords.map((tok) => {
     if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
+    const idx = gi++;
     const text = forceArabic ? tok.w : arText(tok.w);
-    const html = '<span class="proverb-word" data-gi="' + (gi++) + '">' + text + '</span>' + (tok.punct || '');
+    const cls = 'proverb-word' + (clickableWords ? ' proverb-word-clickable' : '') + (clickableWords && flashcardWordTrayGi === idx ? ' tapped' : '');
+    const onclick = clickableWords ? ' onclick="handleFlashcardWordTap(event, ' + idx + ')"' : '';
+    const html = '<span class="' + cls + '" data-gi="' + idx + '"' + onclick + '>' + text + '</span>' + (tok.punct || '');
     return html;
   }).join(' ');
 }
@@ -1884,31 +1889,45 @@ function stubViewHtml() {
 }
 
 /* ─────────────── FLASHCARDS TAB ───────────────
-   One card per proverb, sequential deck. Front is deliberately ALWAYS Arabic script -- it's the
-   recall challenge -- independent of the global learning-alphabet toggle (scriptMode), with a
-   tap-to-peek Hebrew transliteration hint and a listen button (both reusing Proverbs-tab
-   machinery verbatim: proverbWordsHtml for the data-gi word spans, playProverbAudio for karaoke
-   playback). Back face reuses proverbExplainHtml() verbatim, per the shared-panel design. */
+   One card per proverb, sequential deck. Arabic (with tashkeel) is always shown, at large size,
+   with the learner's preferred transliteration automatically underneath -- no toggle needed.
+   Two independent reveal buttons (Literal meaning / Explanation) show their own section inline,
+   rather than a single flip to a combined back face -- lets a learner check just the literal
+   breakdown without also seeing the full contextual explanation, or vice versa. Tapping any word
+   shows its own gloss (wordGlosses -- an AI-drafted, unreviewed layer; see word_glosses source
+   note in favorite-proverbs/data.json history) in a small tray under the phrase. */
 let flashcardIdx = 0;
-let flashcardFlipped = false;
-let flashcardTranslitPeek = false;
+let flashcardShowLiteral = false;
+let flashcardShowMeaning = false;
+let flashcardWordTrayGi = null;
 function goToFlashcard(delta) {
   const next = flashcardIdx + delta;
   if (next < 0 || next >= PROVERBS.length) return;
   flashcardIdx = next;
-  flashcardFlipped = false;
-  flashcardTranslitPeek = false;
+  flashcardShowLiteral = false;
+  flashcardShowMeaning = false;
+  flashcardWordTrayGi = null;
   stopPronunciation();
   renderFlashcardsView();
 }
-function toggleFlashcardFlip() {
-  flashcardFlipped = !flashcardFlipped;
+function toggleFlashcardLiteral() {
+  flashcardShowLiteral = !flashcardShowLiteral;
   renderFlashcardsView();
 }
-function toggleFlashcardTranslitPeek(e) {
-  e.stopPropagation();
-  flashcardTranslitPeek = !flashcardTranslitPeek;
+function toggleFlashcardMeaning() {
+  flashcardShowMeaning = !flashcardShowMeaning;
   renderFlashcardsView();
+}
+function handleFlashcardWordTap(e, gi) {
+  e.stopPropagation();
+  flashcardWordTrayGi = (flashcardWordTrayGi === gi) ? null : gi;
+  renderFlashcardsView();
+}
+// Always the Hebrew transliteration unless the site's learning-alphabet toggle is specifically
+// set to English transliteration -- Hebrew is the default "preferred" hint per this app's
+// Hebrew-primary principle, matching every other trilingual surface in the app.
+function preferredTranslit(text) {
+  return scriptMode === 'translit-en' ? transliterateArabicEnglish(text) : transliterateArabicHebrew(text);
 }
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
@@ -1916,30 +1935,43 @@ function renderFlashcardsView() {
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   if (flashcardIdx >= PROVERBS.length) flashcardIdx = 0;
   const p = PROVERBS[flashcardIdx];
+  const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const plainText = p.arWords.map(t => t.w).join(' ');
-  const peekLine = flashcardTranslitPeek
-    ? '<div class="flashcard-peek-line" dir="rtl">' + transliterateArabicHebrew(plainText) + '</div>'
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+
+  let wordTrayHtml = '';
+  if (flashcardWordTrayGi != null) {
+    const gloss = p.wordGlosses && p.wordGlosses[flashcardWordTrayGi];
+    const text = gloss ? (en ? gloss.en : gloss.he) : (en ? 'Not glossed yet' : 'טרם תורגם');
+    wordTrayHtml = '<div class="flashcard-word-tray" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</div>';
+  }
+
+  const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+  const meaningText = en ? p.enGloss : p.heGloss;
+  const revealRow = (show, label, text) => show
+    ? '<div class="flashcard-reveal"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + (text || '') + '</div></div>'
     : '';
-  const face = flashcardFlipped
-    ? '<div class="flashcard-back">' + proverbExplainHtml(p) + '</div>'
-    : '<div class="flashcard-front">' +
-        '<div class="flashcard-front-controls">' +
-          (hasAudio
-            ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
-            : '<span></span>') +
-          '<button class="flashcard-translit-btn" onclick="toggleFlashcardTranslitPeek(event)">' + (appLang === 'en' ? 'aA' : 'תעתיק') + '</button>' +
-        '</div>' +
-        '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true) + '</div>' +
-        peekLine +
-        '<div class="flashcard-tap-hint">' + (appLang === 'en' ? 'Tap card to reveal meaning' : 'הקישו על הכרטיס לגילוי המשמעות') + '</div>' +
-      '</div>';
+
   el.innerHTML =
     '<div class="flashcard-progress">' + (flashcardIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
-    '<div class="flashcard' + (flashcardFlipped ? ' flipped' : '') + '" onclick="toggleFlashcardFlip()">' + face + '</div>' +
+    '<div class="flashcard">' +
+      '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
+      '<div class="flashcard-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
+      wordTrayHtml +
+      '<div class="flashcard-controls">' +
+        (hasAudio
+          ? '<button class="flashcard-play-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<button class="flashcard-action-btn' + (flashcardShowLiteral ? ' active' : '') + '" onclick="toggleFlashcardLiteral()">' + (en ? 'Literal meaning' : 'פירוש מילולי') + '</button>' +
+        '<button class="flashcard-action-btn' + (flashcardShowMeaning ? ' active' : '') + '" onclick="toggleFlashcardMeaning()">' + (en ? 'Explanation' : 'הסבר') + '</button>' +
+      '</div>' +
+      revealRow(flashcardShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      revealRow(flashcardShowMeaning, en ? 'Meaning' : 'משמעות', meaningText) +
+    '</div>' +
     '<div class="flashcard-nav">' +
-      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (appLang === 'en' ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn"' + (flashcardIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (appLang === 'en' ? 'Next ›' : 'הבא ›') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
     '</div>';
 }
 function renderFillBlankView() {
