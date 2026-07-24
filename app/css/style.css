@@ -37,7 +37,13 @@ button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action:
 }
 .hamburger-btn svg rect { fill: currentColor; }
 .hamburger-btn:hover { background: var(--active-bg); }
-.mobile-header-title { display: none; font-size: 18px; font-weight: 700; }
+.mobile-header-title { display: none; font-size: 20px; font-weight: 700; }
+/* text-align:start (set in the mobile media query below) resolves to right by default since the
+   page direction is rtl -- correct for Hebrew (sits next to the hamburger, which is always on
+   the physical right). In English mode, flip to ltr so it resolves to left instead, matching how
+   every in-page heading (.lesson-title, .watch-head, etc.) already re-anchors left in English --
+   not stay right-justified next to a menu button whose position doesn't follow reading direction. */
+body.lang-en .mobile-header-title { direction: ltr; }
 .menu-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,.32);
   opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 40;
