@@ -13,17 +13,16 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --black: #0D0D0D; --mid: #8A8A8A; --rule: #E4E3E0; --active-bg: #F0EFE9; }
   html, body { min-height: 100%; background: #fff; color: var(--black); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
-  /* Page frame stays physically fixed regardless of language -- only the text content inside it
-     (subtitle, card copy) flips direction/alignment via body.lang-en below. Same split the rest
-     of the app uses (see app.js's applyAppLang/body.lang-en): without this, toggling the whole
-     page's dir would mirror the header on every click and the switch button itself would jump
-     from one side of the screen to the other. */
-  .lib-wrap { direction: ltr; max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
-  .lib-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 40px; }
+  /* Page frame stays physically fixed regardless of language. The switch is pinned to a fixed
+     corner (outside normal flow) so it never travels, and the title/subtitle are centered so
+     flipping their direction/alignment (via body.lang-en below) changes how the text reads in
+     place instead of yanking it from one edge of the screen to the other. */
+  .lib-wrap { position: relative; max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  .lib-header { text-align: center; margin-bottom: 40px; }
   .lib-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
-  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; text-align: right; }
-  body.lang-en .lib-subtitle { direction: ltr; text-align: left; }
-  .lang-switch { display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; flex-shrink: 0; }
+  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; }
+  body.lang-en .lib-subtitle { direction: ltr; }
+  .lang-switch { position: absolute; top: 48px; right: 24px; display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; }
   .lang-switch-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--mid); padding: 5px 12px; border-radius: 13px; cursor: pointer; transition: background .12s, color .12s; }
   .lang-switch-btn.active { background: var(--black); color: #fff; }
   .lib-list { display: flex; flex-direction: column; gap: 14px; }
