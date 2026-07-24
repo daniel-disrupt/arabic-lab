@@ -1967,13 +1967,12 @@ let themeCardWidthPx = null;
 function computeThemeCardWidth() {
   if (themeCardWidthPx !== null) return themeCardWidthPx;
   const ctx = document.createElement('canvas').getContext('2d');
-  ctx.font = "700 18px -apple-system, 'Segoe UI', system-ui, sans-serif";
+  ctx.font = "700 21px -apple-system, 'Segoe UI', system-ui, sans-serif";
   const labels = PROVERB_THEME_ORDER.concat([{ en: 'Other', he: 'שונות' }])
-    .flatMap(t => [t.en.toUpperCase(), t.he]);
+    .flatMap(t => [t.en, t.he]);
   const widest = Math.max(...labels.map(s => ctx.measureText(s).width));
-  // canvas measureText doesn't apply the name's CSS letter-spacing, and real font hinting/kerning
-  // in the DOM tends to render slightly wider than the canvas estimate -- 5% + a flat 14px keeps
-  // the longest title (EN) from wrapping once the measurement is handed off to actual layout.
+  // canvas measureText tends to slightly underestimate real DOM font hinting/kerning -- 5% + a
+  // flat 14px keeps the longest title (EN) from wrapping once handed off to actual layout.
   themeCardWidthPx = Math.ceil(widest * 1.05) + 14;
   return themeCardWidthPx;
 }

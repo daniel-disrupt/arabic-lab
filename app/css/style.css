@@ -503,16 +503,16 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    and the card is centered under that title's own text rather than stretched full-bleed -- see
    computeThemeCardWidth's note in app.js for why the width can't just track the current language. */
 .proverb-theme-head {
-  display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 7px; text-align: center;
   width: var(--theme-card-w, auto); max-width: 100%; margin: 0 auto;
-  padding: 10px 0 12px; border-bottom: 1px solid var(--rule); cursor: pointer; user-select: none;
+  padding: 14px 0 16px; border-bottom: 1px solid var(--rule); cursor: pointer; user-select: none;
 }
-.proverb-theme-head:not(:first-child) { margin-top: 18px; }
-.proverb-theme-name { font-size: 18px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; color: var(--black); }
+.proverb-theme-head:not(:first-child) { margin-top: 22px; }
+.proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); }
 /* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
    doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
    ellipsis) since the card is narrow rather than a full-width single line. */
-.proverb-theme-teaser { font-size: 15px; font-style: italic; color: var(--mid); }
+.proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; }
 .proverb-theme-chev { flex-shrink: 0; color: var(--mid); font-size: 14px; transform: rotate(90deg); transition: transform .18s; }
 .proverb-theme-head.open .proverb-theme-chev { transform: rotate(-90deg); }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
