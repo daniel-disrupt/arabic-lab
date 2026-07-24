@@ -1004,6 +1004,21 @@ function clearProverbLiveWord() {
   activeProverbContainerEl = null;
   activeProverbId = null;
 }
+// Most renderings stamp one span per word (data-gi="<idx>"), a direct match. Word Scramble's
+// built area stamps one span per multi-word chunk instead (scrambleChunks groups several arWords
+// together as a single puzzle tile -- see the WORD-SCRAMBLE TAB comment), so a chunk span carries
+// a data-gi-start/data-gi-end range and highlights as a whole whenever the active word index
+// falls anywhere inside it.
+function findLiveWordEl(containerEl, gi) {
+  if (gi < 0) return null;
+  const exact = containerEl.querySelector('[data-gi="' + gi + '"]');
+  if (exact) return exact;
+  const ranged = containerEl.querySelectorAll('[data-gi-start]');
+  for (const el of ranged) {
+    if (gi >= +el.dataset.giStart && gi <= +el.dataset.giEnd) return el;
+  }
+  return null;
+}
 function updateProverbLiveWord() {
   if (!activeProverbContainerEl || activeProverbId == null) return;
   const proverb = PROVERBS.find(p => p.id === activeProverbId);
@@ -1012,7 +1027,7 @@ function updateProverbLiveWord() {
   if (gi === proverbLiveGi) return;
   proverbLiveGi = gi;
   if (proverbLiveEl) proverbLiveEl.classList.remove('live');
-  proverbLiveEl = gi >= 0 ? activeProverbContainerEl.querySelector('[data-gi="' + gi + '"]') : null;
+  proverbLiveEl = findLiveWordEl(activeProverbContainerEl, gi);
   if (proverbLiveEl) proverbLiveEl.classList.add('live');
 }
 audioEl.addEventListener('timeupdate', updateProverbLiveWord);
@@ -2172,7 +2187,7 @@ function renderFlashcardsView() {
       '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>' +
       '<div class="flashcard-icon-row">' +
         (hasAudio
-          ? '<button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
           : '') +
         '<button class="flashcard-icon-btn' + (flashcardShowLiteral ? ' active' : '') + '" data-fc-btn="literal" onclick="toggleFlashcardReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
         '<button class="flashcard-icon-btn' + (flashcardShowMeaning ? ' active' : '') + '" data-fc-btn="meaning" onclick="toggleFlashcardReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
@@ -2300,9 +2315,9 @@ function renderFillBlankView() {
     if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
     if (i === p.blankIdx) {
       const shown = answered ? arText(correctWord) : '____';
-      return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '">' + shown + '</span>' + (tok.punct || '');
+      return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '" data-gi="' + i + '">' + shown + '</span>' + (tok.punct || '');
     }
-    return '<span class="proverb-word">' + arText(tok.w) + '</span>' + (tok.punct || '');
+    return '<span class="proverb-word" data-gi="' + i + '">' + arText(tok.w) + '</span>' + (tok.punct || '');
   }).join(' ');
   // Mirrors the sentence's own blanking -- the transliteration must not give away the answer
   // before it's picked, so it masks the same word rather than transliterating the full phrase.
@@ -2349,7 +2364,7 @@ function renderFillBlankView() {
     '<div class="flashcard-progress">' + (en ? 'Cycle ' : 'מחזור ') + fillblankCycle + ' · ' + (fillblankIdx + 1) + ' / ' + fillblankOrder.length + '</div>' +
     '<div class="flashcard">' +
       (hasAudio && answered
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
         : '') +
       '<div class="flashcard-text-group">' +
         '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
@@ -2467,7 +2482,10 @@ function renderScrambleView() {
   const solved = scramblePlaced.length === chunkCount;
 
   const builtHtml = scramblePlaced.length
-    ? scramblePlaced.map((ci) => '<span class="proverb-word">' + scrambleChunkText(p, ci, false) + '</span>').join(' ')
+    ? scramblePlaced.map((ci) => {
+        const [s, e] = scrambleChunkRanges(p)[ci];
+        return '<span class="proverb-word" data-gi-start="' + s + '" data-gi-end="' + e + '">' + scrambleChunkText(p, ci, false) + '</span>';
+      }).join(' ')
     : '<span class="scramble-built-empty">' + (en ? 'Tap the pieces in order' : 'הקישו על החלקים לפי הסדר') + '</span>';
   const builtTranslit = scramblePlaced.length
     ? scramblePlaced.map((ci) => scrambleChunkText(p, ci, true)).join(' ')
@@ -2500,7 +2518,7 @@ function renderScrambleView() {
     '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
     '<div class="flashcard">' +
       (hasAudio && solved
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
         : '') +
       '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
       (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
