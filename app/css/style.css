@@ -76,6 +76,10 @@ button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action:
   flex-shrink: 0; display: flex; flex-direction: column; gap: 10px;
   padding: 14px 20px; border-top: 1px solid var(--rule);
 }
+/* The drawer is only ~260px wide after padding -- a label plus 3 buttons side by side (the
+   header popover's layout) doesn't fit at any reasonable button text length, so stack label
+   above buttons here instead of shrinking text to chase a moving target. */
+.side-menu-settings .switch-group { flex-direction: column; align-items: flex-start; gap: 8px; }
 
 /* ── HEADER SETTINGS MENU (site language + learning alphabet) ──
    Both switches live behind one icon button rather than inline in the header -- with the tabs
