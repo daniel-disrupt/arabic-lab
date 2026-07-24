@@ -1895,6 +1895,18 @@ function toggleProverbExpand(id) {
   if (expandedProverbIds.has(id)) expandedProverbIds.delete(id); else expandedProverbIds.add(id);
   renderProverbsView();
 }
+// Theme groups start CLOSED -- the list used to dump all ~46 cards open at once, which read as an
+// undifferentiated wall of text. Collapsed by default, every group's own state independently
+// toggleable (a Set, not a single "active" key) so more than one topic can be open at a time, same
+// multi-open pattern as expandedProverbIds above. Nothing is pre-opened on load: instead each closed
+// row shows a one-line "teaser" (the first proverb's literal translation) so the learner picks a
+// topic by what's actually in it -- often the odd literal image ("a monkey is a gazelle to its
+// mother") is the hook -- rather than tapping blind through a list of bare category names.
+let expandedThemeKeys = new Set();
+function toggleThemeExpand(key) {
+  if (expandedThemeKeys.has(key)) expandedThemeKeys.delete(key); else expandedThemeKeys.add(key);
+  renderProverbsView();
+}
 // data-gi is LOCAL to this proverb (0..N-1), not a lesson-global index like the Reader's --
 // matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
 // forceArabic bypasses the global scriptMode toggle and always renders raw Arabic -- used by
@@ -1919,16 +1931,21 @@ function proverbExplainHtml(p) {
   const literal = en ? p.literalEn : p.literalHe;
   const meaning = en ? p.enGloss : p.heGloss;
   const usage = en ? p.usageEn : p.usageHe;
-  const labels = en
-    ? { literal: 'Literally', meaning: 'Meaning', usage: 'When to use it' }
-    : { literal: 'פירוש מילולי', meaning: 'משמעות', usage: 'מתי אומרים את זה' };
-  const row = (label, text) => text
+  const usageLabel = en ? 'When to use it' : 'מתי אומרים את זה';
+  // Literal/meaning reuse the same book/bulb icons as the Flashcards/Fill-in-the-Blank/Scramble
+  // reveal buttons (FC_BOOK_ICON_SVG / FC_BULB_ICON_SVG) instead of a text label -- one visual
+  // vocabulary for "this is the literal translation" / "this is what it actually means" across the
+  // whole lesson. Usage has no icon equivalent elsewhere, so it keeps its text label.
+  const iconRow = (icon, iconLabel, text) => text
+    ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
+    : '';
+  const textRow = (label, text) => text
     ? '<div class="proverb-explain-row"><span class="proverb-explain-label">' + label + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
     : '';
   return '<div class="proverb-explain">' +
-    row(labels.literal, literal) +
-    row(labels.meaning, meaning) +
-    row(labels.usage, usage) +
+    iconRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literal) +
+    iconRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaning) +
+    textRow(usageLabel, usage) +
     '</div>';
 }
 function proverbCardHtml(p) {
@@ -1945,6 +1962,25 @@ function proverbCardHtml(p) {
       (expanded ? proverbExplainHtml(p) : '') +
     '</div>';
 }
+// Fixed at the widest theme TITLE across BOTH languages (not just the current appLang) -- so
+// toggling the site's HE/EN language never changes a theme card's width. Hebrew and English
+// theme names are wildly different lengths ("גלגל המזל" vs "Self-Reliance & Practical Wisdom"),
+// so sizing to whichever language is active would make every card resize/reflow the moment the
+// learner switches languages. Computed once via canvas measureText (matching the name's actual
+// font/weight/size) and cached, since the label set is fixed regardless of which lesson is loaded.
+let themeCardWidthPx = null;
+function computeThemeCardWidth() {
+  if (themeCardWidthPx !== null) return themeCardWidthPx;
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = "700 21px -apple-system, 'Segoe UI', system-ui, sans-serif";
+  const labels = PROVERB_THEME_ORDER.concat([{ en: 'Other', he: 'שונות' }])
+    .flatMap(t => [t.en, t.he]);
+  const widest = Math.max(...labels.map(s => ctx.measureText(s).width));
+  // canvas measureText tends to slightly underestimate real DOM font hinting/kerning -- 5% + a
+  // flat 14px keeps the longest title (EN) from wrapping once handed off to actual layout.
+  themeCardWidthPx = Math.ceil(widest * 1.05) + 14;
+  return themeCardWidthPx;
+}
 function renderProverbsView() {
   const list = document.getElementById('proverbs-list');
   if (!list) return;
@@ -1957,13 +1993,17 @@ function renderProverbsView() {
     (g || other).proverbs.push(p);
   });
   if (other.proverbs.length) groups.push(other);
+  list.style.setProperty('--theme-card-w', computeThemeCardWidth() + 'px');
 
   list.innerHTML = groups.filter(g => g.proverbs.length).map(g => {
-    const heading = '<div class="proverb-theme-head">' +
-      '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
-      '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+    const isOpen = expandedThemeKeys.has(g.theme.key);
+    const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
+    const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
+        '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+        '<span class="proverb-theme-chev">›</span>' +
+        '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>' +
     '</div>';
-    return heading + g.proverbs.map(proverbCardHtml).join('');
+    return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');
 }
 
