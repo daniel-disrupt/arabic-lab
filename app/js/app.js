@@ -4,6 +4,8 @@ let SEED_VOCAB = [], SAVED_VOCAB = [];
 let SAVED_VERBS = [];
 let WATCH_CAPTIONS = [];
 let VOICEOVER_SRC = '', VOICEOVER_CHUNKS = [], VOICEOVER_WORD_TIMES = [];
+let PROVERBS = [];
+let LESSON_BASE = ''; // 'lessons/<slug>/' -- needed to resolve each proverb's own audio file path
 let HOME_CONTENT = { en: { title: '', subtitle: '', intro: [] }, he: { title: '', subtitle: '', intro: [] } };
 let INTRO_CONTENT = { en: { title: '', text: '' }, he: { title: '', text: '' } };
 let ABOUT_CONTENT = { en: { dir: 'ltr', sections: [] }, he: { dir: 'rtl', sections: [] } };
@@ -84,9 +86,19 @@ function adjustWatchScale(dir) { watchScaler.adjust(dir); }
 let appLang = localStorage.getItem('arabicLabLang') || 'he';
 // Canonical Hebrew pronoun strings used throughout verbs-data.js conjugation rows.
 const PRONOUN_EN = { 'אני':'I', 'אתה':'you (m.)', 'את':'you (f.)', 'הוא':'he', 'היא':'she', 'אנחנו':'we', 'אתם/ן':'you (pl.)', 'הם/ן':'they' };
+// Every tab name that can ever exist across any lesson type -- lesson.html carries markup for
+// all of them always; a given lesson's bundle.meta.tabs (see initLesson()) narrows which ones
+// actually show. Keeping one master list (rather than a hardcoded array duplicated at each call
+// site) is what lets switchTab()/applyAppLang() work generically for any lesson's tab subset.
+const ALL_TAB_NAMES = ['watch','reader','vocab','verbs','proverbs','flashcards','fillblank','scramble','about'];
 const TAB_LABELS = {
-  en: { reader: 'Reader', vocab: 'Vocab', verbs: 'Verbs', watch: 'Home', about: 'About' },
-  he: { reader: 'קורא', vocab: 'אוצר מילים', verbs: 'פעלים', watch: 'בית', about: 'אודות' },
+  en: { reader: 'Reader', vocab: 'Vocab', verbs: 'Verbs', watch: 'Home', about: 'About',
+        proverbs: 'Proverbs', flashcards: 'Flashcards', fillblank: 'Fill in the Blank', scramble: 'Word Scramble' },
+  // proverbs/flashcards/fillblank/scramble Hebrew labels are a first draft, not yet reviewed by
+  // the user -- flag for their real wording before treating as final (project convention: all
+  // Hebrew UI copy gets a human pass, see feedback_ui_wording_iteration).
+  he: { reader: 'קורא', vocab: 'אוצר מילים', verbs: 'פעלים', watch: 'בית', about: 'אודות',
+        proverbs: 'פתגמים', flashcards: 'כרטיסיות', fillblank: 'השלמת מילים', scramble: 'סידור מילים' },
 };
 // Homepage (the "watch" view/tab internally) frames the video as the emotional entry point:
 // context on the moment, then the speech itself, then a bridge into the study tools in the
@@ -168,16 +180,14 @@ function applyAppLang() {
   document.getElementById('lesson-title').textContent = intro.title;
   document.getElementById('lesson-intro').textContent = intro.text;
   const tabLabels = TAB_LABELS[appLang];
-  document.getElementById('tab-reader').textContent = tabLabels.reader;
-  document.getElementById('tab-vocab').textContent = tabLabels.vocab;
-  document.getElementById('tab-verbs').textContent = tabLabels.verbs;
-  document.getElementById('tab-watch').textContent = tabLabels.watch;
-  document.getElementById('tab-about').textContent = tabLabels.about;
-  document.getElementById('menu-tab-reader').textContent = tabLabels.reader;
-  document.getElementById('menu-tab-vocab').textContent = tabLabels.vocab;
-  document.getElementById('menu-tab-verbs').textContent = tabLabels.verbs;
-  document.getElementById('menu-tab-watch').textContent = tabLabels.watch;
-  document.getElementById('menu-tab-about').textContent = tabLabels.about;
+  ALL_TAB_NAMES.forEach(name => {
+    const label = tabLabels[name];
+    if (label == null) return;
+    const tabEl = document.getElementById('tab-' + name);
+    if (tabEl) tabEl.textContent = label;
+    const menuEl = document.getElementById('menu-tab-' + name);
+    if (menuEl) menuEl.textContent = label;
+  });
   document.getElementById('mobile-header-title').textContent = tabLabels[activeTabName];
   const home = HOME_CONTENT[appLang];
   document.getElementById('watch-title').textContent = home.title;
@@ -205,6 +215,10 @@ function applyAppLang() {
   applyWatchTranslationLang();
   renderVocabView();
   renderVerbsView();
+  renderProverbsView();
+  renderFlashcardsView();
+  renderFillBlankView();
+  renderScrambleView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
 
@@ -389,6 +403,10 @@ function applyScriptMode() {
   renderMobileCueOverlay(activeWatchCueIdx);
   renderVocabView();
   renderVerbsView();
+  renderProverbsView();
+  renderFlashcardsView();
+  renderFillBlankView();
+  renderScrambleView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
 
@@ -445,8 +463,24 @@ function toggleVerbGroup(key) {
 }
 
 /* ─────────────── TAB SWITCHING ─────────────── */
-// The Watch tab opens by default; on mobile, Reader/Vocab/Verbs/About live behind the hamburger
-// drawer instead of a tab row, since there wasn't room for both that and the language switch.
+// Which tabs the CURRENT lesson shows, and in what order -- narrowed from ALL_TAB_NAMES by
+// initLesson() based on the fetched bundle's meta.tabs (see LESSON BOOTSTRAP at the bottom of
+// this file). Defaults to the full classic set so this stays correct even if a bundle omits
+// meta.tabs entirely.
+let ACTIVE_TABS = ['watch','reader','vocab','verbs','about'];
+function applyActiveTabs() {
+  ALL_TAB_NAMES.forEach(name => {
+    const show = ACTIVE_TABS.includes(name);
+    const tabEl = document.getElementById('tab-' + name);
+    if (tabEl) tabEl.style.display = show ? '' : 'none';
+    const menuEl = document.getElementById('menu-tab-' + name);
+    if (menuEl) menuEl.style.display = show ? '' : 'none';
+  });
+}
+// The Watch tab opens by default on Abed's lesson; other lesson types set their own first tab
+// via initLesson() -> switchTab(ACTIVE_TABS[0]). On mobile, every tab besides the active one
+// lives behind the hamburger drawer instead of a tab row, since there wasn't room for both that
+// and the language switch.
 let activeTabName = 'watch';
 function switchTab(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -460,15 +494,21 @@ function switchTab(name) {
     exitWatchTheater();
   }
   activeTabName = name;
-  const tabs = document.querySelectorAll('.tab');
-  const idx = ['watch','reader','vocab','verbs','about'].indexOf(name);
-  if (idx !== -1) tabs[idx].classList.add('active');
+  const tabEl = document.getElementById('tab-' + name);
+  if (tabEl) tabEl.classList.add('active');
   const menuItem = document.getElementById('menu-tab-' + name);
   if (menuItem) menuItem.classList.add('active');
   document.getElementById('mobile-header-title').textContent = TAB_LABELS[appLang][name];
   if (name === 'verbs') renderVerbsView();
   if (name === 'vocab') renderVocabView();
   if (name === 'about') renderAboutView();
+  if (name === 'proverbs') renderProverbsView();
+  // Reshuffle the deck order fresh on every entry into these tabs (not on incidental re-renders
+  // from a language/script toggle, and not per Prev/Next step) so returning to the tab surfaces
+  // a different run through the set instead of always starting at proverb #1.
+  if (name === 'flashcards') { shuffleFlashcardDeck(); renderFlashcardsView(); }
+  if (name === 'fillblank') { shuffleFillBlankDeck(); renderFillBlankView(); }
+  if (name === 'scramble') { shuffleScrambleDeck(); renderScrambleView(); }
 }
 
 /* ─────────────── HAMBURGER MENU (mobile) ─────────────── */
@@ -934,6 +974,7 @@ function stopPronunciation() {
   setPronounceBtnPlaying(activePronounceBtn, false);
   activePronounceBtn = null;
   clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
 }
 // For other code paths that take over audioEl directly (Reader chunk clicks, the main play
 // button, scrubbing) -- clears the stale "playing" indicator without re-pausing audio that's
@@ -943,6 +984,59 @@ function clearActivePronounceIndicator() {
   setPronounceBtnPlaying(activePronounceBtn, false);
   activePronounceBtn = null;
   clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
+}
+
+/* ─────────────── PROVERB AUDIO (Proverbs/Flashcards) ───────────────
+   Unlike the Reader/Vocab, which all share one lesson-length voiceover track and a single
+   lesson-wide word-index space, proverbs are independent standalone units -- each gets its own
+   short TTS clip and its own local {idx,t} word-timing array (idx 0..N-1 within that proverb,
+   not a global index). Deliberately a separate small mechanism rather than bending the
+   shared-track assumptions baked into voiceoverTimedWords/playLessonAudioSlice. */
+let activeProverbId = null;
+let activeProverbContainerEl = null;
+let proverbLiveGi = -1;
+let proverbLiveEl = null;
+function clearProverbLiveWord() {
+  if (proverbLiveEl) proverbLiveEl.classList.remove('live');
+  proverbLiveEl = null;
+  proverbLiveGi = -1;
+  activeProverbContainerEl = null;
+  activeProverbId = null;
+}
+function updateProverbLiveWord() {
+  if (!activeProverbContainerEl || activeProverbId == null) return;
+  const proverb = PROVERBS.find(p => p.id === activeProverbId);
+  const wordTimes = (proverb && proverb.audio && proverb.audio.wordTimes) || [];
+  const gi = findActiveTimedIndex(wordTimes, audioEl.currentTime);
+  if (gi === proverbLiveGi) return;
+  proverbLiveGi = gi;
+  if (proverbLiveEl) proverbLiveEl.classList.remove('live');
+  proverbLiveEl = gi >= 0 ? activeProverbContainerEl.querySelector('[data-gi="' + gi + '"]') : null;
+  if (proverbLiveEl) proverbLiveEl.classList.add('live');
+}
+audioEl.addEventListener('timeupdate', updateProverbLiveWord);
+// Natural end-of-clip isn't covered by stopAudioSliceWatch (that's only for stopping mid-track
+// at a slice boundary) -- reset the playing indicator here so the button doesn't stay stuck
+// showing "playing" after a proverb clip finishes on its own.
+audioEl.addEventListener('ended', () => {
+  if (activeProverbId != null) { setPronounceBtnPlaying(activePronounceBtn, false); activePronounceBtn = null; clearProverbLiveWord(); }
+});
+function playProverbAudio(proverbId, containerEl, btnEl) {
+  if (btnEl && btnEl === activePronounceBtn && activeProverbId === proverbId) { stopPronunciation(); return; }
+  const proverb = PROVERBS.find(p => p.id === proverbId);
+  if (!proverb || !proverb.audio || !proverb.audio.src) return; // no audio generated yet -- nothing to play, don't fabricate a sound
+  stopAudioSliceWatch();
+  setPronounceBtnPlaying(activePronounceBtn, false);
+  clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
+  activeProverbId = proverbId;
+  activeProverbContainerEl = containerEl;
+  audioEl.src = LESSON_BASE + proverb.audio.src;
+  audioEl.currentTime = 0;
+  audioEl.play();
+  activePronounceBtn = btnEl || null;
+  setPronounceBtnPlaying(activePronounceBtn, true);
 }
 function playLessonAudioSlice(startT, endT, btnEl) {
   if (btnEl && btnEl === activePronounceBtn) { stopPronunciation(); return; }
@@ -1764,6 +1858,519 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { skipWatch(-5); e.preventDefault(); }
   else if (e.key === 'ArrowRight') { skipWatch(5); e.preventDefault(); }
 });
+// Left/right arrow paging for Flashcards/Fill-in-the-Blank/Word-Scramble. The app is RTL-mirrored
+// throughout (see the Overall design note at the top of style.css), so Prev always renders on the
+// physical RIGHT and Next on the physical LEFT regardless of appLang -- mapping ArrowRight->Prev
+// and ArrowLeft->Next points each key toward the button actually sitting on that side of the screen.
+const CARD_TAB_NAV = { flashcards: goToFlashcard, fillblank: goToFillBlank, scramble: goToScramble };
+document.addEventListener('keydown', (e) => {
+  const goTo = CARD_TAB_NAV[activeTabName];
+  if (!goTo) return;
+  if (e.target.closest('input, textarea, [contenteditable]')) return;
+  if (e.key === 'ArrowLeft') { goTo(1); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { goTo(-1); e.preventDefault(); }
+});
+
+/* ─────────────── PROVERBS TAB (browsable list, standalone units) ───────────────
+   Each proverb is its own self-contained card -- unlike the Reader's one continuous chunked
+   text, proverbs are unrelated sayings, so there's no shared "essay" to flow through. Tapping a
+   card expands the shared "explain it" block (literal meaning / idiomatic meaning / usage
+   scenario) -- the same renderer is reused verbatim by the Flashcards tab's back face.
+
+   The list is grouped under theme headers (each proverb tagged "theme" in data.json) rather than
+   left as one long undifferentiated scroll of 46 cards -- order within a theme still follows the
+   source collection's own sequence. PROVERB_THEME_ORDER is the display order of the groups; a
+   proverb whose theme key isn't in this list (or has none) falls into a trailing "Other" group
+   instead of silently disappearing. */
+const PROVERB_THEME_ORDER = [
+  { key: 'self',      en: 'Self-Reliance & Practical Wisdom', he: 'עצמאות וחוכמת חיים' },
+  { key: 'company',   en: 'Company & Generosity',             he: 'חברה ונדיבות' },
+  { key: 'seeing',     en: 'Reading Between the Lines',        he: 'לקרוא בין השורות' },
+  { key: 'fortune',    en: 'Fortune’s Wheel',                  he: 'גלגל המזל' },
+  { key: 'timing',     en: 'Patience & Timing',                he: 'סבלנות ותזמון' },
+  { key: 'risk',       en: 'Risk & Consequence',               he: 'סיכון ותוצאה' },
+];
+let expandedProverbIds = new Set();
+function toggleProverbExpand(id) {
+  if (expandedProverbIds.has(id)) expandedProverbIds.delete(id); else expandedProverbIds.add(id);
+  renderProverbsView();
+}
+// data-gi is LOCAL to this proverb (0..N-1), not a lesson-global index like the Reader's --
+// matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
+// forceArabic bypasses the global scriptMode toggle and always renders raw Arabic -- used by
+// Flashcards, whose front face is deliberately always the Arabic-script recall challenge
+// regardless of the site's current learning-alphabet setting. clickableWords wires each word up
+// to handleFlashcardWordTap (also Flashcards-only -- the Proverbs list's own card-tap-to-expand
+// would otherwise conflict with a per-word click).
+function proverbWordsHtml(p, forceArabic, clickableWords) {
+  let gi = 0;
+  return p.arWords.map((tok) => {
+    if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
+    const idx = gi++;
+    const text = forceArabic ? tok.w : arText(tok.w);
+    const cls = 'proverb-word' + (clickableWords ? ' proverb-word-clickable' : '') + (clickableWords && flashcardWordTrayGi === idx ? ' tapped' : '');
+    const onclick = clickableWords ? ' onclick="handleFlashcardWordTap(event, ' + idx + ')"' : '';
+    const html = '<span class="' + cls + '" data-gi="' + idx + '"' + onclick + '>' + text + '</span>' + (tok.punct || '');
+    return html;
+  }).join(' ');
+}
+function proverbExplainHtml(p) {
+  const en = appLang === 'en';
+  const literal = en ? p.literalEn : p.literalHe;
+  const meaning = en ? p.enGloss : p.heGloss;
+  const usage = en ? p.usageEn : p.usageHe;
+  const labels = en
+    ? { literal: 'Literally', meaning: 'Meaning', usage: 'When to use it' }
+    : { literal: 'פירוש מילולי', meaning: 'משמעות', usage: 'מתי אומרים את זה' };
+  const row = (label, text) => text
+    ? '<div class="proverb-explain-row"><span class="proverb-explain-label">' + label + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
+    : '';
+  return '<div class="proverb-explain">' +
+    row(labels.literal, literal) +
+    row(labels.meaning, meaning) +
+    row(labels.usage, usage) +
+    '</div>';
+}
+function proverbCardHtml(p) {
+    const expanded = expandedProverbIds.has(p.id);
+    const hasAudio = !!(p.audio && p.audio.src);
+    return '<div class="proverb-card' + (expanded ? ' expanded' : '') + '">' +
+      '<div class="proverb-card-head" onclick="toggleProverbExpand(\'' + p.id + '\')">' +
+        (hasAudio
+          ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'proverb-words-' + p.id + '\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<div class="proverb-words" id="proverb-words-' + p.id + '" dir="' + scriptDir() + '">' + proverbWordsHtml(p) + '</div>' +
+        '<span class="proverb-chev">›</span>' +
+      '</div>' +
+      (expanded ? proverbExplainHtml(p) : '') +
+    '</div>';
+}
+function renderProverbsView() {
+  const list = document.getElementById('proverbs-list');
+  if (!list) return;
+  const en = appLang === 'en';
+  const groups = PROVERB_THEME_ORDER.map(t => ({ theme: t, proverbs: [] }));
+  const groupByKey = new Map(groups.map(g => [g.theme.key, g]));
+  const other = { theme: { key: 'other', en: 'Other', he: 'שונות' }, proverbs: [] };
+  PROVERBS.forEach(p => {
+    const g = groupByKey.get(p.theme);
+    (g || other).proverbs.push(p);
+  });
+  if (other.proverbs.length) groups.push(other);
+
+  list.innerHTML = groups.filter(g => g.proverbs.length).map(g => {
+    const heading = '<div class="proverb-theme-head">' +
+      '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+      '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+    '</div>';
+    return heading + g.proverbs.map(proverbCardHtml).join('');
+  }).join('');
+}
+
+/* ─────────────── FLASHCARDS / FILL-IN-THE-BLANK / WORD-SCRAMBLE ───────────────
+   Stub views -- built out in later phases once the Proverbs tab pattern above is confirmed.
+   Kept as real (if minimal) functions rather than leaving switchTab() calling something
+   undefined, so the tab-gating mechanism is fully wired end-to-end today. */
+function stubViewHtml() {
+  return '<div class="stub-view">' + (appLang === 'en' ? 'Coming soon.' : 'בקרוב.') + '</div>';
+}
+
+/* ─────────────── FLASHCARDS TAB ───────────────
+   One card per proverb, sequential deck. Arabic (with tashkeel) is always shown, large, with the
+   learner's preferred transliteration automatically right underneath -- no toggle needed. Below
+   that, three small icon buttons (listen / literal meaning / explanation) sit close together
+   rather than full-width text pills, keeping the default (nothing revealed) view compact instead
+   of padded out with dead space.
+
+   Reveal panels and the word-gloss tray are ALWAYS present in the DOM (built once per card by
+   renderFlashcardsView) and animate open/closed via a CSS max-height transition -- same pattern
+   as the Vocab tab's .vocab-expand/.open. Toggling them only flips a class on the existing
+   element (toggleFlashcardReveal / handleFlashcardWordTap), it does NOT re-render the card --
+   that's what made the earlier version feel like it was jumping: a full innerHTML rebuild on
+   every click has no starting height to transition from, so the layout just snaps. */
+// Shared by Flashcards and Fill-in-the-Blank -- both browse PROVERBS through a shuffled index
+// order rather than the source docx order, and reshuffle fresh every time the tab is (re)entered
+// (see switchTab()), not on every render or every Prev/Next step.
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let flashcardOrder = [];
+let flashcardIdx = 0;
+let flashcardShowLiteral = false;
+let flashcardShowMeaning = false;
+let flashcardWordTrayGi = null;
+function shuffleFlashcardDeck() {
+  flashcardOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  flashcardIdx = 0;
+  flashcardShowLiteral = false;
+  flashcardShowMeaning = false;
+  flashcardWordTrayGi = null;
+}
+function goToFlashcard(delta) {
+  const next = flashcardIdx + delta;
+  if (next < 0 || next >= flashcardOrder.length) return;
+  flashcardIdx = next;
+  flashcardShowLiteral = false;
+  flashcardShowMeaning = false;
+  flashcardWordTrayGi = null;
+  stopPronunciation();
+  renderFlashcardsView();
+}
+function toggleFlashcardReveal(which) {
+  const show = which === 'literal' ? (flashcardShowLiteral = !flashcardShowLiteral) : (flashcardShowMeaning = !flashcardShowMeaning);
+  document.getElementById('flashcard-reveal-' + which).classList.toggle('open', show);
+  document.querySelector('.flashcard-icon-btn[data-fc-btn="' + which + '"]').classList.toggle('active', show);
+}
+function handleFlashcardWordTap(e, gi) {
+  e.stopPropagation();
+  const p = PROVERBS[flashcardOrder[flashcardIdx]];
+  const trayEl = document.getElementById('flashcard-word-tray');
+  document.querySelectorAll('#flashcard-words .proverb-word-clickable.tapped').forEach(w => w.classList.remove('tapped'));
+  if (flashcardWordTrayGi === gi) { flashcardWordTrayGi = null; trayEl.classList.remove('open'); return; }
+  flashcardWordTrayGi = gi;
+  const wordEl = document.querySelector('#flashcard-words [data-gi="' + gi + '"]');
+  if (wordEl) wordEl.classList.add('tapped');
+  const en = appLang === 'en';
+  const gloss = p.wordGlosses && p.wordGlosses[gi];
+  trayEl.textContent = gloss ? (en ? gloss.en : gloss.he) : (en ? 'Not glossed yet' : 'טרם תורגם');
+  trayEl.dir = en ? 'ltr' : 'rtl';
+  trayEl.classList.add('open');
+}
+// Always the Hebrew transliteration unless the site's learning-alphabet toggle is specifically
+// set to English transliteration -- Hebrew is the default "preferred" hint per this app's
+// Hebrew-primary principle, matching every other trilingual surface in the app.
+function preferredTranslit(text) {
+  return scriptMode === 'translit-en' ? transliterateArabicEnglish(text) : transliterateArabicHebrew(text);
+}
+const FC_BOOK_ICON_SVG = '<svg width="17" height="15" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2C8 1.6 5 1.1 1.5 1.5V13.3c3.5-.4 6.5.1 8.5 1.7"/><path d="M10 3.2c2-1.6 5-2.1 8.5-1.7V13.3c-3.5-.4-6.5.1-8.5 1.7"/><path d="M10 3.2v11.8"/></svg>';
+const FC_BULB_ICON_SVG = '<svg width="14" height="17" viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1a5 5 0 00-3 9c.7.6 1 1.3 1 2.2v.6h4v-.6c0-.9.3-1.6 1-2.2A5 5 0 008 1z"/><path d="M6 15.5h4M6.5 17.5h3"/></svg>';
+function renderFlashcardsView() {
+  const el = document.getElementById('flashcards-inner');
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (!flashcardOrder.length) shuffleFlashcardDeck();
+  if (flashcardIdx >= flashcardOrder.length) flashcardIdx = 0;
+  const p = PROVERBS[flashcardOrder[flashcardIdx]];
+  const en = appLang === 'en';
+  const hasAudio = !!(p.audio && p.audio.src);
+  const plainText = p.arWords.map(t => t.w).join(' ');
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+  const proseDir = en ? 'ltr' : 'rtl';
+
+  const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+  const meaningText = en ? p.enGloss : p.heGloss;
+  const reveal = (which, open, label, text) =>
+    '<div class="flashcard-reveal' + (open ? ' open' : '') + '" id="flashcard-reveal-' + which + '">' +
+      '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
+    '</div>';
+
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (flashcardIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard">' +
+      '<div class="flashcard-text-group">' +
+        '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
+        '<div class="flashcard-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
+      '</div>' +
+      '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>' +
+      '<div class="flashcard-icon-row">' +
+        (hasAudio
+          ? '<button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<button class="flashcard-icon-btn' + (flashcardShowLiteral ? ' active' : '') + '" data-fc-btn="literal" onclick="toggleFlashcardReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (flashcardShowMeaning ? ' active' : '') + '" data-fc-btn="meaning" onclick="toggleFlashcardReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+      '</div>' +
+      reveal('literal', flashcardShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      reveal('meaning', flashcardShowMeaning, en ? 'Meaning' : 'משמעות', meaningText) +
+    '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === flashcardOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
+}
+/* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
+   One masked word per proverb, multiple choice from blankChoices (hand-authored per proverb --
+   see word_glosses-style caveat: AI-drafted, not yet reviewed by a native speaker). Choice order
+   is shuffled once per card (not on every render) so re-renders from a language/script switch
+   mid-attempt don't reshuffle the buttons out from under the learner. Follows the global
+   scriptMode toggle like the Proverbs list (unlike Flashcards' front, which deliberately doesn't)
+   -- this is a reading/recall exercise, not specifically an Arabic-script drill. */
+let fillblankOrder = [];
+let fillblankIdx = 0;
+let fillblankChoiceOrder = [];
+let fillblankSelectedIdx = null;
+let fillblankShowLiteral = false;
+let fillblankShowMeaning = false;
+// Reshuffles the whole deck order and jumps back to its first card -- see shuffleFlashcardDeck's
+// sibling comment above; called from switchTab() on every fresh entry into this tab, not on
+// every render or Prev/Next step.
+function shuffleFillBlankDeck() {
+  fillblankOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  fillblankIdx = 0;
+  setupFillBlankCard();
+}
+function setupFillBlankCard() {
+  const p = PROVERBS[fillblankOrder[fillblankIdx]];
+  fillblankChoiceOrder = shuffleArray(p.blankChoices);
+  fillblankSelectedIdx = null;
+  fillblankShowLiteral = false;
+  fillblankShowMeaning = false;
+}
+function goToFillBlank(delta) {
+  const next = fillblankIdx + delta;
+  if (next < 0 || next >= fillblankOrder.length) return;
+  fillblankIdx = next;
+  stopPronunciation();
+  setupFillBlankCard();
+  renderFillBlankView();
+}
+function selectFillBlankChoice(orderIdx) {
+  if (fillblankSelectedIdx != null) return; // already answered -- ignore further picks
+  fillblankSelectedIdx = orderIdx;
+  renderFillBlankView();
+}
+// Same non-destructive class-toggle approach as toggleFlashcardReveal -- these fire AFTER the
+// answer-lock render already happened, so the icon row/reveal panels are already in the DOM;
+// toggling them must not re-render the whole card or the reveal loses its animation again.
+function toggleFillBlankReveal(which) {
+  const show = which === 'literal' ? (fillblankShowLiteral = !fillblankShowLiteral) : (fillblankShowMeaning = !fillblankShowMeaning);
+  document.getElementById('fillblank-reveal-' + which).classList.toggle('open', show);
+  document.querySelector('.fillblank-icon-row [data-fb-btn="' + which + '"]').classList.toggle('active', show);
+}
+function renderFillBlankView() {
+  const el = document.getElementById('fillblank-inner');
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (!fillblankOrder.length) shuffleFillBlankDeck();
+  if (fillblankIdx >= fillblankOrder.length) fillblankIdx = 0;
+  if (!fillblankChoiceOrder.length) setupFillBlankCard();
+  const p = PROVERBS[fillblankOrder[fillblankIdx]];
+  const en = appLang === 'en';
+  const hasAudio = !!(p.audio && p.audio.src);
+  const answered = fillblankSelectedIdx != null;
+  const correctWord = p.blankChoices[0];
+  const dir = scriptDir();
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+  const proseDir = en ? 'ltr' : 'rtl';
+
+  const sentenceHtml = p.arWords.map((tok, i) => {
+    if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
+    if (i === p.blankIdx) {
+      const shown = answered ? arText(correctWord) : '____';
+      return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '">' + shown + '</span>' + (tok.punct || '');
+    }
+    return '<span class="proverb-word">' + arText(tok.w) + '</span>' + (tok.punct || '');
+  }).join(' ');
+  // Mirrors the sentence's own blanking -- the transliteration must not give away the answer
+  // before it's picked, so it masks the same word rather than transliterating the full phrase.
+  const translitLine = p.arWords.map((tok, i) => {
+    if (tok.sep !== undefined) return tok.sep;
+    if (i === p.blankIdx) return (answered ? preferredTranslit(correctWord) : '____') + (tok.punct || '');
+    return preferredTranslit(tok.w) + (tok.punct || '');
+  }).join(' ');
+
+  const choicesHtml = fillblankChoiceOrder.map((choice, i) => {
+    let cls = 'fillblank-choice-btn';
+    if (answered) {
+      if (choice === correctWord) cls += ' correct';
+      else if (i === fillblankSelectedIdx) cls += ' incorrect';
+    }
+    return '<button class="' + cls + '"' + (answered ? ' disabled' : '') + ' onclick="selectFillBlankChoice(' + i + ')">' + arText(choice) + '</button>';
+  }).join('');
+
+  const feedback = answered
+    ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
+    : '';
+
+  // Payoff after answering: icon buttons (same book/lightbulb pattern as Flashcards) rather than
+  // dumping both the literal breakdown and the full explanation at once -- a learner who just
+  // wants to confirm they got it right isn't forced past a wall of text to reach Next.
+  let payoffHtml = '';
+  if (answered) {
+    const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+    const meaningText = en ? p.enGloss : p.heGloss;
+    const revealPanel = (which, show, label, text) =>
+      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="fillblank-reveal-' + which + '">' +
+        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
+      '</div>';
+    payoffHtml =
+      '<div class="flashcard-icon-row fillblank-icon-row">' +
+        '<button class="flashcard-icon-btn' + (fillblankShowLiteral ? ' active' : '') + '" data-fb-btn="literal" onclick="toggleFillBlankReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (fillblankShowMeaning ? ' active' : '') + '" data-fb-btn="meaning" onclick="toggleFillBlankReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+      '</div>' +
+      revealPanel('literal', fillblankShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      revealPanel('meaning', fillblankShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+  }
+
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (fillblankIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard">' +
+      (hasAudio
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        : '') +
+      '<div class="flashcard-text-group">' +
+        '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
+        '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
+      '</div>' +
+      '<div class="fillblank-choices">' + choicesHtml + '</div>' +
+      feedback +
+      payoffHtml +
+    '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (fillblankIdx === 0 ? ' disabled' : '') + ' onclick="goToFillBlank(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (fillblankIdx === fillblankOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
+}
+/* ─────────────── WORD-SCRAMBLE TAB ───────────────
+   The proverb is grouped into a few multi-word CHUNKS (scrambleChunks: an array of chunk sizes
+   authored per proverb, e.g. [2,3,2] -- natural phrase/clause groupings, not one tile per word;
+   reconstructing word-by-word turned out to be a much harder puzzle than intended). Chunks
+   shuffle into a tile pool; tap them in the correct order to rebuild the sentence. Checked
+   per-tap, not per-attempt: the correct next chunk locks into the "built so far" area (a real
+   state change, worth a full re-render); a wrong tap just flashes that tile red and stays in the
+   pool -- no re-render, no lockout, so a wrong guess never costs progress or forces a restart.
+   Chunks are tracked by their 0-based position (0..chunkCount-1), which is already their correct
+   order by construction, so "the next expected chunk" is simply scramblePlaced.length -- no
+   separate lookup array needed the way word-level indices required.
+   Same shuffled-deck-per-entry + arrow-key paging as Flashcards/Fill-in-the-Blank, and the same
+   book/lightbulb icon reveal for the payoff once solved. */
+let scrambleOrder = [];
+let scrambleIdx = 0;
+let scrambleTileOrder = [];
+let scramblePlaced = [];
+let scrambleShowLiteral = false;
+let scrambleShowMeaning = false;
+// [startIdx, endIdx] (inclusive) into arWords for each chunk -- falls back to one word per chunk
+// if a proverb somehow lacks scrambleChunks, rather than crashing.
+function scrambleChunkRanges(p) {
+  const sizes = p.scrambleChunks || p.arWords.map(() => 1);
+  const ranges = [];
+  let start = 0;
+  sizes.forEach((size) => { ranges.push([start, start + size - 1]); start += size; });
+  return ranges;
+}
+function scrambleChunkText(p, ci, useTranslit) {
+  const [s, e] = scrambleChunkRanges(p)[ci];
+  const parts = [];
+  for (let i = s; i <= e; i++) {
+    const tok = p.arWords[i];
+    parts.push((useTranslit ? preferredTranslit(tok.w) : arText(tok.w)) + (tok.punct || ''));
+  }
+  return parts.join(' ');
+}
+function setupScrambleCard() {
+  const p = PROVERBS[scrambleOrder[scrambleIdx]];
+  const chunkIndices = scrambleChunkRanges(p).map((_, i) => i);
+  scrambleTileOrder = shuffleArray(chunkIndices);
+  // For proverbs with only 2-3 chunks, a random shuffle has a real chance of landing back on the
+  // original order, which reads as "not scrambled at all" -- reshuffle once more if so.
+  if (scrambleTileOrder.length > 1 && scrambleTileOrder.every((v, i) => v === chunkIndices[i])) {
+    scrambleTileOrder = shuffleArray(chunkIndices);
+  }
+  scramblePlaced = [];
+  scrambleShowLiteral = false;
+  scrambleShowMeaning = false;
+}
+function shuffleScrambleDeck() {
+  scrambleOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  scrambleIdx = 0;
+  setupScrambleCard();
+}
+function goToScramble(delta) {
+  const next = scrambleIdx + delta;
+  if (next < 0 || next >= scrambleOrder.length) return;
+  scrambleIdx = next;
+  stopPronunciation();
+  setupScrambleCard();
+  renderScrambleView();
+}
+function resetScrambleCard() {
+  setupScrambleCard();
+  renderScrambleView();
+}
+function toggleScrambleReveal(which) {
+  const show = which === 'literal' ? (scrambleShowLiteral = !scrambleShowLiteral) : (scrambleShowMeaning = !scrambleShowMeaning);
+  document.getElementById('scramble-reveal-' + which).classList.toggle('open', show);
+  document.querySelector('.scramble-icon-row [data-sc-btn="' + which + '"]').classList.toggle('active', show);
+}
+function handleScrambleTap(ci, btnEl) {
+  if (ci === scramblePlaced.length) {
+    scramblePlaced.push(ci);
+    renderScrambleView();
+  } else {
+    btnEl.classList.add('wrong');
+    setTimeout(() => btnEl.classList.remove('wrong'), 400);
+  }
+}
+function renderScrambleView() {
+  const el = document.getElementById('scramble-inner');
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (!scrambleOrder.length) shuffleScrambleDeck();
+  if (scrambleIdx >= scrambleOrder.length) scrambleIdx = 0;
+  const p = PROVERBS[scrambleOrder[scrambleIdx]];
+  const en = appLang === 'en';
+  const hasAudio = !!(p.audio && p.audio.src);
+  const proseDir = en ? 'ltr' : 'rtl';
+  const dir = scriptDir();
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+
+  const chunkCount = scrambleChunkRanges(p).length;
+  const solved = scramblePlaced.length === chunkCount;
+
+  const builtHtml = scramblePlaced.length
+    ? scramblePlaced.map((ci) => '<span class="proverb-word">' + scrambleChunkText(p, ci, false) + '</span>').join(' ')
+    : '<span class="scramble-built-empty">' + (en ? 'Tap the pieces in order' : 'הקישו על החלקים לפי הסדר') + '</span>';
+  const builtTranslit = scramblePlaced.length
+    ? scramblePlaced.map((ci) => scrambleChunkText(p, ci, true)).join(' ')
+    : '';
+
+  const poolHtml = scrambleTileOrder
+    .filter((ci) => !scramblePlaced.includes(ci))
+    .map((ci) => '<button class="scramble-tile" onclick="handleScrambleTap(' + ci + ', this)">' + scrambleChunkText(p, ci, false) + '</button>')
+    .join('');
+
+  let payoffHtml = '';
+  if (solved) {
+    const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+    const meaningText = en ? p.enGloss : p.heGloss;
+    const revealPanel = (which, show, label, text) =>
+      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="scramble-reveal-' + which + '">' +
+        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
+      '</div>';
+    payoffHtml =
+      '<div class="fillblank-feedback">' + (en ? 'Solved!' : 'פתרת!') + '</div>' +
+      '<div class="flashcard-icon-row scramble-icon-row">' +
+        '<button class="flashcard-icon-btn' + (scrambleShowLiteral ? ' active' : '') + '" data-sc-btn="literal" onclick="toggleScrambleReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (scrambleShowMeaning ? ' active' : '') + '" data-sc-btn="meaning" onclick="toggleScrambleReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+      '</div>' +
+      revealPanel('literal', scrambleShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      revealPanel('meaning', scrambleShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+  }
+
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard">' +
+      (hasAudio
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        : '') +
+      '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
+      (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
+      (!solved
+        ? '<div class="scramble-tiles">' + poolHtml + '</div>' +
+          '<button class="scramble-reset-btn" onclick="resetScrambleCard()">' + (en ? 'Reset' : 'איפוס') + '</button>'
+        : '') +
+      payoffHtml +
+    '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (scrambleIdx === 0 ? ' disabled' : '') + ' onclick="goToScramble(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (scrambleIdx === scrambleOrder.length - 1 ? ' disabled' : '') + ' onclick="goToScramble(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
+}
 
 /* ─────────────── LESSON BOOTSTRAP ───────────────
    Multi-lesson site: lesson.html?slug=<slug> fetches that lesson's data.json bundle (produced
@@ -1784,16 +2391,23 @@ function initLesson(bundle) {
   VOICEOVER_CHUNKS = (bundle.voiceover && bundle.voiceover.chunks) || [];
   VOICEOVER_WORD_TIMES = (bundle.voiceover && bundle.voiceover.wordTimes) || [];
   voiceoverTimedWords = VOICEOVER_WORD_TIMES.slice().sort((a, b) => a.t - b.t);
-  HOME_CONTENT = bundle.homeContent;
-  INTRO_CONTENT = bundle.introContent;
-  ABOUT_CONTENT = bundle.aboutContent;
-  HEADER_GLOSS = bundle.headerGloss;
+  // Fall back to the empty-shape defaults declared at the top of this file rather than requiring
+  // every lesson to author narrative content for tabs it doesn't even show (e.g. a proverbs
+  // lesson with no Watch/Reader tab has nothing to put in homeContent/introContent).
+  HOME_CONTENT = bundle.homeContent || HOME_CONTENT;
+  INTRO_CONTENT = bundle.introContent || INTRO_CONTENT;
+  ABOUT_CONTENT = bundle.aboutContent || ABOUT_CONTENT;
+  HEADER_GLOSS = bundle.headerGloss || HEADER_GLOSS;
+  PROVERBS = bundle.proverbs || [];
 
   const base = 'lessons/' + bundle.meta.slug + '/';
-  audioEl.src = base + VOICEOVER_SRC;
-  document.getElementById('watch-video-source').src = base + bundle.meta.videoPath;
-  document.getElementById('watch-captions').src = base + bundle.meta.captionsPath;
-  watchVideoEl.load();
+  LESSON_BASE = base;
+  if (VOICEOVER_SRC) audioEl.src = base + VOICEOVER_SRC; // only the Reader's shared-track model needs this set up front
+  if (bundle.meta.videoPath) {
+    document.getElementById('watch-video-source').src = base + bundle.meta.videoPath;
+    document.getElementById('watch-captions').src = base + bundle.meta.captionsPath;
+    watchVideoEl.load();
+  }
   document.title = bundle.meta.title;
 
   buildReader();
@@ -1804,6 +2418,14 @@ function initLesson(bundle) {
   applyWatchScale();
   initOutsideTapClose('verbs-scroll', (target) => !target.closest('.verb-pill') && !target.closest('.verb-card'), closeVerbDrawer);
   renderVerbsView();
+  renderProverbsView();
+
+  // Narrow the nav/side-menu to this lesson's declared tabs and open its first one -- falls back
+  // to the classic 5-tab set if a bundle doesn't declare meta.tabs at all.
+  ACTIVE_TABS = (bundle.meta.tabs && bundle.meta.tabs.length) ? bundle.meta.tabs : ACTIVE_TABS;
+  applyActiveTabs();
+  switchTab(ACTIVE_TABS[0]);
+
   applyAppLang();
   applyScriptMode();
 }

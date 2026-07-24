@@ -489,6 +489,141 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    and nested inside .chunk-preview-hl's black background (white) without a separate override. */
 .chunk-preview-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
 
+/* ── PROVERBS TAB ── */
+.proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
+.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
+.proverb-list { display: flex; flex-direction: column; gap: 14px; }
+.proverb-theme-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 9px; border-bottom: 1px solid var(--rule); }
+.proverb-theme-head:not(:first-child) { margin-top: 22px; }
+.proverb-theme-name { font-size: 18px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; color: var(--black); }
+.proverb-theme-count { flex-shrink: 0; font-size: 13px; color: var(--mid); font-variant-numeric: tabular-nums; }
+.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
+.proverb-card.expanded { border-color: var(--black); }
+.proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.proverb-pronounce {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); transition: all .12s;
+}
+.proverb-pronounce:hover { border-color: var(--black); color: var(--black); }
+.proverb-pronounce.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.proverb-words {
+  flex: 1; min-width: 0;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 19px; line-height: 1.6; direction: rtl; text-align: right;
+}
+body.translit-mode .proverb-words { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
+.proverb-word.live { box-shadow: inset 0 -3px 0 0 currentColor; border-radius: 2px; }
+.proverb-sep { color: var(--mid); }
+.proverb-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }
+.proverb-card.expanded .proverb-chev { transform: rotate(-90deg); }
+.proverb-explain { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; }
+.proverb-explain-row { display: flex; flex-direction: column; gap: 3px; }
+.proverb-explain-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); }
+/* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
+   isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. */
+.proverb-explain-text { font-size: 14px; line-height: 1.6; }
+.stub-view { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; }
+
+/* ── FLASHCARDS TAB ── */
+.flashcard-progress { text-align: center; font-size: 12px; color: var(--mid); letter-spacing: .04em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+.flashcard {
+  border: 1px solid var(--rule); border-radius: 16px; background: #fff;
+  padding: 40px 32px 28px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+/* Arabic + transliteration read as one caption-style unit -- tight gap between them -- with a
+   clearly bigger gap before the icon row/reveals below, so the default (nothing revealed) card
+   reads as a compact, deliberate block instead of a mostly-empty box. */
+.flashcard-text-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.flashcard-words { font-size: 40px; line-height: 1.5; }
+/* The card is always real Arabic script regardless of the global learning-alphabet toggle (see
+   proverbWordsHtml's forceArabic param) -- these two overrides win over the general .proverb-words
+   translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
+   don't flip just because the rest of the app is in a transliteration mode. */
+body.translit-mode .flashcard-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
+.proverb-word-clickable { cursor: pointer; transition: background .1s; }
+.proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
+.proverb-word-clickable.tapped { background: var(--black); color: #fff; border-radius: 4px; }
+.flashcard-translit-line { font-size: 19px; color: var(--mid); }
+/* Word-gloss tray and the two reveal panels all use the same animated max-height accordion as
+   the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
+   already in the DOM (see toggleFlashcardReveal/handleFlashcardWordTap), so the browser has a
+   real starting height to transition from instead of the layout just snapping. */
+.flashcard-word-tray {
+  max-height: 0; overflow: hidden; opacity: 0; width: 100%;
+  font-size: 15px; background: var(--active-bg); border-radius: 8px;
+  transition: max-height .22s cubic-bezier(.25,.8,.25,1), opacity .18s, margin .22s, padding .22s;
+}
+.flashcard-word-tray.open { max-height: 80px; opacity: 1; margin-bottom: 14px; padding: 10px 16px; }
+.flashcard-icon-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.flashcard-icon-btn {
+  flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); transition: all .12s;
+}
+.flashcard-icon-btn:hover { border-color: var(--black); color: var(--black); }
+.flashcard-icon-btn.active, .flashcard-icon-btn.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.flashcard-reveal { max-height: 0; overflow: hidden; opacity: 0; width: 100%; transition: max-height .28s cubic-bezier(.25,.8,.25,1), opacity .2s; }
+.flashcard-reveal.open { max-height: 300px; opacity: 1; }
+.flashcard-reveal-inner { width: 100%; text-align: start; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--rule); }
+.flashcard-reveal-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); margin-bottom: 4px; }
+.flashcard-reveal-text { font-size: 16px; line-height: 1.6; }
+.flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.flashcard-nav-btn {
+  flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+}
+.flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
+.flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
+
+/* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
+   .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
+.fillblank-sentence { font-size: 26px; line-height: 1.8; }
+/* The "____" placeholder text is the only blank indicator -- no extra border-bottom, which
+   used to render as a second (black) line stacked right under the grey underscore glyphs. */
+.fillblank-blank { display: inline-block; min-width: 64px; color: var(--light); }
+.fillblank-blank.filled { color: var(--black); font-weight: 600; }
+.fillblank-choices { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
+.fillblank-choice-btn {
+  font-size: 18px; padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+}
+body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.fillblank-choice-btn:hover:not(:disabled) { border-color: var(--black); }
+.fillblank-choice-btn:disabled { cursor: default; }
+.fillblank-choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+.fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
+.fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
+.fillblank-icon-row { margin-top: 16px; }
+
+/* ── WORD-SCRAMBLE TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
+   .flashcard-icon-row/.flashcard-icon-btn/.flashcard-reveal* and .fillblank-feedback) */
+.scramble-built {
+  min-height: 44px; font-size: 26px; line-height: 1.8;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.scramble-built-empty { font-size: 15px; color: var(--light); }
+.scramble-tiles { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 24px; }
+.scramble-tile {
+  font-size: 18px; padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+}
+body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.scramble-tile:hover { border-color: var(--black); }
+.scramble-tile.wrong { background: #fdecea; border-color: #c62828; color: #b71c1c; }
+.scramble-reset-btn {
+  margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--mid);
+  background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.scramble-reset-btn:hover { color: var(--black); }
+
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
