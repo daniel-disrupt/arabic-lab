@@ -2026,8 +2026,8 @@ function renderFlashcardsView() {
     el.innerHTML =
       '<div class="flashcard-progress">' + (en ? 'Round ' + flashcardRound : 'סבב ' + flashcardRound) + '</div>' +
       '<div class="flashcard fillblank-done">' +
-        '<div class="fillblank-done-title">' + (en ? 'All ' + PROVERBS.length + ' clear!' : 'כל ה־' + PROVERBS.length + ' סומנו כידועים!') + '</div>' +
-        '<div class="fillblank-done-sub">' + (en
+        '<div class="fillblank-done-title" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? 'All ' + PROVERBS.length + ' clear!' : 'כל ה־' + PROVERBS.length + ' סומנו כידועים!') + '</div>' +
+        '<div class="fillblank-done-sub" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en
           ? ('Took ' + flashcardRound + ' round' + (flashcardRound === 1 ? '' : 's'))
           : ('לקח ' + flashcardRound + ' ' + (flashcardRound === 1 ? 'סבב' : 'סבבים'))) + '</div>' +
         '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFlashcardDeck(); renderFlashcardsView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
@@ -2166,8 +2166,8 @@ function renderFillBlankView() {
     el.innerHTML =
       '<div class="flashcard-progress">' + (en ? 'Cycle ' + fillblankCycle : 'מחזור ' + fillblankCycle) + '</div>' +
       '<div class="flashcard fillblank-done">' +
-        '<div class="fillblank-done-title">' + (en ? 'All ' + PROVERBS.length + ' correct!' : 'כל ה־' + PROVERBS.length + ' נכונים!') + '</div>' +
-        '<div class="fillblank-done-sub">' + (en
+        '<div class="fillblank-done-title" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? 'All ' + PROVERBS.length + ' correct!' : 'כל ה־' + PROVERBS.length + ' נכונים!') + '</div>' +
+        '<div class="fillblank-done-sub" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en
           ? ('Took ' + fillblankCycle + ' cycle' + (fillblankCycle === 1 ? '' : 's'))
           : ('לקח ' + fillblankCycle + ' ' + (fillblankCycle === 1 ? 'מחזור' : 'מחזורים'))) + '</div>' +
         '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFillBlankDeck(); renderFillBlankView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
