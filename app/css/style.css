@@ -37,7 +37,7 @@ button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action:
 }
 .hamburger-btn svg rect { fill: currentColor; }
 .hamburger-btn:hover { background: var(--active-bg); }
-.mobile-header-title { display: none; font-size: 14px; font-weight: 600; }
+.mobile-header-title { display: none; font-size: 18px; font-weight: 700; }
 .menu-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,.32);
   opacity: 0; pointer-events: none; transition: opacity .22s; z-index: 40;
@@ -667,15 +667,17 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 
 /* ══════════════════════════ MOBILE (≤720px) ══════════════════════════ */
 @media (max-width: 720px) {
-  /* — header: swap the tab row for a hamburger + centered title, so Vocab/Verbs/About (and the
-     settings popover, see .settings-wrap below) live in the side menu instead of competing with
-     the tabs for a narrow header — */
-  .header { display: flex; align-items: center; padding: 0 6px; gap: 4px; }
+  /* — header: swap the tab row for a hamburger + title, so Vocab/Verbs/About (and the settings
+     popover, see .settings-wrap below) live in the side menu instead of competing with the tabs
+     for a narrow header. Title reads start-aligned next to the hamburger (matching how every
+     in-page heading -- .lesson-title, .watch-title, etc -- is start-aligned, not centered) and
+     at a size closer to those headings instead of reading as a shrunken afterthought. — */
+  .header { display: flex; align-items: center; padding: 0 6px; gap: 10px; }
   .header > .header-side:last-child { display: none; }
   .header-side { flex-shrink: 0; }
   .tabs { display: none; }
   .hamburger-btn { display: flex; }
-  .mobile-header-title { display: block; flex: 1 1 auto; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mobile-header-title { display: block; flex: 1 1 auto; text-align: start; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* The header settings popover anchors itself to the button's position (see .settings-menu) --
      fine on desktop where that button sits at the far end of a wide header, but on this narrow
      header it ends up near the screen edge and the panel runs off-canvas. Hidden here in favor
