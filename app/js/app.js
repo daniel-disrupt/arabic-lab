@@ -1974,12 +1974,10 @@ function renderProverbsView() {
     const isOpen = expandedThemeKeys.has(g.theme.key);
     const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
     const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
-      '<div class="proverb-theme-head-row">' +
         '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+        (isOpen ? '' : '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>') +
         '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
         '<span class="proverb-theme-chev">›</span>' +
-      '</div>' +
-      (isOpen ? '' : '<div class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</div>') +
     '</div>';
     return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');
