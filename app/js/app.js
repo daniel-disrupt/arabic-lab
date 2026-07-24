@@ -1933,14 +1933,28 @@ let flashcardIdx = 0;
 let flashcardShowLiteral = false;
 let flashcardShowMeaning = false;
 let flashcardWordTrayGi = null;
+// Round-retry state, same shape as Fill-in-the-Blank's cycle-retry (fillblankCycle/Results/Done):
+// round 1 is the full 46-proverb deck; every later round's pool is only the proverbs still
+// starred, shuffled fresh, until a round finishes with nothing starred. flashcardStarred is
+// keyed by the proverb's PROVERBS-array index (stable across rounds, unlike flashcardOrder
+// positions) and, unlike fillblankResults, persists across rounds rather than being cleared each
+// time -- there's no auto-grading here, so a card only leaves the retry pool when the learner
+// taps the star again themselves to unmark it.
+let flashcardRound = 1;
+let flashcardStarred = new Set();
+let flashcardDone = false;
 function shuffleFlashcardDeck() {
   flashcardOrder = shuffleArray(PROVERBS.map((_, i) => i));
   flashcardIdx = 0;
   flashcardShowLiteral = false;
   flashcardShowMeaning = false;
   flashcardWordTrayGi = null;
+  flashcardRound = 1;
+  flashcardStarred = new Set();
+  flashcardDone = false;
 }
 function goToFlashcard(delta) {
+  if (delta > 0 && flashcardIdx === flashcardOrder.length - 1) { advanceFlashcardRound(); return; }
   const next = flashcardIdx + delta;
   if (next < 0 || next >= flashcardOrder.length) return;
   flashcardIdx = next;
@@ -1948,6 +1962,30 @@ function goToFlashcard(delta) {
   flashcardShowMeaning = false;
   flashcardWordTrayGi = null;
   stopPronunciation();
+  renderFlashcardsView();
+}
+// Fires off the last card of a round's Next click. Only proverbs still starred at that moment
+// carry into the next round's pool -- one the learner starred earlier and has since un-starred
+// (because a later look at it went fine) drops out, same as fill-in-blank dropping a proverb once
+// it's answered correctly.
+function advanceFlashcardRound() {
+  const remaining = flashcardOrder.filter(gi => flashcardStarred.has(gi));
+  stopPronunciation();
+  if (remaining.length === 0) {
+    flashcardDone = true;
+  } else {
+    flashcardRound += 1;
+    flashcardOrder = shuffleArray(remaining);
+    flashcardIdx = 0;
+    flashcardShowLiteral = false;
+    flashcardShowMeaning = false;
+    flashcardWordTrayGi = null;
+  }
+  renderFlashcardsView();
+}
+function toggleFlashcardStar() {
+  const gi = flashcardOrder[flashcardIdx];
+  if (flashcardStarred.has(gi)) flashcardStarred.delete(gi); else flashcardStarred.add(gi);
   renderFlashcardsView();
 }
 function toggleFlashcardReveal(which) {
@@ -1978,14 +2016,29 @@ function preferredTranslit(text) {
 }
 const FC_BOOK_ICON_SVG = '<svg width="17" height="15" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2C8 1.6 5 1.1 1.5 1.5V13.3c3.5-.4 6.5.1 8.5 1.7"/><path d="M10 3.2c2-1.6 5-2.1 8.5-1.7V13.3c-3.5-.4-6.5.1-8.5 1.7"/><path d="M10 3.2v11.8"/></svg>';
 const FC_BULB_ICON_SVG = '<svg width="14" height="17" viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1a5 5 0 00-3 9c.7.6 1 1.3 1 2.2v.6h4v-.6c0-.9.3-1.6 1-2.2A5 5 0 008 1z"/><path d="M6 15.5h4M6.5 17.5h3"/></svg>';
+const FC_STAR_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 1.5l2.5 5.6 6 .6-4.5 4.1 1.3 6.1-5.3-3.2-5.3 3.2 1.3-6.1-4.5-4.1 6-.6z"/></svg>';
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
   if (!el) return;
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  const en = appLang === 'en';
+  if (flashcardDone) {
+    el.innerHTML =
+      '<div class="flashcard-progress">' + (en ? 'Round ' + flashcardRound : 'סבב ' + flashcardRound) + '</div>' +
+      '<div class="flashcard fillblank-done">' +
+        '<div class="fillblank-done-title">' + (en ? 'All ' + PROVERBS.length + ' clear!' : 'כל ה־' + PROVERBS.length + ' סומנו כידועים!') + '</div>' +
+        '<div class="fillblank-done-sub">' + (en
+          ? ('Took ' + flashcardRound + ' round' + (flashcardRound === 1 ? '' : 's'))
+          : ('לקח ' + flashcardRound + ' ' + (flashcardRound === 1 ? 'סבב' : 'סבבים'))) + '</div>' +
+        '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFlashcardDeck(); renderFlashcardsView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
+      '</div>';
+    return;
+  }
   if (!flashcardOrder.length) shuffleFlashcardDeck();
   if (flashcardIdx >= flashcardOrder.length) flashcardIdx = 0;
-  const p = PROVERBS[flashcardOrder[flashcardIdx]];
-  const en = appLang === 'en';
+  const gi = flashcardOrder[flashcardIdx];
+  const p = PROVERBS[gi];
+  const starred = flashcardStarred.has(gi);
   const hasAudio = !!(p.audio && p.audio.src);
   const plainText = p.arWords.map(t => t.w).join(' ');
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
@@ -1999,7 +2052,7 @@ function renderFlashcardsView() {
     '</div>';
 
   el.innerHTML =
-    '<div class="flashcard-progress">' + (flashcardIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard-progress">' + (en ? 'Round ' : 'סבב ') + flashcardRound + ' · ' + (flashcardIdx + 1) + ' / ' + flashcardOrder.length + '</div>' +
     '<div class="flashcard">' +
       '<div class="flashcard-text-group">' +
         '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
@@ -2012,13 +2065,16 @@ function renderFlashcardsView() {
           : '') +
         '<button class="flashcard-icon-btn' + (flashcardShowLiteral ? ' active' : '') + '" data-fc-btn="literal" onclick="toggleFlashcardReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
         '<button class="flashcard-icon-btn' + (flashcardShowMeaning ? ' active' : '') + '" data-fc-btn="meaning" onclick="toggleFlashcardReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>' +
       '</div>' +
       reveal('literal', flashcardShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
       reveal('meaning', flashcardShowMeaning, en ? 'Meaning' : 'משמעות', meaningText) +
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn"' + (flashcardIdx === flashcardOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+      '<button class="flashcard-nav-btn" onclick="goToFlashcard(1)">' + (flashcardIdx === flashcardOrder.length - 1
+        ? (en ? 'Finish round ›' : 'סיום סבב ›')
+        : (en ? 'Next ›' : 'הבא ›')) + '</button>' +
     '</div>';
 }
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
@@ -2034,12 +2090,23 @@ let fillblankChoiceOrder = [];
 let fillblankSelectedIdx = null;
 let fillblankShowLiteral = false;
 let fillblankShowMeaning = false;
+// Cycle-retry state: cycle 1 is the full 46-proverb deck; every subsequent cycle's pool is only
+// the proverbs missed (wrong OR skipped) last time around, shuffled fresh, until a whole cycle
+// comes back with nothing wrong. fillblankResults is keyed by the proverb's PROVERBS-array index
+// (stable identity across cycles, unlike fillblankOrder positions) so Prev/Next re-visits and
+// re-renders never lose track of what was actually answered this cycle.
+let fillblankCycle = 1;
+let fillblankResults = {};
+let fillblankDone = false;
 // Reshuffles the whole deck order and jumps back to its first card -- see shuffleFlashcardDeck's
 // sibling comment above; called from switchTab() on every fresh entry into this tab, not on
-// every render or Prev/Next step.
+// every render or Prev/Next step. Also the "Start Over" handler once fillblankDone is reached.
 function shuffleFillBlankDeck() {
   fillblankOrder = shuffleArray(PROVERBS.map((_, i) => i));
   fillblankIdx = 0;
+  fillblankCycle = 1;
+  fillblankResults = {};
+  fillblankDone = false;
   setupFillBlankCard();
 }
 function setupFillBlankCard() {
@@ -2050,6 +2117,7 @@ function setupFillBlankCard() {
   fillblankShowMeaning = false;
 }
 function goToFillBlank(delta) {
+  if (delta > 0 && fillblankIdx === fillblankOrder.length - 1) { advanceFillBlankCycle(); return; }
   const next = fillblankIdx + delta;
   if (next < 0 || next >= fillblankOrder.length) return;
   fillblankIdx = next;
@@ -2057,9 +2125,28 @@ function goToFillBlank(delta) {
   setupFillBlankCard();
   renderFillBlankView();
 }
+// Fires off the last card of a cycle's Next click. A proverb never answered (skipped past) counts
+// as wrong here, same as one answered incorrectly -- it wasn't demonstrated as known, so it goes
+// into the retry pool same as a genuine miss, rather than silently vanishing from the count.
+function advanceFillBlankCycle() {
+  const wrongIdxs = fillblankOrder.filter(gi => fillblankResults[gi] !== true);
+  if (wrongIdxs.length === 0) {
+    fillblankDone = true;
+  } else {
+    fillblankCycle += 1;
+    fillblankOrder = shuffleArray(wrongIdxs);
+    fillblankIdx = 0;
+    fillblankResults = {};
+    setupFillBlankCard();
+  }
+  stopPronunciation();
+  renderFillBlankView();
+}
 function selectFillBlankChoice(orderIdx) {
   if (fillblankSelectedIdx != null) return; // already answered -- ignore further picks
   fillblankSelectedIdx = orderIdx;
+  const p = PROVERBS[fillblankOrder[fillblankIdx]];
+  fillblankResults[fillblankOrder[fillblankIdx]] = fillblankChoiceOrder[orderIdx] === p.blankChoices[0];
   renderFillBlankView();
 }
 // Same non-destructive class-toggle approach as toggleFlashcardReveal -- these fire AFTER the
@@ -2074,11 +2161,23 @@ function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
   if (!el) return;
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  const en = appLang === 'en';
+  if (fillblankDone) {
+    el.innerHTML =
+      '<div class="flashcard-progress">' + (en ? 'Cycle ' + fillblankCycle : 'מחזור ' + fillblankCycle) + '</div>' +
+      '<div class="flashcard fillblank-done">' +
+        '<div class="fillblank-done-title">' + (en ? 'All ' + PROVERBS.length + ' correct!' : 'כל ה־' + PROVERBS.length + ' נכונים!') + '</div>' +
+        '<div class="fillblank-done-sub">' + (en
+          ? ('Took ' + fillblankCycle + ' cycle' + (fillblankCycle === 1 ? '' : 's'))
+          : ('לקח ' + fillblankCycle + ' ' + (fillblankCycle === 1 ? 'מחזור' : 'מחזורים'))) + '</div>' +
+        '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFillBlankDeck(); renderFillBlankView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
+      '</div>';
+    return;
+  }
   if (!fillblankOrder.length) shuffleFillBlankDeck();
   if (fillblankIdx >= fillblankOrder.length) fillblankIdx = 0;
   if (!fillblankChoiceOrder.length) setupFillBlankCard();
   const p = PROVERBS[fillblankOrder[fillblankIdx]];
-  const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const answered = fillblankSelectedIdx != null;
   const correctWord = p.blankChoices[0];
@@ -2136,7 +2235,7 @@ function renderFillBlankView() {
   }
 
   el.innerHTML =
-    '<div class="flashcard-progress">' + (fillblankIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard-progress">' + (en ? 'Cycle ' : 'מחזור ') + fillblankCycle + ' · ' + (fillblankIdx + 1) + ' / ' + fillblankOrder.length + '</div>' +
     '<div class="flashcard">' +
       (hasAudio
         ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
@@ -2151,7 +2250,12 @@ function renderFillBlankView() {
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (fillblankIdx === 0 ? ' disabled' : '') + ' onclick="goToFillBlank(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn"' + (fillblankIdx === fillblankOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+      // At the last card of a cycle, Next no longer pages within the deck -- it hands off to
+      // advanceFillBlankCycle() (see goToFillBlank), so it's never disabled here and its label
+      // says so rather than looking like a dead-end "Next" with nothing left to page to.
+      '<button class="flashcard-nav-btn" onclick="goToFillBlank(1)">' + (fillblankIdx === fillblankOrder.length - 1
+        ? (en ? 'Finish cycle ›' : 'סיום מחזור ›')
+        : (en ? 'Next ›' : 'הבא ›')) + '</button>' +
     '</div>';
 }
 function renderScrambleView() {

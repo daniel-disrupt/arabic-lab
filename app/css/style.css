@@ -564,6 +564,11 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 }
 .flashcard-icon-btn:hover { border-color: var(--black); color: var(--black); }
 .flashcard-icon-btn.active, .flashcard-icon-btn.playing { background: var(--black); color: #fff; border-color: var(--black); }
+/* Star (save-to-retry) uses its own amber accent rather than the black .active fill the other
+   icons share, so a starred card reads as a distinct "flagged" state at a glance, not just
+   another toggled-open panel. */
+.flashcard-star-btn.starred { background: #fdf3dd; color: #b8860b; border-color: #e0b13a; }
+.flashcard-star-btn.starred svg { fill: currentColor; }
 .flashcard-reveal { max-height: 0; overflow: hidden; opacity: 0; width: 100%; transition: max-height .28s cubic-bezier(.25,.8,.25,1), opacity .2s; }
 .flashcard-reveal.open { max-height: 300px; opacity: 1; }
 .flashcard-reveal-inner { width: 100%; text-align: start; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--rule); }
@@ -597,6 +602,10 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
 .fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
 .fillblank-icon-row { margin-top: 16px; }
+.fillblank-done { gap: 10px; padding: 56px 32px; }
+.fillblank-done-title { font-size: 22px; font-weight: 700; }
+.fillblank-done-sub { font-size: 14px; color: var(--mid); margin-bottom: 12px; }
+.fillblank-restart-btn { flex: none; padding: 10px 28px; }
 
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
