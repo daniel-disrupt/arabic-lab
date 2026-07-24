@@ -598,6 +598,28 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
 .fillblank-icon-row { margin-top: 16px; }
 
+/* ── WORD-SCRAMBLE TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
+   .flashcard-icon-row/.flashcard-icon-btn/.flashcard-reveal* and .fillblank-feedback) */
+.scramble-built {
+  min-height: 44px; font-size: 26px; line-height: 1.8;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.scramble-built-empty { font-size: 15px; color: var(--light); }
+.scramble-tiles { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 24px; }
+.scramble-tile {
+  font-size: 18px; padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+}
+body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.scramble-tile:hover { border-color: var(--black); }
+.scramble-tile.wrong { background: #fdecea; border-color: #c62828; color: #b71c1c; }
+.scramble-reset-btn {
+  margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--mid);
+  background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.scramble-reset-btn:hover { color: var(--black); }
+
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }

@@ -218,6 +218,7 @@ function applyAppLang() {
   renderProverbsView();
   renderFlashcardsView();
   renderFillBlankView();
+  renderScrambleView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
 
@@ -368,6 +369,7 @@ function applyScriptMode() {
   renderProverbsView();
   renderFlashcardsView();
   renderFillBlankView();
+  renderScrambleView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
 
@@ -469,7 +471,7 @@ function switchTab(name) {
   // a different run through the set instead of always starting at proverb #1.
   if (name === 'flashcards') { shuffleFlashcardDeck(); renderFlashcardsView(); }
   if (name === 'fillblank') { shuffleFillBlankDeck(); renderFillBlankView(); }
-  if (name === 'scramble') renderScrambleView();
+  if (name === 'scramble') { shuffleScrambleDeck(); renderScrambleView(); }
 }
 
 /* ─────────────── HAMBURGER MENU (mobile) ─────────────── */
@@ -1819,14 +1821,15 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') { skipWatch(-5); e.preventDefault(); }
   else if (e.key === 'ArrowRight') { skipWatch(5); e.preventDefault(); }
 });
-// Left/right arrow paging for Flashcards/Fill-in-the-Blank. The app is RTL-mirrored throughout
-// (see the Overall design note at the top of style.css), so Prev always renders on the physical
-// RIGHT and Next on the physical LEFT regardless of appLang -- mapping ArrowRight->Prev and
-// ArrowLeft->Next points each key toward the button actually sitting on that side of the screen.
+// Left/right arrow paging for Flashcards/Fill-in-the-Blank/Word-Scramble. The app is RTL-mirrored
+// throughout (see the Overall design note at the top of style.css), so Prev always renders on the
+// physical RIGHT and Next on the physical LEFT regardless of appLang -- mapping ArrowRight->Prev
+// and ArrowLeft->Next points each key toward the button actually sitting on that side of the screen.
+const CARD_TAB_NAV = { flashcards: goToFlashcard, fillblank: goToFillBlank, scramble: goToScramble };
 document.addEventListener('keydown', (e) => {
-  if (activeTabName !== 'flashcards' && activeTabName !== 'fillblank') return;
+  const goTo = CARD_TAB_NAV[activeTabName];
+  if (!goTo) return;
   if (e.target.closest('input, textarea, [contenteditable]')) return;
-  const goTo = activeTabName === 'flashcards' ? goToFlashcard : goToFillBlank;
   if (e.key === 'ArrowLeft') { goTo(1); e.preventDefault(); }
   else if (e.key === 'ArrowRight') { goTo(-1); e.preventDefault(); }
 });
@@ -2154,9 +2157,135 @@ function renderFillBlankView() {
       '<button class="flashcard-nav-btn"' + (fillblankIdx === fillblankOrder.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
     '</div>';
 }
+/* ─────────────── WORD-SCRAMBLE TAB ───────────────
+   The proverb's words are shuffled into a tile pool; tap them in the correct order to rebuild
+   the sentence. Checked per-tap, not per-attempt: tapping the correct next word locks it into
+   the "built so far" area (a real state change, worth a full re-render); tapping a wrong one just
+   flashes that tile red and leaves it in the pool to try again -- no re-render, no lockout, so a
+   wrong guess never costs progress or forces a restart. Tiles are index-based (not text-based)
+   since a proverb can repeat the same word twice (e.g. "اللي...اللي" in illi-ido-bil-mayy).
+   Same shuffled-deck-per-entry + arrow-key paging as Flashcards/Fill-in-the-Blank, and the same
+   book/lightbulb icon reveal for the payoff once solved. */
+let scrambleOrder = [];
+let scrambleIdx = 0;
+let scrambleTileOrder = [];
+let scramblePlaced = [];
+let scrambleShowLiteral = false;
+let scrambleShowMeaning = false;
+function scrambleWordIndices(p) {
+  return p.arWords.map((t, i) => i).filter((i) => p.arWords[i].sep === undefined);
+}
+function setupScrambleCard() {
+  const p = PROVERBS[scrambleOrder[scrambleIdx]];
+  const wordIndices = scrambleWordIndices(p);
+  scrambleTileOrder = shuffleArray(wordIndices);
+  // For very short proverbs (2-3 words) a random shuffle has a real chance of landing back on
+  // the original order, which reads as "not scrambled at all" -- reshuffle once more if so.
+  if (scrambleTileOrder.length > 1 && scrambleTileOrder.every((v, i) => v === wordIndices[i])) {
+    scrambleTileOrder = shuffleArray(wordIndices);
+  }
+  scramblePlaced = [];
+  scrambleShowLiteral = false;
+  scrambleShowMeaning = false;
+}
+function shuffleScrambleDeck() {
+  scrambleOrder = shuffleArray(PROVERBS.map((_, i) => i));
+  scrambleIdx = 0;
+  setupScrambleCard();
+}
+function goToScramble(delta) {
+  const next = scrambleIdx + delta;
+  if (next < 0 || next >= scrambleOrder.length) return;
+  scrambleIdx = next;
+  stopPronunciation();
+  setupScrambleCard();
+  renderScrambleView();
+}
+function resetScrambleCard() {
+  setupScrambleCard();
+  renderScrambleView();
+}
+function toggleScrambleReveal(which) {
+  const show = which === 'literal' ? (scrambleShowLiteral = !scrambleShowLiteral) : (scrambleShowMeaning = !scrambleShowMeaning);
+  document.getElementById('scramble-reveal-' + which).classList.toggle('open', show);
+  document.querySelector('.scramble-icon-row [data-sc-btn="' + which + '"]').classList.toggle('active', show);
+}
+function handleScrambleTap(wi, btnEl) {
+  const p = PROVERBS[scrambleOrder[scrambleIdx]];
+  const wordIndices = scrambleWordIndices(p);
+  const expected = wordIndices[scramblePlaced.length];
+  if (wi === expected) {
+    scramblePlaced.push(wi);
+    renderScrambleView();
+  } else {
+    btnEl.classList.add('wrong');
+    setTimeout(() => btnEl.classList.remove('wrong'), 400);
+  }
+}
 function renderScrambleView() {
   const el = document.getElementById('scramble-inner');
-  if (el) el.innerHTML = stubViewHtml();
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (!scrambleOrder.length) shuffleScrambleDeck();
+  if (scrambleIdx >= scrambleOrder.length) scrambleIdx = 0;
+  const p = PROVERBS[scrambleOrder[scrambleIdx]];
+  const en = appLang === 'en';
+  const hasAudio = !!(p.audio && p.audio.src);
+  const proseDir = en ? 'ltr' : 'rtl';
+  const dir = scriptDir();
+  const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
+
+  const wordIndices = scrambleWordIndices(p);
+  const solved = scramblePlaced.length === wordIndices.length;
+
+  const builtHtml = scramblePlaced.length
+    ? scramblePlaced.map((wi) => '<span class="proverb-word">' + arText(p.arWords[wi].w) + '</span>' + (p.arWords[wi].punct || '')).join(' ')
+    : '<span class="scramble-built-empty">' + (en ? 'Tap the words in order' : 'הקישו על המילים לפי הסדר') + '</span>';
+  const builtTranslit = scramblePlaced.length
+    ? scramblePlaced.map((wi) => preferredTranslit(p.arWords[wi].w) + (p.arWords[wi].punct || '')).join(' ')
+    : '';
+
+  const poolHtml = scrambleTileOrder
+    .filter((wi) => !scramblePlaced.includes(wi))
+    .map((wi) => '<button class="scramble-tile" onclick="handleScrambleTap(' + wi + ', this)">' + arText(p.arWords[wi].w) + '</button>')
+    .join('');
+
+  let payoffHtml = '';
+  if (solved) {
+    const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
+    const meaningText = en ? p.enGloss : p.heGloss;
+    const revealPanel = (which, show, label, text) =>
+      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="scramble-reveal-' + which + '">' +
+        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
+      '</div>';
+    payoffHtml =
+      '<div class="fillblank-feedback">' + (en ? 'Solved!' : 'פתרת!') + '</div>' +
+      '<div class="flashcard-icon-row scramble-icon-row">' +
+        '<button class="flashcard-icon-btn' + (scrambleShowLiteral ? ' active' : '') + '" data-sc-btn="literal" onclick="toggleScrambleReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (scrambleShowMeaning ? ' active' : '') + '" data-sc-btn="meaning" onclick="toggleScrambleReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+      '</div>' +
+      revealPanel('literal', scrambleShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
+      revealPanel('meaning', scrambleShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+  }
+
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard">' +
+      (hasAudio
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        : '') +
+      '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
+      (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
+      (!solved
+        ? '<div class="scramble-tiles">' + poolHtml + '</div>' +
+          '<button class="scramble-reset-btn" onclick="resetScrambleCard()">' + (en ? 'Reset' : 'איפוס') + '</button>'
+        : '') +
+      payoffHtml +
+    '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (scrambleIdx === 0 ? ' disabled' : '') + ' onclick="goToScramble(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (scrambleIdx === scrambleOrder.length - 1 ? ' disabled' : '') + ' onclick="goToScramble(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
 }
 
 /* ─────────────── LESSON BOOTSTRAP ───────────────
