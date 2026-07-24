@@ -106,8 +106,15 @@ body.lang-en .mobile-header-title { direction: ltr; }
   box-shadow: 0 10px 28px rgba(0,0,0,.14); padding: 14px; z-index: 30;
 }
 .settings-menu.open { display: flex; }
-.switch-group { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 4px 9px; border: 1px solid var(--rule); border-radius: 16px; direction: ltr; }
-.switch-label { font-size: 10px; font-weight: 700; letter-spacing: .05em; color: var(--mid); white-space: nowrap; }
+/* flex-direction:row-reverse is the Hebrew-UI default (label reads on the right, matching RTL),
+   while direction:ltr stays fixed regardless of appLang so the buttons inside .lang-switch/
+   .script-switch keep a stable left-to-right order either way -- only the label's position (not
+   the buttons' internal order) should follow the UI language. body.lang-en below reverts the
+   label to the left for English. */
+.switch-group { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 4px 9px; border: 1px solid var(--rule); border-radius: 16px; direction: ltr; flex-direction: row-reverse; }
+body.lang-en .switch-group { flex-direction: row; }
+.switch-label { font-size: 10px; font-weight: 700; letter-spacing: .05em; color: var(--mid); white-space: nowrap; text-align: right; }
+body.lang-en .switch-label { text-align: left; }
 
 /* ── GLOBAL LANGUAGE SWITCH (UI chrome + gloss language) ── */
 .lang-switch { display: flex; align-items: center; gap: 6px; }
@@ -120,8 +127,9 @@ body.lang-en .mobile-header-title { direction: ltr; }
 .lang-switch-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
 
 /* ── SCRIPT SWITCH (which script the Arabic learning content itself renders in) ──
-   Kept visually distinct from the language switch via an outline-only active state (vs.
-   lang-switch's solid fill), on top of the two controls sitting in separate labeled boxes. */
+   Same active-state treatment as .lang-switch-btn (solid black fill) -- the two controls sit in
+   separate labeled boxes already, so they don't need a second visual distinction on top of that;
+   matching interaction styling reads as more consistent than an outline-only variant here. */
 .script-switch { display: flex; align-items: center; gap: 6px; }
 .script-switch-btn {
   font-size: 12px; font-weight: 600; padding: 5px 11px;
@@ -129,7 +137,7 @@ body.lang-en .mobile-header-title { direction: ltr; }
   cursor: pointer; transition: all .12s;
 }
 .script-switch-btn:hover { border-color: var(--black); color: var(--black); }
-.script-switch-btn.active { border-color: var(--black); color: var(--black); font-weight: 700; }
+.script-switch-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
 
 /* ── VIEWS ── */
 .view { display: none; flex: 1; overflow: hidden; flex-direction: column; }
