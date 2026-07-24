@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <title>Arabic Lab</title>
@@ -13,17 +13,22 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --black: #0D0D0D; --mid: #8A8A8A; --rule: #E4E3E0; --active-bg: #F0EFE9; }
   html, body { min-height: 100%; background: #fff; color: var(--black); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
-  .lib-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  /* Page frame stays physically fixed regardless of language -- only the text content inside it
+     (subtitle, card copy) flips direction/alignment via body.lang-en below. Same split the rest
+     of the app uses (see app.js's applyAppLang/body.lang-en): without this, toggling the whole
+     page's dir would mirror the header on every click and the switch button itself would jump
+     from one side of the screen to the other. */
+  .lib-wrap { direction: ltr; max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
   .lib-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 40px; }
   .lib-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
-  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; }
-  /* Pill toggle, same visual language as lesson.html's #lang-switch -- kept direction:ltr
-     internally so button order never flips, only the page around it does. */
-  .lang-switch { display: flex; direction: ltr; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; flex-shrink: 0; }
+  .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; text-align: right; }
+  body.lang-en .lib-subtitle { direction: ltr; text-align: left; }
+  .lang-switch { display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; flex-shrink: 0; }
   .lang-switch-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--mid); padding: 5px 12px; border-radius: 13px; cursor: pointer; transition: background .12s, color .12s; }
   .lang-switch-btn.active { background: var(--black); color: #fff; }
   .lib-list { display: flex; flex-direction: column; gap: 14px; }
-  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; text-align: start; }
+  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; direction: rtl; text-align: right; }
+  body.lang-en .lib-card { direction: ltr; text-align: left; }
   .lib-card:hover { background: var(--active-bg); border-color: var(--black); }
   .lib-card-title { font-size: 16px; font-weight: 600; }
   .lib-card-subtitle { font-size: 13px; color: var(--mid); margin-top: 4px; }
@@ -75,7 +80,6 @@ function localize(field) {
 
 function renderLessonList() {
   const list = document.getElementById('lib-list');
-  const emptyEl = document.getElementById('lib-empty');
   if (!loadedLessons || !loadedLessons.length) return;
   list.innerHTML = loadedLessons.map(l => `
     <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
@@ -86,8 +90,7 @@ function renderLessonList() {
 }
 
 function applySiteLang() {
-  document.documentElement.lang = siteLang;
-  document.documentElement.dir = siteLang === 'he' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('lang-en', siteLang === 'en');
   document.getElementById('lib-subtitle').textContent = SITE_STRINGS[siteLang].subtitle;
   document.querySelectorAll('.lang-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === siteLang));
   const emptyEl = document.getElementById('lib-empty');
