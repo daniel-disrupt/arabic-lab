@@ -579,9 +579,11 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 
 /* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
    .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
-.fillblank-sentence { font-size: 26px; line-height: 1.8; margin: 4px 0 24px; }
-.fillblank-blank { display: inline-block; min-width: 64px; border-bottom: 2px solid var(--black); color: var(--light); }
-.fillblank-blank.filled { border-bottom-color: transparent; color: var(--black); font-weight: 600; }
+.fillblank-sentence { font-size: 26px; line-height: 1.8; }
+/* The "____" placeholder text is the only blank indicator -- no extra border-bottom, which
+   used to render as a second (black) line stacked right under the grey underscore glyphs. */
+.fillblank-blank { display: inline-block; min-width: 64px; color: var(--light); }
+.fillblank-blank.filled { color: var(--black); font-weight: 600; }
 .fillblank-choices { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
 .fillblank-choice-btn {
   font-size: 18px; padding: 12px 22px; border-radius: 10px;

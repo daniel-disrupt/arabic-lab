@@ -2105,8 +2105,10 @@ function renderFillBlankView() {
       (hasAudio
         ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
         : '') +
-      '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
-      '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
+      '<div class="flashcard-text-group">' +
+        '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
+        '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
+      '</div>' +
       '<div class="fillblank-choices">' + choicesHtml + '</div>' +
       feedback +
       payoffHtml +
