@@ -1931,16 +1931,21 @@ function proverbExplainHtml(p) {
   const literal = en ? p.literalEn : p.literalHe;
   const meaning = en ? p.enGloss : p.heGloss;
   const usage = en ? p.usageEn : p.usageHe;
-  const labels = en
-    ? { literal: 'Literally', meaning: 'Meaning', usage: 'When to use it' }
-    : { literal: 'פירוש מילולי', meaning: 'משמעות', usage: 'מתי אומרים את זה' };
-  const row = (label, text) => text
+  const usageLabel = en ? 'When to use it' : 'מתי אומרים את זה';
+  // Literal/meaning reuse the same book/bulb icons as the Flashcards/Fill-in-the-Blank/Scramble
+  // reveal buttons (FC_BOOK_ICON_SVG / FC_BULB_ICON_SVG) instead of a text label -- one visual
+  // vocabulary for "this is the literal translation" / "this is what it actually means" across the
+  // whole lesson. Usage has no icon equivalent elsewhere, so it keeps its text label.
+  const iconRow = (icon, iconLabel, text) => text
+    ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
+    : '';
+  const textRow = (label, text) => text
     ? '<div class="proverb-explain-row"><span class="proverb-explain-label">' + label + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
     : '';
   return '<div class="proverb-explain">' +
-    row(labels.literal, literal) +
-    row(labels.meaning, meaning) +
-    row(labels.usage, usage) +
+    iconRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literal) +
+    iconRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaning) +
+    textRow(usageLabel, usage) +
     '</div>';
 }
 function proverbCardHtml(p) {

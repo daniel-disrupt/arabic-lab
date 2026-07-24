@@ -540,6 +540,11 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 .proverb-explain { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; }
 .proverb-explain-row { display: flex; flex-direction: column; gap: 3px; }
 .proverb-explain-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); }
+/* Literal/meaning rows swap the text label for the same book/bulb icon used on the Flashcards
+   reveal buttons (see proverbExplainHtml in app.js) -- icon sits beside the text instead of
+   stacked above it, so this variant runs as a row, not the label variant's column. */
+.proverb-explain-row.icon-row { flex-direction: row; align-items: flex-start; gap: 10px; }
+.proverb-explain-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: var(--mid); }
 /* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
    isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. */
 .proverb-explain-text { font-size: 16px; line-height: 1.6; }
