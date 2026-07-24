@@ -10,15 +10,26 @@ alignment than free transcription: per-chunk word-level timestamps from
 faster-whisper should match the known text far more reliably, since there's no
 rephrasing/reordering to account for.
 
-Exact-string matching still misses a real, common case: faster-whisper mishearing
-one letter of an unusual dialectal word (e.g. transcribing بِحُكّك as بحقك — ق for
-ك) while getting the timing and every surrounding word exactly right. Since the
-audio truly is the known text (this is forced alignment, not free transcription),
-an isolated single-word substitution sandwiched between two confirmed exact matches
-is accepted if it's a close character-level match — genuine content divergence
-(extra/missing/reordered words) is a different opcode shape (insert/delete, or an
-unequal-length replace) and is never touched by this fuzzy fallback, preserving the
-project's "never fabricate a timestamp" rule for cases that actually are uncertain.
+Exact-string matching misses two real, common cases:
+1. faster-whisper mishearing one letter of an unusual dialectal word (e.g.
+   transcribing بِحُكّك as بحقك — ق for ك) while getting the timing and every
+   surrounding word exactly right.
+2. faster-whisper splitting one written word into two adjacent ASR tokens (e.g.
+   منصلي heard as separate "من" + "صلي" tokens, عالكتاب heard as "على" + "الكتاب") —
+   the sounds are heard correctly, just not grouped the way the text is written.
+
+Since the audio truly is the known text (this is forced alignment, not free
+transcription), a 'replace' opcode block (raw and known words disagree over some
+span) is resolved by finding the best way to partition that span's raw tokens into
+contiguous groups, one per known word in order, and checking each group's
+concatenation against its known word. This only ever *uses* an already-measured
+token start time (the earliest sub-token in a group) — it never interpolates a new
+one, so a known word that's actually merged into a larger ASR token elsewhere (the
+reverse direction — more known words than raw tokens) still can't be split with any
+confidence and is correctly left unaligned, preserving the project's "never
+fabricate a timestamp" rule for cases that really are uncertain. Likewise
+insert/delete opcodes (raw and known genuinely have different content, not just
+different tokenization) are never touched.
 
 Usage:
   python scripts/align-voiceover-words.py <input.json> <output.json>
@@ -52,6 +63,42 @@ def norm(s):
     s = s.replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا').replace('ٱ', 'ا')
     s = s.replace('ى', 'ي')
     return s.strip().strip(PUNCT).strip()
+
+
+def best_partition(raw_block, known_block):
+    """Partition raw_block (>= len(known_block)) into len(known_block) contiguous,
+    non-empty, ordered groups maximizing the sum of each group's concatenation
+    similarity to its known word. Returns a list of (start, end) index pairs into
+    raw_block, one per known word, or None if no valid partition exists (only
+    possible when raw_block is shorter than known_block)."""
+    R, K = len(raw_block), len(known_block)
+    if R < K:
+        return None
+    NEG = float('-inf')
+    best = [[NEG] * (K + 1) for _ in range(R + 1)]
+    back = [[None] * (K + 1) for _ in range(R + 1)]
+    best[0][0] = 0.0
+    for k in range(1, K + 1):
+        for i in range(k, R + 1):
+            for j in range(k - 1, i):
+                if best[j][k - 1] == NEG:
+                    continue
+                concat = ''.join(raw_block[j:i])
+                sim = 1.0 if concat == known_block[k - 1] else difflib.SequenceMatcher(None, concat, known_block[k - 1]).ratio()
+                score = best[j][k - 1] + sim
+                if score > best[i][k]:
+                    best[i][k] = score
+                    back[i][k] = j
+    if best[R][K] == NEG:
+        return None
+    groups = []
+    i, k = R, K
+    while k > 0:
+        j = back[i][k]
+        groups.append((j, i))
+        i, k = j, k - 1
+    groups.reverse()
+    return groups
 
 
 def main():
@@ -88,21 +135,27 @@ def main():
                 for k in range(a2 - a1):
                     accept(a1 + k, b1 + k)
                     matched += 1
-            elif tag == 'replace' and (a2 - a1) == (b2 - b1):
-                # Equal-length, position-for-position substitution between two confirmed
-                # matches -- structurally almost certainly the same word misheard by a
-                # letter or two, not a genuinely different word (which is why this is
-                # restricted to 'replace', never 'insert'/'delete': those mean the raw and
-                # known sequences actually have different lengths at that point, i.e. real
-                # content divergence, not a misspelling).
-                for k in range(a2 - a1):
-                    raw_i, known_i = a1 + k, b1 + k
-                    ratio = difflib.SequenceMatcher(None, raw_norm[raw_i], known_norm[known_i]).ratio()
+            elif tag == 'replace' and (a2 - a1) >= (b2 - b1):
+                # raw has at least as many tokens as known words in this span -- try
+                # grouping raw tokens (1 or more per known word) to recover from both a
+                # misheard letter (group size 1) and a word faster-whisper split into
+                # multiple ASR tokens (group size >1). Never attempted when raw has FEWER
+                # tokens than known (more known words than raw tokens) -- that would mean
+                # guessing where inside a single measured span an unmeasured word boundary
+                # falls, which is fabrication, not measurement.
+                groups = best_partition(raw_norm[a1:a2], known_norm[b1:b2])
+                for m, (j, i) in enumerate(groups):
+                    raw_i, known_i = a1 + j, b1 + m
+                    concat = ''.join(raw_norm[a1 + j:a1 + i])
+                    kn = known_norm[b1 + m]
+                    ratio = 1.0 if concat == kn else difflib.SequenceMatcher(None, concat, kn).ratio()
                     if ratio >= FUZZY_RATIO_THRESHOLD:
                         accept(raw_i, known_i)
                         matched += 1
-                        fuzzy_matched += 1
-                        print(f"  fuzzy match: heard {raw_norm[raw_i]!r} for known {known_norm[known_i]!r} (ratio {ratio:.2f})", file=sys.stderr)
+                        if ratio < 1.0 or (i - j) > 1:
+                            fuzzy_matched += 1
+                            note = f"merged {i - j} tokens " if (i - j) > 1 else ""
+                            print(f"  fuzzy match: {note}heard {concat!r} for known {kn!r} (ratio {ratio:.2f})", file=sys.stderr)
 
     aligned.sort(key=lambda a: a['t'])
     with open(out_path, 'w', encoding='utf-8') as f:
