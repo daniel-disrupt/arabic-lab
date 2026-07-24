@@ -62,6 +62,26 @@ TTS-synthesized-audio case, expect the reliable end of that range, but still:
 - **Never fabricate a timestamp** for a word the aligner didn't match. Leave
   it out of `wordTimes` entirely; the UI already handles a word with no
   matching `idx` by simply never highlighting it, rather than guessing.
+- **A low match rate is often a tokenization mismatch, not a mishearing —
+  check before accepting it as a hard limit.** On the Proverbs batch,
+  `align-voiceover-words.py`'s exact-string matching initially missed words
+  where faster-whisper heard the audio correctly but split one written word
+  into two adjacent ASR tokens (منصلي heard as "من"+"صلي", عالكتاب heard as
+  "على"+"الكتاب") or misheard a single letter of an unusual dialectal word
+  (بِحُكّك heard as بحقك). The script now resolves this generally: for any
+  `replace` span where the raw side has *at least as many* tokens as the known
+  side, it finds the best way to group consecutive raw tokens (one or more per
+  known word) and accepts a group if its concatenation is a close match —
+  still using only an already-measured token's start time, never an
+  interpolated one. The one direction it still won't touch, correctly: a
+  `replace` span where raw has *fewer* tokens than known (some known words
+  genuinely got absorbed/elided into a neighboring word with no distinct
+  ASR-detectable boundary) — splitting that would mean guessing where inside
+  a single measured span an unmeasured word boundary falls, which is
+  fabrication. Confirmed by directly re-transcribing a stuck clip and reading
+  the raw word list before concluding a gap was a real limitation rather than
+  a fixable mismatch — do this before writing off a low rate as "just how
+  good ASR gets."
 
 ## Adding this to a new per-item-style lesson
 
