@@ -1,12 +1,24 @@
 [
   {
     "slug": "abed-jaffa-speech",
-    "title": "Abed Abu Shehadeh, in his own words",
-    "subtitle": "Ghazaza Park, Jaffa · June 28, 2026"
+    "title": {
+      "en": "Abed Abu Shehadeh, in his own words",
+      "he": "עבד אבו שחאדה, במילים שלו"
+    },
+    "subtitle": {
+      "en": "Ghazaza Park, Jaffa · June 28, 2026",
+      "he": "גן אל-ע׳זאזווה, יפו · 28 ביוני 2026"
+    }
   },
   {
     "slug": "favorite-proverbs",
-    "title": "My Favorite Arabic Proverbs",
-    "subtitle": "A personal collection, chosen to learn"
+    "title": {
+      "en": "My Favorite Arabic Proverbs",
+      "he": "הפתגמים הערביים האהובים עליי"
+    },
+    "subtitle": {
+      "en": "A personal collection, chosen to learn",
+      "he": "אוסף אישי, שנבחר כדי ללמוד"
+    }
   }
 ]
