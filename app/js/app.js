@@ -1957,6 +1957,26 @@ function proverbCardHtml(p) {
       (expanded ? proverbExplainHtml(p) : '') +
     '</div>';
 }
+// Fixed at the widest theme TITLE across BOTH languages (not just the current appLang) -- so
+// toggling the site's HE/EN language never changes a theme card's width. Hebrew and English
+// theme names are wildly different lengths ("גלגל המזל" vs "Self-Reliance & Practical Wisdom"),
+// so sizing to whichever language is active would make every card resize/reflow the moment the
+// learner switches languages. Computed once via canvas measureText (matching the name's actual
+// font/weight/size) and cached, since the label set is fixed regardless of which lesson is loaded.
+let themeCardWidthPx = null;
+function computeThemeCardWidth() {
+  if (themeCardWidthPx !== null) return themeCardWidthPx;
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = "700 18px -apple-system, 'Segoe UI', system-ui, sans-serif";
+  const labels = PROVERB_THEME_ORDER.concat([{ en: 'Other', he: 'שונות' }])
+    .flatMap(t => [t.en.toUpperCase(), t.he]);
+  const widest = Math.max(...labels.map(s => ctx.measureText(s).width));
+  // canvas measureText doesn't apply the name's CSS letter-spacing, and real font hinting/kerning
+  // in the DOM tends to render slightly wider than the canvas estimate -- 5% + a flat 14px keeps
+  // the longest title (EN) from wrapping once the measurement is handed off to actual layout.
+  themeCardWidthPx = Math.ceil(widest * 1.05) + 14;
+  return themeCardWidthPx;
+}
 function renderProverbsView() {
   const list = document.getElementById('proverbs-list');
   if (!list) return;
@@ -1969,15 +1989,18 @@ function renderProverbsView() {
     (g || other).proverbs.push(p);
   });
   if (other.proverbs.length) groups.push(other);
+  list.style.setProperty('--theme-card-w', computeThemeCardWidth() + 'px');
 
   list.innerHTML = groups.filter(g => g.proverbs.length).map(g => {
     const isOpen = expandedThemeKeys.has(g.theme.key);
     const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
     const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
         '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+        '<div class="proverb-theme-meta">' +
+          '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+          '<span class="proverb-theme-chev">›</span>' +
+        '</div>' +
         (isOpen ? '' : '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>') +
-        '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
-        '<span class="proverb-theme-chev">›</span>' +
     '</div>';
     return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');
