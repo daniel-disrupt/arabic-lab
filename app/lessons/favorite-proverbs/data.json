@@ -34,8 +34,12 @@
       "literalEn": "Nothing scratches you but your own fingernail.",
       "heGloss": "בסוף אתה סומך רק על עצמך.",
       "enGloss": "Only you truly look after your own needs — rely on yourself.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "ضُفرَك",
+        "يَدَك",
+        "رِجلَك"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -78,8 +82,12 @@
       "literalEn": "The monkey in his mother's eye is a gazelle.",
       "heGloss": "כל אחד רואה את שלו כיפה מכולם.",
       "enGloss": "Everyone thinks their own is beautiful; love blinds judgment.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "غزال",
+        "أسَد",
+        "ذيب"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -122,8 +130,12 @@
       "literalEn": "One hand alone doesn't clap.",
       "heGloss": "צריך שניים בשביל שזה יעבוד.",
       "enGloss": "Nothing gets done alone; it takes cooperation (or two to tango).",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "بِتصَفِّق",
+        "بِترقُص",
+        "بِتِشتغِل"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -176,8 +188,12 @@
       "literalEn": "The door the wind comes from — shut it and rest.",
       "heGloss": "סגור אותה ותנוח. חתוך את מקור הצרות.",
       "enGloss": "Cut off the source of your troubles and you'll have peace.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "الرّيح",
+        "الشّمس",
+        "البَرْد"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -235,8 +251,12 @@
       "literalEn": "After he went gray they sent him to school.",
       "heGloss": "לעשות משהו מאוחר מדי.",
       "enGloss": "Doing something far too late; teaching an old dog new tricks.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "عالكُتّاب",
+        "عالجامِع",
+        "عالسّوق"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -280,8 +300,12 @@
       "literalEn": "The neighbor before the house.",
       "heGloss": "בדוק מי השכנים לפני שתבחר בית.",
       "enGloss": "Check who your neighbors are before you pick the home.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 0,
+      "blankChoices": [
+        "الجّار",
+        "الصّاحِب",
+        "الأخ"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -323,8 +347,12 @@
       "literalEn": "Your near neighbor rather than your faraway brother.",
       "heGloss": "מי שקרוב ונמצא שם עוזר יותר מקרוב־משפחה רחוק.",
       "enGloss": "The one close by who shows up beats blood relations far away.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "أخوك",
+        "صاحِبَك",
+        "عَمَّك"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -383,8 +411,12 @@
       "literalEn": "Teet-teet: same way you went is the way you came back.",
       "heGloss": "הרבה מאמץ ובסוף חזרת בדיוק לאותו מקום.",
       "enGloss": "A lot of effort and you end up exactly where you started.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "رُحتي",
+        "بَقيتي",
+        "مَشيتي"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -455,8 +487,12 @@
       "literalEn": "One whose hand is in water isn't like one whose hand is in fire.",
       "heGloss": "מי שלא סובל לא מבין את הכואב.",
       "enGloss": "The comfortable onlooker can't feel what the sufferer feels.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 7,
+      "blankChoices": [
+        "بِالنّار",
+        "بِالتَّلج",
+        "بِالهوا"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -518,8 +554,12 @@
       "literalEn": "Entering the bathhouse isn't like leaving it.",
       "heGloss": "קל להסתבך, קשה להשתחרר.",
       "enGloss": "Getting into something is easy; getting out is the hard part.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "الحَمّام",
+        "البيت",
+        "السّجن"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -582,8 +622,12 @@
       "literalEn": "You who step between the onion and its peel get only its stink.",
       "heGloss": "יקבל רק את הריח. אל תתערב בריב של אחרים.",
       "enGloss": "Meddle in others' private quarrels and you'll only get grief.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 8,
+      "blankChoices": [
+        "صَنّتها",
+        "طَعمِتها",
+        "لَونِتها"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -646,8 +690,12 @@
       "literalEn": "Talking isn't like seeing.",
       "heGloss": "שמיעה על משהו זה לא כמו לראות במו עיניך.",
       "enGloss": "Hearing about something isn't the same as seeing it yourself.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "الشّوف",
+        "السّمع",
+        "الفَهم"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -684,8 +732,12 @@
       "literalEn": "Two backsides in one pair of underwear.",
       "heGloss": "שני אנשים דבוקים, תמיד ביחד.",
       "enGloss": "Two people joined at the hip — inseparable, always together.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "بِلِباس",
+        "بِقميص",
+        "بِجاكيت"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -730,8 +782,12 @@
       "literalEn": "Who wants to play with the cat bears its scratches.",
       "heGloss": "שיסבול את השריטות. נכנסת לסיכון, תספוג.",
       "enGloss": "If you take on something risky, accept the consequences.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "القِطّ",
+        "الكِلب",
+        "الأسَد"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -789,8 +845,12 @@
       "literalEn": "The white penny is useful on the black day.",
       "heGloss": "תחסוך היום, זה יעזור ביום קשה.",
       "enGloss": "Save now; the money you put aside helps on your worst day.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "الإسوَد",
+        "الأحمَر",
+        "الأصفَر"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -847,8 +907,12 @@
       "literalEn": "Like a fish: the moment it leaves the water it dies.",
       "heGloss": "ברגע שיצא מהמים מת. מישהו ששורד רק בסביבה שלו.",
       "enGloss": "Someone who can't survive outside their own element.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "السّمَكة",
+        "العُصفور",
+        "القِطّة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -906,8 +970,12 @@
       "literalEn": "Ask one who's tried, not one who's learned.",
       "heGloss": "ניסיון עדיף על תיאוריה.",
       "enGloss": "Experience beats theory — ask someone who's actually done it.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "حكيم",
+        "دُكتور",
+        "مُعَلِّم"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -948,8 +1016,12 @@
       "literalEn": "The world turns.",
       "heGloss": "המזל מתחלף, גלגל חוזר.",
       "enGloss": "Fortunes rotate; today's high is tomorrow's low, and vice versa.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "دَوّارة",
+        "كبيرة",
+        "غريبة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -984,8 +1056,12 @@
       "literalEn": "A day for you and a day against you.",
       "heGloss": "ככה זה בחיים, פעם ככה פעם ככה.",
       "enGloss": "Some days you win, some you lose — that's life.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "عليك",
+        "مَعَك",
+        "قُدّامَك"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1028,8 +1104,12 @@
       "literalEn": "In every delay there's a good.",
       "heGloss": "לפעמים העיכוב מסתבר כברכה.",
       "enGloss": "Delays often turn out to be blessings in disguise.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "خيرة",
+        "مُصيبة",
+        "حكاية"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1069,8 +1149,12 @@
       "literalEn": "Patience is the key to relief.",
       "heGloss": "תתאזר בסבלנות והכל ייפתח.",
       "enGloss": "Hold on patiently and things will open up.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "مِفتاح",
+        "طَريق",
+        "سِرّ"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1115,8 +1199,12 @@
       "literalEn": "Until the boy comes, we keep passing the time.",
       "heGloss": "ממלאים את ההמתנה במשהו עד שהדבר שמחכים לו סוף־סוף מגיע.",
       "enGloss": "Keep busy with filler until the thing you're waiting for finally shows up.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "الصّبي",
+        "البِنت",
+        "الشّيخ"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1164,8 +1252,12 @@
       "literalEn": "The rascal's life endures.",
       "heGloss": "דווקא המציקים תמיד שורדים.",
       "enGloss": "The troublesome ones somehow always survive/stick around.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "الشّقي",
+        "الطّيّب",
+        "الغَني"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1216,8 +1308,12 @@
       "literalEn": "Put your head among the heads and say 'O head-chopper.'",
       "heGloss": "הצטרף לקבוצה וחלוק את גורלה.",
       "enGloss": "Go along with the crowd and share their fate.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 6,
+      "blankChoices": [
+        "قَطّاع",
+        "حامي",
+        "مَلِك"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1282,8 +1378,12 @@
       "literalEn": "Marble on the outside, soot on the inside.",
       "heGloss": "נראה מבריק, ובפנים בלגן.",
       "enGloss": "Looks polished on the surface, a mess underneath.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "رُخام",
+        "ذَهَب",
+        "فِضّة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1346,8 +1446,12 @@
       "literalEn": "All dolled up outside, stuffed filth inside.",
       "heGloss": "גרסה בוטה ומצחיקה: חזות נוצצת שמסתירה פנים רקובות.",
       "enGloss": "Blunter, funnier version: flashy exterior hiding a rotten interior.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 6,
+      "blankChoices": [
+        "خَرا",
+        "تِبن",
+        "رَماد"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1409,8 +1513,12 @@
       "literalEn": "Talk to the pot and the cauldron hears you.",
       "heGloss": "מילה עוברת מהר, אמרת לאחד יודעים כולם.",
       "enGloss": "Word travels fast; say it to one and everyone knows.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "الطّنجرة",
+        "الصّحن",
+        "الكاس"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1466,8 +1574,12 @@
       "literalEn": "The words are for you, daughter-in-law, but listen up, neighbor.",
       "heGloss": "לומר משהו לאדם אחד כשהוא מכוון למישהו אחר ששומע.",
       "enGloss": "Say something to one person meaning it for another who's listening.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "كِنّة",
+        "بِنتي",
+        "أُختي"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1531,8 +1643,12 @@
       "literalEn": "Who can't dance says the floor is crooked.",
       "heGloss": "מאשים את הנסיבות במקום את עצמו.",
       "enGloss": "Blaming circumstances for your own shortcomings.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "يِرقُص",
+        "يِغَنّي",
+        "يِلعَب"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1581,8 +1697,12 @@
       "literalEn": "Movement is blessing.",
       "heGloss": "תמשיך לזוז ולעשות, מזה יוצא טוב.",
       "enGloss": "Keep moving and doing — activity brings good things.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "بَرَكة",
+        "مُشكِلة",
+        "تَعَب"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1620,8 +1740,12 @@
       "literalEn": "Stretch your legs to the length of your blanket.",
       "heGloss": "חיה לפי היכולת שלך.",
       "enGloss": "Live within your means; don't overreach.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "لِحافَك",
+        "جيبَك",
+        "بيتَك"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1665,8 +1789,12 @@
       "literalEn": "What has passed is dead.",
       "heGloss": "עזוב את העבר, זה נגמר.",
       "enGloss": "Let the past go; it's over and done with.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "مات",
+        "رَجَع",
+        "نِسي"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1702,8 +1830,12 @@
       "literalEn": "The walls have ears.",
       "heGloss": "היזהר במה שאתה אומר.",
       "enGloss": "Careful what you say — someone may be listening.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "وِدان",
+        "عيون",
+        "قلوب"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1748,8 +1880,12 @@
       "literalEn": "Today's egg is better than tomorrow's hen.",
       "heGloss": "ציפור ביד שווה שתיים על העץ.",
       "enGloss": "A bird in the hand is worth two in the bush.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "دَجاجة",
+        "بَطّة",
+        "حَمامة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1806,8 +1942,12 @@
       "literalEn": "A bird in the hand, not ten on the tree.",
       "heGloss": "מה שיש לך ביד עדיף על סיכוי גדול ולא בטוח.",
       "enGloss": "The Arabic 'bird in hand': what you hold beats bigger uncertain prospects.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 3,
+      "blankChoices": [
+        "عَشرة",
+        "خَمسة",
+        "مية"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1871,8 +2011,12 @@
       "literalEn": "A friend useless in hard times was never any use.",
       "heGloss": "חבר אמת מתגלה בקושי.",
       "enGloss": "A true friend shows up when things get tough.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 0,
+      "blankChoices": [
+        "الصّاحِب",
+        "القريب",
+        "الجار"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1928,8 +2072,12 @@
       "literalEn": "He came to line her eyes with kohl and blinded her.",
       "heGloss": "ניסה לעזור ורק הרס.",
       "enGloss": "Tried to help and only made things far worse.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "عَماها",
+        "فَرَّحها",
+        "وَجَّعها"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -1983,8 +2131,12 @@
       "literalEn": "What came without effort leaves without regret.",
       "heGloss": "קל בא, קל הולך.",
       "enGloss": "Easy come, easy go.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "تعَب",
+        "فلوس",
+        "وَقِت"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2050,8 +2202,12 @@
       "literalEn": "Like the cat: eats its dinner then denies it.",
       "heGloss": "אוכלת את ארוחתה ומתכחשת. כפוי טובה.",
       "enGloss": "Ungrateful — takes the favor then acts like it never happened.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "القِطّة",
+        "الكِلبة",
+        "الفار"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2095,8 +2251,12 @@
       "literalEn": "The cat eats its own dinner (then denies it).",
       "heGloss": "צורה מקומית קצרה: כפוי הטובה שלוקח ושוכח.",
       "enGloss": "Short local form: the ingrate who takes the favor and forgets it.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 0,
+      "blankChoices": [
+        "البِسّ",
+        "الكلب",
+        "الحمار"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2138,8 +2298,12 @@
       "literalEn": "Marry the well-rooted one and sleep on a straw mat.",
       "heGloss": "אופי חשוב מעושר.",
       "enGloss": "Good character matters more than wealth.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 4,
+      "blankChoices": [
+        "الحصيرة",
+        "السّرير",
+        "الكَنَبة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2183,8 +2347,12 @@
       "literalEn": "A pot that found its lid.",
       "heGloss": "שני אנשים שמתאימים בול, לרוב אותו טיפוס.",
       "enGloss": "Two people perfectly matched — often two of a kind.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 0,
+      "blankChoices": [
+        "طَنجرة",
+        "صَحن",
+        "كاس"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2223,8 +2391,12 @@
       "literalEn": "You rejoice for the holiday when the holiday's gone.",
       "heGloss": "התלהבות ממשהו שכבר חלף.",
       "enGloss": "Getting excited for something that's already passed.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 1,
+      "blankChoices": [
+        "للعيد",
+        "للعُرس",
+        "للسّفر"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2270,8 +2442,12 @@
       "literalEn": "Setting off for the pilgrimage as everyone's heading home.",
       "heGloss": "לגמרי לא בתזמון, מתחיל בדיוק כשכולם מסיימים.",
       "enGloss": "Hopelessly out of step — starting just as everyone else finishes.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "الحَجّ",
+        "السّوق",
+        "المدرسة"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2321,8 +2497,12 @@
       "literalEn": "From too many cooks the dish burns.",
       "heGloss": "יותר מדי מבשלים מקלקלים את התבשיל.",
       "enGloss": "Too many cooks spoil the broth.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "الطّبّاخين",
+        "السّوّاقين",
+        "الخيّاطين"
+      ],
       "audio": null,
       "wordGlosses": [
         {
@@ -2381,8 +2561,12 @@
       "literalEn": "The hand that gives is better than the hand that takes.",
       "heGloss": "עדיף להיות הנותן.",
       "enGloss": "It's better to be the giver than the receiver.",
-      "blankIdx": null,
-      "blankChoices": null,
+      "blankIdx": 2,
+      "blankChoices": [
+        "بتِعطي",
+        "بتِشتغِل",
+        "بتِسرِق"
+      ],
       "audio": null,
       "wordGlosses": [
         {

@@ -217,6 +217,7 @@ function applyAppLang() {
   renderVerbsView();
   renderProverbsView();
   renderFlashcardsView();
+  renderFillBlankView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
 
@@ -366,6 +367,7 @@ function applyScriptMode() {
   renderVerbsView();
   renderProverbsView();
   renderFlashcardsView();
+  renderFillBlankView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
 
@@ -1985,9 +1987,92 @@ function renderFlashcardsView() {
       '<button class="flashcard-nav-btn"' + (flashcardIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
     '</div>';
 }
+/* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
+   One masked word per proverb, multiple choice from blankChoices (hand-authored per proverb --
+   see word_glosses-style caveat: AI-drafted, not yet reviewed by a native speaker). Choice order
+   is shuffled once per card (not on every render) so re-renders from a language/script switch
+   mid-attempt don't reshuffle the buttons out from under the learner. Follows the global
+   scriptMode toggle like the Proverbs list (unlike Flashcards' front, which deliberately doesn't)
+   -- this is a reading/recall exercise, not specifically an Arabic-script drill. */
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+let fillblankIdx = 0;
+let fillblankChoiceOrder = [];
+let fillblankSelectedIdx = null;
+function setupFillBlankCard() {
+  const p = PROVERBS[fillblankIdx];
+  fillblankChoiceOrder = shuffleArray(p.blankChoices);
+  fillblankSelectedIdx = null;
+}
+function goToFillBlank(delta) {
+  const next = fillblankIdx + delta;
+  if (next < 0 || next >= PROVERBS.length) return;
+  fillblankIdx = next;
+  stopPronunciation();
+  setupFillBlankCard();
+  renderFillBlankView();
+}
+function selectFillBlankChoice(orderIdx) {
+  if (fillblankSelectedIdx != null) return; // already answered -- ignore further picks
+  fillblankSelectedIdx = orderIdx;
+  renderFillBlankView();
+}
 function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
-  if (el) el.innerHTML = stubViewHtml();
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (fillblankIdx >= PROVERBS.length) fillblankIdx = 0;
+  if (!fillblankChoiceOrder.length) setupFillBlankCard();
+  const p = PROVERBS[fillblankIdx];
+  const en = appLang === 'en';
+  const hasAudio = !!(p.audio && p.audio.src);
+  const answered = fillblankSelectedIdx != null;
+  const correctWord = p.blankChoices[0];
+  const dir = scriptDir();
+
+  const sentenceHtml = p.arWords.map((tok, i) => {
+    if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
+    if (i === p.blankIdx) {
+      const shown = answered ? arText(correctWord) : '____';
+      return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '">' + shown + '</span>' + (tok.punct || '');
+    }
+    return '<span class="proverb-word">' + arText(tok.w) + '</span>' + (tok.punct || '');
+  }).join(' ');
+
+  const choicesHtml = fillblankChoiceOrder.map((choice, i) => {
+    let cls = 'fillblank-choice-btn';
+    if (answered) {
+      if (choice === correctWord) cls += ' correct';
+      else if (i === fillblankSelectedIdx) cls += ' incorrect';
+    }
+    return '<button class="' + cls + '"' + (answered ? ' disabled' : '') + ' onclick="selectFillBlankChoice(' + i + ')">' + arText(choice) + '</button>';
+  }).join('');
+
+  const feedback = answered
+    ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
+    : '';
+
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (fillblankIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard">' +
+      (hasAudio
+        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
+        : '') +
+      '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
+      '<div class="fillblank-choices">' + choicesHtml + '</div>' +
+      feedback +
+      (answered ? proverbExplainHtml(p) : '') +
+    '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (fillblankIdx === 0 ? ' disabled' : '') + ' onclick="goToFillBlank(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (fillblankIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFillBlank(1)">' + (en ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
 }
 function renderScrambleView() {
   const el = document.getElementById('scramble-inner');

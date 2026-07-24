@@ -577,6 +577,24 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
 .flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
 
+/* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
+   .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
+.fillblank-sentence { font-size: 26px; line-height: 1.8; margin: 4px 0 24px; }
+.fillblank-blank { display: inline-block; min-width: 64px; border-bottom: 2px solid var(--black); color: var(--light); }
+.fillblank-blank.filled { border-bottom-color: transparent; color: var(--black); font-weight: 600; }
+.fillblank-choices { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
+.fillblank-choice-btn {
+  font-size: 18px; padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+}
+body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.fillblank-choice-btn:hover:not(:disabled) { border-color: var(--black); }
+.fillblank-choice-btn:disabled { cursor: default; }
+.fillblank-choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
+.fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
+.fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
+
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
