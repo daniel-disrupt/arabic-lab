@@ -493,6 +493,10 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
+.proverb-theme-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.proverb-theme-head:not(:first-child) { margin-top: 14px; }
+.proverb-theme-name { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--black); }
+.proverb-theme-count { flex-shrink: 0; font-size: 11px; color: var(--mid); font-variant-numeric: tabular-nums; }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
@@ -597,6 +601,28 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
 .fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
 .fillblank-icon-row { margin-top: 16px; }
+
+/* ── WORD-SCRAMBLE TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
+   .flashcard-icon-row/.flashcard-icon-btn/.flashcard-reveal* and .fillblank-feedback) */
+.scramble-built {
+  min-height: 44px; font-size: 26px; line-height: 1.8;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+}
+.scramble-built-empty { font-size: 15px; color: var(--light); }
+.scramble-tiles { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 24px; }
+.scramble-tile {
+  font-size: 18px; padding: 12px 22px; border-radius: 10px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+}
+body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.scramble-tile:hover { border-color: var(--black); }
+.scramble-tile.wrong { background: #fdecea; border-color: #c62828; color: #b71c1c; }
+.scramble-reset-btn {
+  margin-top: 16px; font-size: 12px; font-weight: 600; color: var(--mid);
+  background: none; border: none; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+.scramble-reset-btn:hover { color: var(--black); }
 
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
