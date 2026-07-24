@@ -252,7 +252,7 @@ const TRANSLIT_VOWEL_MARKS = {
   'ً':'ַ', 'ٌ':'ֻ', 'ٍ':'ִ', // tanwin -> same, case ending dropped (not pronounced in dialect)
 };
 const TRANSLIT_PUNCT = { '،':',', '؟':'?', '؛':';' };
-const TRANSLIT_GEMINATION_MARK = 'ّ'; // U+0651 ARABIC SHADDA, reused directly on the Hebrew letter -- confirmed against Madrasa's live dictionary entries (not their guide table, which uses a dagesh inconsistently)
+const TRANSLIT_GEMINATION_MARK = 'ּ'; // U+05BC HEBREW DAGESH -- Madrasa's live data uses Arabic shadda (U+0651) here, but system fonts don't render U+0651 on Hebrew base letters (shows as tofu boxes on mobile); dagesh is visually equivalent and universally supported
 const TRANSLIT_DAGESH = 'ּ'; // U+05BC -- forced onto ב/כ (Arabic ب/ك are always hard b/k, never v/kh) and reused as-is for שׁוּרוּק (dot IN a mater vav = long u)
 const TRANSLIT_CHOLAM = 'ֹ'; // U+05B9 -- חוֹלם מלא (dot ON a mater vav = long o)
 const TRANSLIT_YOD_DIPHTHONG_LONG = 'ֵ'; // fatha + silent ي glide (bay) -> tsere stays on the PRECEDING consonant, e.g. بَيْت "bayt" -> בֵּית "beit" -- unlike vav below, Hebrew yod-niqqud doesn't move onto the mater letter itself
@@ -313,10 +313,10 @@ function transliterateArabicHebrew(str) {
     const mod = entry.mod || '';
     const letter = (u.base === 'ة' && vowelMark) ? 'ת' : entry.letter;
     const dagesh = entry.forceDagesh ? TRANSLIT_DAGESH : '';
-    // Gemination (shadda): single letter + niqqud + the actual Arabic shadda mark reused on top
-    // of it, not a doubled letter -- matches Madrasa's live dictionary data and is far less dense
-    // on screen than the old letter+mod+letter+niqqud+mod.
-    out += u.marks.includes(TRANSLIT_SHADDA) ? (letter + dagesh + niqqud + TRANSLIT_GEMINATION_MARK + mod) : (letter + dagesh + niqqud + mod);
+    // Gemination (shadda): add a dagesh for gemination, but skip it when the letter already
+    // carries forceDagesh (ב/כ) -- one dagesh is sufficient and a double-dagesh would be invalid.
+    const geminationMark = (u.marks.includes(TRANSLIT_SHADDA) && !entry.forceDagesh) ? TRANSLIT_GEMINATION_MARK : '';
+    out += letter + dagesh + niqqud + geminationMark + mod;
   }
   return applyHebrewSofitForms(out);
 }
