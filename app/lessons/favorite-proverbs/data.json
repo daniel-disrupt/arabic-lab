@@ -15,10 +15,11 @@
     {
       "id": "ma-bhukkak-illa-dufrak",
       "order": 1,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "بِحُكّك"
@@ -58,11 +59,16 @@
           "he": "הציפורן שלך",
           "en": "your fingernail"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "il-ird-bi-en",
       "order": 2,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -75,7 +81,7 @@
           "w": "إمّه"
         },
         {
-          "w": "غزال"
+          "w": "غَزال"
         }
       ],
       "literalHe": "הקוף בעיני אמו הוא צבי",
@@ -84,7 +90,7 @@
       "enGloss": "Everyone thinks their own is beautiful; love blinds judgment.",
       "blankIdx": 3,
       "blankChoices": [
-        "غزال",
+        "غَزال",
         "أسَد",
         "ذيب"
       ],
@@ -106,11 +112,17 @@
           "he": "צבי",
           "en": "gazelle"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2,
+        1
       ]
     },
     {
       "id": "id-la-halha-ma",
       "order": 3,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -120,7 +132,7 @@
           "w": "لِحالها"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "بِتصَفِّق"
@@ -154,18 +166,23 @@
           "he": "מוחאת כף",
           "en": "claps"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "il-bab-illi-bijilak",
       "order": 4,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
           "w": "الباب"
         },
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "بِجيلَك"
@@ -224,21 +241,27 @@
           "he": "ותנוח",
           "en": "and rest"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        3,
+        2
       ]
     },
     {
       "id": "baad-ma-shab-wadduh",
       "order": 5,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
-          "w": "بعد"
+          "w": "بَعد"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
-          "w": "شاب"
+          "w": "شَاب"
         },
         {
           "w": "وَدّوه"
@@ -279,11 +302,17 @@
           "he": "לבית הספר (כותאב)",
           "en": "to the (Qur'anic) school"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        1,
+        1
       ]
     },
     {
       "id": "ij-jar-abl-id",
       "order": 6,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -304,7 +333,7 @@
       "blankChoices": [
         "الجّار",
         "الصّاحِب",
-        "الأخ"
+        "الأَخ"
       ],
       "audio": null,
       "wordGlosses": [
@@ -320,11 +349,16 @@
           "he": "הבית",
           "en": "the house"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "jarak-il-arib-wala",
       "order": 7,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -334,13 +368,13 @@
           "w": "القَريب"
         },
         {
-          "w": "ولا"
+          "w": "وَلا"
         },
         {
-          "w": "أخوك"
+          "w": "أَخوك"
         },
         {
-          "w": "البعيد"
+          "w": "البَعيد"
         }
       ],
       "literalHe": "שכן קרוב עדיף על אח רחוק",
@@ -349,7 +383,7 @@
       "enGloss": "The one close by who shows up beats blood relations far away.",
       "blankIdx": 3,
       "blankChoices": [
-        "أخوك",
+        "أَخوك",
         "صاحِبَك",
         "عَمَّك"
       ],
@@ -375,11 +409,17 @@
           "he": "הרחוק",
           "en": "the far/distant one"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "tit-tit-zayy-ma",
       "order": 8,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -392,7 +432,7 @@
           "w": "زَيْ"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "رُحتي"
@@ -401,10 +441,10 @@
           "w": "زَيْ"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
-          "w": "جيتي"
+          "w": "جِيتي"
         }
       ],
       "literalHe": "כמו שהלכת ככה חזרת",
@@ -451,15 +491,22 @@
           "he": "באת",
           "en": "you came (f.)"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1,
+        3,
+        3
       ]
     },
     {
       "id": "illi-ido-bil-mayy",
       "order": 9,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "إيدُه"
@@ -474,7 +521,7 @@
           "w": "زَيْ"
         },
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "إيدُه"
@@ -527,11 +574,18 @@
           "he": "באש",
           "en": "in the fire"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2,
+        2,
+        3
       ]
     },
     {
       "id": "dukhul-il-hammam-mish",
       "order": 10,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -557,7 +611,7 @@
       "blankIdx": 1,
       "blankChoices": [
         "الحَمّام",
-        "البيت",
+        "البَيْت",
         "السّجن"
       ],
       "audio": null,
@@ -582,21 +636,27 @@
           "he": "יציאה ממנו",
           "en": "leaving it"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "ya-dakhil-ben-il",
       "order": 11,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
-          "w": "يا"
+          "w": "يَا"
         },
         {
           "w": "داخِل"
         },
         {
-          "w": "بين"
+          "w": "بَيْن"
         },
         {
           "w": "البَصلة"
@@ -606,7 +666,7 @@
           "punct": "،"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "بِيصيبَك"
@@ -666,11 +726,18 @@
           "he": "הצחנה שלה",
           "en": "its stink"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "il-haki-mish-zayy",
       "order": 12,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -714,11 +781,17 @@
           "he": "הראייה",
           "en": "seeing"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2,
+        1
       ]
     },
     {
       "id": "tizen-b-libas",
       "order": 13,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -748,15 +821,20 @@
           "he": "בתחתון אחד",
           "en": "in one pair of underwear"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "illi-biddo-yilab-ma",
       "order": 14,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "بِدّه"
@@ -765,7 +843,7 @@
           "w": "يِلعَب"
         },
         {
-          "w": "مع"
+          "w": "مَع"
         },
         {
           "w": "القِطّ",
@@ -818,11 +896,17 @@
           "he": "השריטות שלו",
           "en": "its scratching"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        2,
+        2
       ]
     },
     {
       "id": "il-irsh-il-abyad",
       "order": 15,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -835,7 +919,7 @@
           "w": "بِنفَع"
         },
         {
-          "w": "باليوم"
+          "w": "بِاليَوم"
         },
         {
           "w": "الإسوَد"
@@ -873,11 +957,17 @@
           "he": "השחור",
           "en": "the black"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "zayy-is-samake-bass",
       "order": 16,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -943,27 +1033,34 @@
           "he": "מת",
           "en": "it dies"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "isal-mijarrib-wala-tisal",
       "order": 17,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اسأل"
+          "w": "اِسأَل"
         },
         {
           "w": "مِجَرِّب"
         },
         {
-          "w": "ولا"
+          "w": "وَلا"
         },
         {
           "w": "تِسأل"
         },
         {
-          "w": "حكيم"
+          "w": "حَكيم"
         }
       ],
       "literalHe": "שאל מנוסה ולא חכם",
@@ -972,7 +1069,7 @@
       "enGloss": "Experience beats theory — ask someone who's actually done it.",
       "blankIdx": 4,
       "blankChoices": [
-        "حكيم",
+        "حَكيم",
         "دُكتور",
         "مُعَلِّم"
       ],
@@ -998,11 +1095,17 @@
           "he": "חכם",
           "en": "a wise/learned one"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "id-dinya-dawwara",
       "order": 18,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1019,8 +1122,8 @@
       "blankIdx": 1,
       "blankChoices": [
         "دَوّارة",
-        "كبيرة",
-        "غريبة"
+        "كْبيرة",
+        "غَريبة"
       ],
       "audio": null,
       "wordGlosses": [
@@ -1032,24 +1135,29 @@
           "he": "מסתובבת",
           "en": "spins/turns"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "yom-ilak-w-yom",
       "order": 19,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
-          "w": "يوم"
+          "w": "يَوم"
         },
         {
           "w": "إلَك"
         },
         {
-          "w": "ويوم"
+          "w": "وَيَوم"
         },
         {
-          "w": "عليك"
+          "w": "عَلَيْك"
         }
       ],
       "literalHe": "יום שלך ויום נגדך",
@@ -1058,7 +1166,7 @@
       "enGloss": "Some days you win, some you lose — that's life.",
       "blankIdx": 3,
       "blankChoices": [
-        "عليك",
+        "عَلَيْك",
         "مَعَك",
         "قُدّامَك"
       ],
@@ -1080,11 +1188,16 @@
           "he": "נגדך",
           "en": "against you"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "kill-takhira-fiha-khira",
       "order": 20,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1094,10 +1207,10 @@
           "w": "تَأخيرة"
         },
         {
-          "w": "فيها"
+          "w": "فِيها"
         },
         {
-          "w": "خيرة"
+          "w": "خَيْرة"
         }
       ],
       "literalHe": "בכל עיכוב יש טובה",
@@ -1106,9 +1219,9 @@
       "enGloss": "Delays often turn out to be blessings in disguise.",
       "blankIdx": 3,
       "blankChoices": [
-        "خيرة",
+        "خَيْرة",
         "مُصيبة",
-        "حكاية"
+        "حِكاية"
       ],
       "audio": null,
       "wordGlosses": [
@@ -1128,11 +1241,16 @@
           "he": "טובה",
           "en": "a good/blessing"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "is-sabir-miftah-il",
       "order": 21,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -1169,18 +1287,23 @@
           "he": "להקלה",
           "en": "to relief/deliverance"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "ta-yiji-is-sabi",
       "order": 22,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
-          "w": "تا"
+          "w": "تَا"
         },
         {
-          "w": "يجي"
+          "w": "يِجي"
         },
         {
           "w": "الصّبي"
@@ -1231,11 +1354,17 @@
           "he": "הנביא",
           "en": "the prophet"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        3
       ]
     },
     {
       "id": "umr-ish-shai-baa",
       "order": 23,
+      "theme": "fortune",
       "reviewed": true,
       "arWords": [
         {
@@ -1245,7 +1374,7 @@
           "w": "الشّقي"
         },
         {
-          "w": "بقى"
+          "w": "بَقى"
         }
       ],
       "literalHe": "החיים של הרשע ארוכים",
@@ -1272,11 +1401,16 @@
           "he": "נשאר / ארוך",
           "en": "endures/remains"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "hatt-rasak-ben-ir",
       "order": 24,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -1286,16 +1420,16 @@
           "w": "راسَك"
         },
         {
-          "w": "بين"
+          "w": "بَيْن"
         },
         {
           "w": "الرّوس"
         },
         {
-          "w": "وقول"
+          "w": "وَقول"
         },
         {
-          "w": "يا"
+          "w": "يَا"
         },
         {
           "w": "قَطّاع"
@@ -1311,7 +1445,7 @@
       "blankIdx": 6,
       "blankChoices": [
         "قَطّاع",
-        "حامي",
+        "حَامِي",
         "مَلِك"
       ],
       "audio": null,
@@ -1348,11 +1482,18 @@
           "he": "הראשים",
           "en": "of heads"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "min-barra-rukham-w",
       "order": 25,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1410,11 +1551,17 @@
           "he": "פיח",
           "en": "soot"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        3
       ]
     },
     {
       "id": "min-barra-tasha-tasha",
       "order": 26,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1486,18 +1633,25 @@
           "he": "ממולא",
           "en": "stuffed"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "tihki-ma-it-tanjara",
       "order": 27,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
           "w": "تِحْكي"
         },
         {
-          "w": "مع"
+          "w": "مَع"
         },
         {
           "w": "الطّنجرة"
@@ -1541,11 +1695,17 @@
           "he": "הקדרה",
           "en": "the cauldron"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "il-haki-ilik-ya",
       "order": 28,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
@@ -1555,7 +1715,7 @@
           "w": "إلِك"
         },
         {
-          "w": "يا"
+          "w": "يَا"
         },
         {
           "w": "كِنّة"
@@ -1564,7 +1724,7 @@
           "w": "واسمَعي"
         },
         {
-          "w": "يا"
+          "w": "يَا"
         },
         {
           "w": "جارة"
@@ -1610,18 +1770,24 @@
           "he": "שכנה",
           "en": "neighbor"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        3
       ]
     },
     {
       "id": "illi-ma-byirif-yirus",
       "order": 29,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "بِعرِف"
@@ -1630,13 +1796,13 @@
           "w": "يِرقُص"
         },
         {
-          "w": "بقول"
+          "w": "بِقول"
         },
         {
-          "w": "الأرض"
+          "w": "الأَرض"
         },
         {
-          "w": "عوجا"
+          "w": "عَوجا"
         }
       ],
       "literalHe": "מי שלא יודע לרקוד אומר שהרצפה עקומה",
@@ -1679,11 +1845,17 @@
           "he": "עקומה",
           "en": "crooked"
         }
+      ],
+      "scrambleChunks": [
+        3,
+        1,
+        3
       ]
     },
     {
       "id": "il-haraka-baraka",
       "order": 30,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1713,15 +1885,20 @@
           "he": "ברכה",
           "en": "blessing"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        1
       ]
     },
     {
       "id": "ala-add-lihafak-midd",
       "order": 31,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
-          "w": "على"
+          "w": "عَلى"
         },
         {
           "w": "قَدّ"
@@ -1768,21 +1945,27 @@
           "he": "רגליך",
           "en": "your legs"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "illi-fat-mat",
       "order": 32,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
-          "w": "فات"
+          "w": "فَات"
         },
         {
-          "w": "مات"
+          "w": "مَات"
         }
       ],
       "literalHe": "מה שעבר מת",
@@ -1791,7 +1974,7 @@
       "enGloss": "Let the past go; it's over and done with.",
       "blankIdx": 2,
       "blankChoices": [
-        "مات",
+        "مَات",
         "رَجَع",
         "نِسي"
       ],
@@ -1809,18 +1992,23 @@
           "he": "מת",
           "en": "is dead"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "il-hitan-ilha-widan",
       "order": 33,
+      "theme": "seeing",
       "reviewed": true,
       "arWords": [
         {
           "w": "الحيطان"
         },
         {
-          "w": "إلها"
+          "w": "إلَها"
         },
         {
           "w": "وِدان"
@@ -1833,8 +2021,8 @@
       "blankIdx": 2,
       "blankChoices": [
         "وِدان",
-        "عيون",
-        "قلوب"
+        "عُيون",
+        "قُلوب"
       ],
       "audio": null,
       "wordGlosses": [
@@ -1850,18 +2038,23 @@
           "he": "אוזניים",
           "en": "ears"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "bedit-il-yom-ahsan",
       "order": 34,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
-          "w": "بيضة"
+          "w": "بَيْضة"
         },
         {
-          "w": "اليوم"
+          "w": "اليَوم"
         },
         {
           "w": "أحسَن"
@@ -1912,11 +2105,17 @@
           "he": "של מחר",
           "en": "of tomorrow"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "usfur-bil-id-wala",
       "order": 35,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
@@ -1926,7 +2125,7 @@
           "w": "بالإيد"
         },
         {
-          "w": "ولا"
+          "w": "وَلا"
         },
         {
           "w": "عَشرة"
@@ -1946,7 +2145,7 @@
       "blankChoices": [
         "عَشرة",
         "خَمسة",
-        "مية"
+        "مِيّة"
       ],
       "audio": null,
       "wordGlosses": [
@@ -1974,21 +2173,27 @@
           "he": "העץ",
           "en": "the tree"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        2
       ]
     },
     {
       "id": "is-sahib-illi-ma",
       "order": 36,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
           "w": "الصّاحِب"
         },
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "بِنفَع"
@@ -2001,7 +2206,7 @@
           "w": "عُمرُه"
         },
         {
-          "w": "ما"
+          "w": "مَا"
         },
         {
           "w": "نِفِع"
@@ -2014,8 +2219,8 @@
       "blankIdx": 0,
       "blankChoices": [
         "الصّاحِب",
-        "القريب",
-        "الجار"
+        "القَريب",
+        "الجّار"
       ],
       "audio": null,
       "wordGlosses": [
@@ -2051,15 +2256,22 @@
           "he": "הועיל",
           "en": "was useful"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        1,
+        3
       ]
     },
     {
       "id": "ija-ykahhilha-amaha",
       "order": 37,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
-          "w": "إجا"
+          "w": "إجَا"
         },
         {
           "w": "يِكحِّلها"
@@ -2092,24 +2304,29 @@
           "he": "עיוור אותה",
           "en": "he blinded her"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1
       ]
     },
     {
       "id": "illi-ija-min-ger",
       "order": 38,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
-          "w": "إجا"
+          "w": "إجَا"
         },
         {
           "w": "مِن"
         },
         {
-          "w": "غير"
+          "w": "غَيْر"
         },
         {
           "w": "تعَب"
@@ -2121,7 +2338,7 @@
           "w": "مِن"
         },
         {
-          "w": "غير"
+          "w": "غَيْر"
         },
         {
           "w": "أسَف"
@@ -2134,7 +2351,7 @@
       "blankIdx": 4,
       "blankChoices": [
         "تعَب",
-        "فلوس",
+        "فْلوس",
         "وَقِت"
       ],
       "audio": null,
@@ -2175,11 +2392,18 @@
           "he": "צער",
           "en": "regret"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        3,
+        1,
+        3
       ]
     },
     {
       "id": "mithl-il-itta-btakul",
       "order": 39,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2230,11 +2454,17 @@
           "he": "ומתכחשת",
           "en": "and denies"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2,
+        1
       ]
     },
     {
       "id": "il-biss-bokil-ashah",
       "order": 40,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
@@ -2254,8 +2484,8 @@
       "blankIdx": 0,
       "blankChoices": [
         "البِسّ",
-        "الكلب",
-        "الحمار"
+        "الكِلب",
+        "الحِمار"
       ],
       "audio": null,
       "wordGlosses": [
@@ -2271,27 +2501,32 @@
           "he": "ארוחתו",
           "en": "its dinner"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "khudh-il-asile-w",
       "order": 41,
+      "theme": "self",
       "reviewed": true,
       "arWords": [
         {
           "w": "خُذ"
         },
         {
-          "w": "الأصيلة"
+          "w": "الأَصِيلة"
         },
         {
-          "w": "ونام"
+          "w": "وَنام"
         },
         {
           "w": "عَ"
         },
         {
-          "w": "الحصيرة"
+          "w": "الحَصيرة"
         }
       ],
       "literalHe": "קח את בעלת השורשים הטובים ותישן על מחצלת",
@@ -2300,7 +2535,7 @@
       "enGloss": "Good character matters more than wealth.",
       "blankIdx": 4,
       "blankChoices": [
-        "الحصيرة",
+        "الحَصيرة",
         "السّرير",
         "الكَنَبة"
       ],
@@ -2326,18 +2561,24 @@
           "he": "המחצלת",
           "en": "the straw mat"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "tanjara-w-laat-gataha",
       "order": 42,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
           "w": "طَنجرة"
         },
         {
-          "w": "ولاقت"
+          "w": "وَلاقت"
         },
         {
           "w": "غَطاها"
@@ -2367,24 +2608,29 @@
           "he": "את מכסהו",
           "en": "its lid"
         }
+      ],
+      "scrambleChunks": [
+        1,
+        2
       ]
     },
     {
       "id": "btifrah-lal-id-wil",
       "order": 43,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
           "w": "بِتِفرَح"
         },
         {
-          "w": "للعيد"
+          "w": "لِلعيد"
         },
         {
-          "w": "والعيد"
+          "w": "وَالعيد"
         },
         {
-          "w": "راح"
+          "w": "رَاح"
         }
       ],
       "literalHe": "אתה שמח לחג והחג כבר עבר",
@@ -2393,7 +2639,7 @@
       "enGloss": "Getting excited for something that's already passed.",
       "blankIdx": 1,
       "blankChoices": [
-        "للعيد",
+        "لِلعيد",
         "للعُرس",
         "للسّفر"
       ],
@@ -2415,11 +2661,16 @@
           "he": "עבר / הלך",
           "en": "has gone"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        2
       ]
     },
     {
       "id": "rayih-a-l-hajj",
       "order": 44,
+      "theme": "timing",
       "reviewed": true,
       "arWords": [
         {
@@ -2446,7 +2697,7 @@
       "blankChoices": [
         "الحَجّ",
         "السّوق",
-        "المدرسة"
+        "المَدرَسة"
       ],
       "audio": null,
       "wordGlosses": [
@@ -2470,11 +2721,17 @@
           "he": "חוזרים",
           "en": "are returning"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "min-kuthr-it-tabbakhin",
       "order": 45,
+      "theme": "risk",
       "reviewed": true,
       "arWords": [
         {
@@ -2525,18 +2782,24 @@
           "he": "התבשיל",
           "en": "the dish"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2
       ]
     },
     {
       "id": "il-id-illi-btiti",
       "order": 46,
+      "theme": "company",
       "reviewed": true,
       "arWords": [
         {
           "w": "الإيد"
         },
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "بتِعطي"
@@ -2551,7 +2814,7 @@
           "w": "الإيد"
         },
         {
-          "w": "اللي"
+          "w": "اللّي"
         },
         {
           "w": "بتاخُذ"
@@ -2601,6 +2864,12 @@
           "he": "לוקחת",
           "en": "takes"
         }
+      ],
+      "scrambleChunks": [
+        2,
+        1,
+        2,
+        3
       ]
     }
   ],
