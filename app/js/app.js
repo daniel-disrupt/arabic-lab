@@ -4,6 +4,8 @@ let SEED_VOCAB = [], SAVED_VOCAB = [];
 let SAVED_VERBS = [];
 let WATCH_CAPTIONS = [];
 let VOICEOVER_SRC = '', VOICEOVER_CHUNKS = [], VOICEOVER_WORD_TIMES = [];
+let PROVERBS = [];
+let LESSON_BASE = ''; // 'lessons/<slug>/' -- needed to resolve each proverb's own audio file path
 let HOME_CONTENT = { en: { title: '', subtitle: '', intro: [] }, he: { title: '', subtitle: '', intro: [] } };
 let INTRO_CONTENT = { en: { title: '', text: '' }, he: { title: '', text: '' } };
 let ABOUT_CONTENT = { en: { dir: 'ltr', sections: [] }, he: { dir: 'rtl', sections: [] } };
@@ -84,9 +86,19 @@ function adjustWatchScale(dir) { watchScaler.adjust(dir); }
 let appLang = localStorage.getItem('arabicLabLang') || 'he';
 // Canonical Hebrew pronoun strings used throughout verbs-data.js conjugation rows.
 const PRONOUN_EN = { 'אני':'I', 'אתה':'you (m.)', 'את':'you (f.)', 'הוא':'he', 'היא':'she', 'אנחנו':'we', 'אתם/ן':'you (pl.)', 'הם/ן':'they' };
+// Every tab name that can ever exist across any lesson type -- lesson.html carries markup for
+// all of them always; a given lesson's bundle.meta.tabs (see initLesson()) narrows which ones
+// actually show. Keeping one master list (rather than a hardcoded array duplicated at each call
+// site) is what lets switchTab()/applyAppLang() work generically for any lesson's tab subset.
+const ALL_TAB_NAMES = ['watch','reader','vocab','verbs','proverbs','flashcards','fillblank','scramble','about'];
 const TAB_LABELS = {
-  en: { reader: 'Reader', vocab: 'Vocab', verbs: 'Verbs', watch: 'Home', about: 'About' },
-  he: { reader: 'קורא', vocab: 'אוצר מילים', verbs: 'פעלים', watch: 'בית', about: 'אודות' },
+  en: { reader: 'Reader', vocab: 'Vocab', verbs: 'Verbs', watch: 'Home', about: 'About',
+        proverbs: 'Proverbs', flashcards: 'Flashcards', fillblank: 'Fill in the Blank', scramble: 'Word Scramble' },
+  // proverbs/flashcards/fillblank/scramble Hebrew labels are a first draft, not yet reviewed by
+  // the user -- flag for their real wording before treating as final (project convention: all
+  // Hebrew UI copy gets a human pass, see feedback_ui_wording_iteration).
+  he: { reader: 'קורא', vocab: 'אוצר מילים', verbs: 'פעלים', watch: 'בית', about: 'אודות',
+        proverbs: 'פתגמים', flashcards: 'כרטיסיות', fillblank: 'השלמת מילים', scramble: 'סידור מילים' },
 };
 // Homepage (the "watch" view/tab internally) frames the video as the emotional entry point:
 // context on the moment, then the speech itself, then a bridge into the study tools in the
@@ -168,16 +180,14 @@ function applyAppLang() {
   document.getElementById('lesson-title').textContent = intro.title;
   document.getElementById('lesson-intro').textContent = intro.text;
   const tabLabels = TAB_LABELS[appLang];
-  document.getElementById('tab-reader').textContent = tabLabels.reader;
-  document.getElementById('tab-vocab').textContent = tabLabels.vocab;
-  document.getElementById('tab-verbs').textContent = tabLabels.verbs;
-  document.getElementById('tab-watch').textContent = tabLabels.watch;
-  document.getElementById('tab-about').textContent = tabLabels.about;
-  document.getElementById('menu-tab-reader').textContent = tabLabels.reader;
-  document.getElementById('menu-tab-vocab').textContent = tabLabels.vocab;
-  document.getElementById('menu-tab-verbs').textContent = tabLabels.verbs;
-  document.getElementById('menu-tab-watch').textContent = tabLabels.watch;
-  document.getElementById('menu-tab-about').textContent = tabLabels.about;
+  ALL_TAB_NAMES.forEach(name => {
+    const label = tabLabels[name];
+    if (label == null) return;
+    const tabEl = document.getElementById('tab-' + name);
+    if (tabEl) tabEl.textContent = label;
+    const menuEl = document.getElementById('menu-tab-' + name);
+    if (menuEl) menuEl.textContent = label;
+  });
   document.getElementById('mobile-header-title').textContent = tabLabels[activeTabName];
   const home = HOME_CONTENT[appLang];
   document.getElementById('watch-title').textContent = home.title;
@@ -205,6 +215,7 @@ function applyAppLang() {
   applyWatchTranslationLang();
   renderVocabView();
   renderVerbsView();
+  renderProverbsView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
 
@@ -352,6 +363,7 @@ function applyScriptMode() {
   renderMobileCueOverlay(activeWatchCueIdx);
   renderVocabView();
   renderVerbsView();
+  renderProverbsView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
 
@@ -408,8 +420,24 @@ function toggleVerbGroup(key) {
 }
 
 /* ─────────────── TAB SWITCHING ─────────────── */
-// The Watch tab opens by default; on mobile, Reader/Vocab/Verbs/About live behind the hamburger
-// drawer instead of a tab row, since there wasn't room for both that and the language switch.
+// Which tabs the CURRENT lesson shows, and in what order -- narrowed from ALL_TAB_NAMES by
+// initLesson() based on the fetched bundle's meta.tabs (see LESSON BOOTSTRAP at the bottom of
+// this file). Defaults to the full classic set so this stays correct even if a bundle omits
+// meta.tabs entirely.
+let ACTIVE_TABS = ['watch','reader','vocab','verbs','about'];
+function applyActiveTabs() {
+  ALL_TAB_NAMES.forEach(name => {
+    const show = ACTIVE_TABS.includes(name);
+    const tabEl = document.getElementById('tab-' + name);
+    if (tabEl) tabEl.style.display = show ? '' : 'none';
+    const menuEl = document.getElementById('menu-tab-' + name);
+    if (menuEl) menuEl.style.display = show ? '' : 'none';
+  });
+}
+// The Watch tab opens by default on Abed's lesson; other lesson types set their own first tab
+// via initLesson() -> switchTab(ACTIVE_TABS[0]). On mobile, every tab besides the active one
+// lives behind the hamburger drawer instead of a tab row, since there wasn't room for both that
+// and the language switch.
 let activeTabName = 'watch';
 function switchTab(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -423,15 +451,18 @@ function switchTab(name) {
     exitWatchTheater();
   }
   activeTabName = name;
-  const tabs = document.querySelectorAll('.tab');
-  const idx = ['watch','reader','vocab','verbs','about'].indexOf(name);
-  if (idx !== -1) tabs[idx].classList.add('active');
+  const tabEl = document.getElementById('tab-' + name);
+  if (tabEl) tabEl.classList.add('active');
   const menuItem = document.getElementById('menu-tab-' + name);
   if (menuItem) menuItem.classList.add('active');
   document.getElementById('mobile-header-title').textContent = TAB_LABELS[appLang][name];
   if (name === 'verbs') renderVerbsView();
   if (name === 'vocab') renderVocabView();
   if (name === 'about') renderAboutView();
+  if (name === 'proverbs') renderProverbsView();
+  if (name === 'flashcards') renderFlashcardsView();
+  if (name === 'fillblank') renderFillBlankView();
+  if (name === 'scramble') renderScrambleView();
 }
 
 /* ─────────────── HAMBURGER MENU (mobile) ─────────────── */
@@ -897,6 +928,7 @@ function stopPronunciation() {
   setPronounceBtnPlaying(activePronounceBtn, false);
   activePronounceBtn = null;
   clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
 }
 // For other code paths that take over audioEl directly (Reader chunk clicks, the main play
 // button, scrubbing) -- clears the stale "playing" indicator without re-pausing audio that's
@@ -906,6 +938,59 @@ function clearActivePronounceIndicator() {
   setPronounceBtnPlaying(activePronounceBtn, false);
   activePronounceBtn = null;
   clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
+}
+
+/* ─────────────── PROVERB AUDIO (Proverbs/Flashcards) ───────────────
+   Unlike the Reader/Vocab, which all share one lesson-length voiceover track and a single
+   lesson-wide word-index space, proverbs are independent standalone units -- each gets its own
+   short TTS clip and its own local {idx,t} word-timing array (idx 0..N-1 within that proverb,
+   not a global index). Deliberately a separate small mechanism rather than bending the
+   shared-track assumptions baked into voiceoverTimedWords/playLessonAudioSlice. */
+let activeProverbId = null;
+let activeProverbContainerEl = null;
+let proverbLiveGi = -1;
+let proverbLiveEl = null;
+function clearProverbLiveWord() {
+  if (proverbLiveEl) proverbLiveEl.classList.remove('live');
+  proverbLiveEl = null;
+  proverbLiveGi = -1;
+  activeProverbContainerEl = null;
+  activeProverbId = null;
+}
+function updateProverbLiveWord() {
+  if (!activeProverbContainerEl || activeProverbId == null) return;
+  const proverb = PROVERBS.find(p => p.id === activeProverbId);
+  const wordTimes = (proverb && proverb.audio && proverb.audio.wordTimes) || [];
+  const gi = findActiveTimedIndex(wordTimes, audioEl.currentTime);
+  if (gi === proverbLiveGi) return;
+  proverbLiveGi = gi;
+  if (proverbLiveEl) proverbLiveEl.classList.remove('live');
+  proverbLiveEl = gi >= 0 ? activeProverbContainerEl.querySelector('[data-gi="' + gi + '"]') : null;
+  if (proverbLiveEl) proverbLiveEl.classList.add('live');
+}
+audioEl.addEventListener('timeupdate', updateProverbLiveWord);
+// Natural end-of-clip isn't covered by stopAudioSliceWatch (that's only for stopping mid-track
+// at a slice boundary) -- reset the playing indicator here so the button doesn't stay stuck
+// showing "playing" after a proverb clip finishes on its own.
+audioEl.addEventListener('ended', () => {
+  if (activeProverbId != null) { setPronounceBtnPlaying(activePronounceBtn, false); activePronounceBtn = null; clearProverbLiveWord(); }
+});
+function playProverbAudio(proverbId, containerEl, btnEl) {
+  if (btnEl && btnEl === activePronounceBtn && activeProverbId === proverbId) { stopPronunciation(); return; }
+  const proverb = PROVERBS.find(p => p.id === proverbId);
+  if (!proverb || !proverb.audio || !proverb.audio.src) return; // no audio generated yet -- nothing to play, don't fabricate a sound
+  stopAudioSliceWatch();
+  setPronounceBtnPlaying(activePronounceBtn, false);
+  clearVocabPreviewLiveWord();
+  clearProverbLiveWord();
+  activeProverbId = proverbId;
+  activeProverbContainerEl = containerEl;
+  audioEl.src = LESSON_BASE + proverb.audio.src;
+  audioEl.currentTime = 0;
+  audioEl.play();
+  activePronounceBtn = btnEl || null;
+  setPronounceBtnPlaying(activePronounceBtn, true);
 }
 function playLessonAudioSlice(startT, endT, btnEl) {
   if (btnEl && btnEl === activePronounceBtn) { stopPronunciation(); return; }
@@ -1728,6 +1813,82 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === 'ArrowRight') { skipWatch(5); e.preventDefault(); }
 });
 
+/* ─────────────── PROVERBS TAB (browsable list, standalone units) ───────────────
+   Each proverb is its own self-contained card -- unlike the Reader's one continuous chunked
+   text, proverbs are unrelated sayings, so there's no shared "essay" to flow through. Tapping a
+   card expands the shared "explain it" block (literal meaning / idiomatic meaning / usage
+   scenario) -- the same renderer is reused verbatim by the Flashcards tab's back face. */
+let expandedProverbIds = new Set();
+function toggleProverbExpand(id) {
+  if (expandedProverbIds.has(id)) expandedProverbIds.delete(id); else expandedProverbIds.add(id);
+  renderProverbsView();
+}
+// data-gi is LOCAL to this proverb (0..N-1), not a lesson-global index like the Reader's --
+// matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
+function proverbWordsHtml(p) {
+  let gi = 0;
+  return p.arWords.map((tok) => {
+    if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
+    const html = '<span class="proverb-word" data-gi="' + (gi++) + '">' + arText(tok.w) + '</span>' + (tok.punct || '');
+    return html;
+  }).join(' ');
+}
+function proverbExplainHtml(p) {
+  const en = appLang === 'en';
+  const literal = en ? p.literalEn : p.literalHe;
+  const meaning = en ? p.enGloss : p.heGloss;
+  const usage = en ? p.usageEn : p.usageHe;
+  const labels = en
+    ? { literal: 'Literally', meaning: 'Meaning', usage: 'When to use it' }
+    : { literal: 'פירוש מילולי', meaning: 'משמעות', usage: 'מתי אומרים את זה' };
+  const row = (label, text) => text
+    ? '<div class="proverb-explain-row"><span class="proverb-explain-label">' + label + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
+    : '';
+  return '<div class="proverb-explain">' +
+    row(labels.literal, literal) +
+    row(labels.meaning, meaning) +
+    row(labels.usage, usage) +
+    '</div>';
+}
+function renderProverbsView() {
+  const list = document.getElementById('proverbs-list');
+  if (!list) return;
+  list.innerHTML = PROVERBS.map(p => {
+    const expanded = expandedProverbIds.has(p.id);
+    const hasAudio = !!(p.audio && p.audio.src);
+    return '<div class="proverb-card' + (expanded ? ' expanded' : '') + '">' +
+      '<div class="proverb-card-head" onclick="toggleProverbExpand(\'' + p.id + '\')">' +
+        (hasAudio
+          ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'proverb-words-' + p.id + '\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<div class="proverb-words" id="proverb-words-' + p.id + '" dir="' + scriptDir() + '">' + proverbWordsHtml(p) + '</div>' +
+        '<span class="proverb-chev">›</span>' +
+      '</div>' +
+      (expanded ? proverbExplainHtml(p) : '') +
+    '</div>';
+  }).join('');
+}
+
+/* ─────────────── FLASHCARDS / FILL-IN-THE-BLANK / WORD-SCRAMBLE ───────────────
+   Stub views -- built out in later phases once the Proverbs tab pattern above is confirmed.
+   Kept as real (if minimal) functions rather than leaving switchTab() calling something
+   undefined, so the tab-gating mechanism is fully wired end-to-end today. */
+function stubViewHtml() {
+  return '<div class="stub-view">' + (appLang === 'en' ? 'Coming soon.' : 'בקרוב.') + '</div>';
+}
+function renderFlashcardsView() {
+  const el = document.getElementById('flashcards-inner');
+  if (el) el.innerHTML = stubViewHtml();
+}
+function renderFillBlankView() {
+  const el = document.getElementById('fillblank-inner');
+  if (el) el.innerHTML = stubViewHtml();
+}
+function renderScrambleView() {
+  const el = document.getElementById('scramble-inner');
+  if (el) el.innerHTML = stubViewHtml();
+}
+
 /* ─────────────── LESSON BOOTSTRAP ───────────────
    Multi-lesson site: lesson.html?slug=<slug> fetches that lesson's data.json bundle (produced
    by the CMS's Publish step, or by scripts/migrate-lesson-to-json.js for the original Abed
@@ -1747,16 +1908,23 @@ function initLesson(bundle) {
   VOICEOVER_CHUNKS = (bundle.voiceover && bundle.voiceover.chunks) || [];
   VOICEOVER_WORD_TIMES = (bundle.voiceover && bundle.voiceover.wordTimes) || [];
   voiceoverTimedWords = VOICEOVER_WORD_TIMES.slice().sort((a, b) => a.t - b.t);
-  HOME_CONTENT = bundle.homeContent;
-  INTRO_CONTENT = bundle.introContent;
-  ABOUT_CONTENT = bundle.aboutContent;
-  HEADER_GLOSS = bundle.headerGloss;
+  // Fall back to the empty-shape defaults declared at the top of this file rather than requiring
+  // every lesson to author narrative content for tabs it doesn't even show (e.g. a proverbs
+  // lesson with no Watch/Reader tab has nothing to put in homeContent/introContent).
+  HOME_CONTENT = bundle.homeContent || HOME_CONTENT;
+  INTRO_CONTENT = bundle.introContent || INTRO_CONTENT;
+  ABOUT_CONTENT = bundle.aboutContent || ABOUT_CONTENT;
+  HEADER_GLOSS = bundle.headerGloss || HEADER_GLOSS;
+  PROVERBS = bundle.proverbs || [];
 
   const base = 'lessons/' + bundle.meta.slug + '/';
-  audioEl.src = base + VOICEOVER_SRC;
-  document.getElementById('watch-video-source').src = base + bundle.meta.videoPath;
-  document.getElementById('watch-captions').src = base + bundle.meta.captionsPath;
-  watchVideoEl.load();
+  LESSON_BASE = base;
+  if (VOICEOVER_SRC) audioEl.src = base + VOICEOVER_SRC; // only the Reader's shared-track model needs this set up front
+  if (bundle.meta.videoPath) {
+    document.getElementById('watch-video-source').src = base + bundle.meta.videoPath;
+    document.getElementById('watch-captions').src = base + bundle.meta.captionsPath;
+    watchVideoEl.load();
+  }
   document.title = bundle.meta.title;
 
   buildReader();
@@ -1767,6 +1935,14 @@ function initLesson(bundle) {
   applyWatchScale();
   initOutsideTapClose('verbs-scroll', (target) => !target.closest('.verb-pill') && !target.closest('.verb-card'), closeVerbDrawer);
   renderVerbsView();
+  renderProverbsView();
+
+  // Narrow the nav/side-menu to this lesson's declared tabs and open its first one -- falls back
+  // to the classic 5-tab set if a bundle doesn't declare meta.tabs at all.
+  ACTIVE_TABS = (bundle.meta.tabs && bundle.meta.tabs.length) ? bundle.meta.tabs : ACTIVE_TABS;
+  applyActiveTabs();
+  switchTab(ACTIVE_TABS[0]);
+
   applyAppLang();
   applyScriptMode();
 }

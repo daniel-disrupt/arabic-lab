@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "slug": "favorite-proverbs",
+    "title": "My Favorite Arabic Proverbs",
+    "subtitle": "A personal collection, chosen to learn",
+    "tabs": ["proverbs", "flashcards", "fillblank", "scramble", "about"]
+  },
+  "proverbs": [
+    {
+      "id": "onion-peel",
+      "reviewed": false,
+      "arWords": [
+        { "w": "يَا" },
+        { "w": "دَاخِل" },
+        { "w": "بِين" },
+        { "w": "البَصَلَة" },
+        { "w": "وِقِشْرِتْها", "punct": "،" },
+        { "w": "مَا" },
+        { "w": "إِلَك" },
+        { "w": "إِلّا" },
+        { "w": "رِيحِتْها" }
+      ],
+      "literalHe": "מי שנכנס בין הבצל לקליפה שלו, לא מקבל אלא את הריח שלו",
+      "literalEn": "Whoever comes between the onion and its peel gets nothing but its smell",
+      "heGloss": "אל תתערבו בריב שלא שייך לכם — כל מה שתרוויחו מזה זה צרות",
+      "enGloss": "Don't meddle in a dispute that isn't yours — all you'll get out of it is trouble",
+      "usageHe": "אומרים את זה למי שדוחף את עצמו למחלוקת בין אנשים אחרים, כדי להזהיר אותו שהוא רק ייפגע מזה",
+      "usageEn": "Said to warn someone inserting themselves into an argument between other people that doesn't concern them",
+      "blankIdx": 8,
+      "blankChoices": ["رِيحِتْها", "طَعْمِتْها", "لَوْنِتْها"],
+      "audio": null
+    },
+    {
+      "id": "hand-in-fire",
+      "reviewed": false,
+      "arWords": [
+        { "w": "اِللِّي" },
+        { "w": "إِيدُه" },
+        { "w": "بِالْمَيّ" },
+        { "w": "مِش" },
+        { "w": "مِتْل" },
+        { "w": "اِللِّي" },
+        { "w": "إِيدُه" },
+        { "w": "بِالنَّار" }
+      ],
+      "literalHe": "מי שידו במים אינו כמו מי שידו באש",
+      "literalEn": "The one whose hand is in water is not like the one whose hand is in fire",
+      "heGloss": "מי שנמצא במצב נוח לא באמת יכול להבין את מי שסובל",
+      "enGloss": "Someone comfortable can't truly understand someone who's suffering",
+      "usageHe": "אומרים על מי ששופט את הקושי של האחר מתוך מקום בטוח ונוח, בלי אמפתיה אמיתית",
+      "usageEn": "Said about someone judging another's hardship from a position of safety and comfort, without real empathy",
+      "blankIdx": 7,
+      "blankChoices": ["بِالنَّار", "بِالْمَيّ", "بِالتَّلْج"],
+      "audio": null
+    }
+  ],
+  "aboutContent": {
+    "en": {
+      "dir": "ltr",
+      "sections": [
+        {
+          "eyebrow": "About this lesson",
+          "heading": "A personal collection of proverbs",
+          "paragraphs": [
+            "These are favorite Palestinian/Levantine Arabic proverbs, gathered to study the same way as the other lesson in this app: full tashkeel, Hebrew-primary glossing with English available, and audio to support pronunciation.",
+            "This is a placeholder starter set (2 proverbs) built to prove out the reading, flashcard, fill-in-the-blank, and word-scramble tabs — the real curated list is still being added."
+          ]
+        }
+      ]
+    },
+    "he": {
+      "dir": "rtl",
+      "sections": [
+        {
+          "eyebrow": "אודות השיעור הזה",
+          "heading": "אוסף אישי של פתגמים",
+          "paragraphs": [
+            "אלה פתגמים אהובים בערבית פלסטינית/לבנטינית מדוברת, שנאספו כדי ללמוד אותם באותה שיטה כמו בשיעור האחר באפליקציה: תשכיל מלא, תרגום בעברית כשפה ראשית עם אנגלית זמינה, ושמע לתמיכה בהגייה.",
+            "זהו סט התחלתי זמני (2 פתגמים) שנבנה כדי לבדוק את לשוניות הקריאה, הכרטיסיות, השלמת המילים ומשחק סידור המילים — הרשימה המלאה עדיין בבנייה."
+          ]
+        }
+      ]
+    }
+  }
+}

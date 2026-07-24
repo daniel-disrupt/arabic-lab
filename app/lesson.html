@@ -52,6 +52,10 @@
     <div class="tab" id="tab-reader" onclick="switchTab('reader')">Reader</div>
     <div class="tab" id="tab-vocab" onclick="switchTab('vocab')">Vocab</div>
     <div class="tab" id="tab-verbs" onclick="switchTab('verbs')">Verbs</div>
+    <div class="tab" id="tab-proverbs" onclick="switchTab('proverbs')">Proverbs</div>
+    <div class="tab" id="tab-flashcards" onclick="switchTab('flashcards')">Flashcards</div>
+    <div class="tab" id="tab-fillblank" onclick="switchTab('fillblank')">Fill in the Blank</div>
+    <div class="tab" id="tab-scramble" onclick="switchTab('scramble')">Word Scramble</div>
     <div class="tab" id="tab-about" onclick="switchTab('about')">About</div>
   </nav>
   <div class="header-side" aria-hidden="true"></div>
@@ -69,6 +73,10 @@
     <div class="side-menu-item" id="menu-tab-reader" onclick="selectMenuTab('reader')">Reader</div>
     <div class="side-menu-item" id="menu-tab-vocab" onclick="selectMenuTab('vocab')">Vocab</div>
     <div class="side-menu-item" id="menu-tab-verbs" onclick="selectMenuTab('verbs')">Verbs</div>
+    <div class="side-menu-item" id="menu-tab-proverbs" onclick="selectMenuTab('proverbs')">Proverbs</div>
+    <div class="side-menu-item" id="menu-tab-flashcards" onclick="selectMenuTab('flashcards')">Flashcards</div>
+    <div class="side-menu-item" id="menu-tab-fillblank" onclick="selectMenuTab('fillblank')">Fill in the Blank</div>
+    <div class="side-menu-item" id="menu-tab-scramble" onclick="selectMenuTab('scramble')">Word Scramble</div>
     <div class="side-menu-item" id="menu-tab-about" onclick="selectMenuTab('about')">About</div>
   </div>
   <!-- Same controls as the desktop header's settings popover -- kept here instead on mobile since
@@ -279,6 +287,36 @@
         </svg>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- PROVERBS VIEW -->
+<div class="view" id="view-proverbs">
+  <div class="proverbs-scroll">
+    <div class="proverbs-inner">
+      <div class="proverb-list" id="proverbs-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FLASHCARDS VIEW -->
+<div class="view" id="view-flashcards">
+  <div class="flashcards-scroll">
+    <div class="flashcards-inner" id="flashcards-inner"></div>
+  </div>
+</div>
+
+<!-- FILL-IN-THE-BLANK VIEW -->
+<div class="view" id="view-fillblank">
+  <div class="fillblank-scroll">
+    <div class="fillblank-inner" id="fillblank-inner"></div>
+  </div>
+</div>
+
+<!-- WORD SCRAMBLE VIEW -->
+<div class="view" id="view-scramble">
+  <div class="scramble-scroll">
+    <div class="scramble-inner" id="scramble-inner"></div>
   </div>
 </div>
 

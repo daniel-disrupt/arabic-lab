@@ -489,6 +489,40 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    and nested inside .chunk-preview-hl's black background (white) without a separate override. */
 .chunk-preview-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
 
+/* ── PROVERBS TAB ── */
+.proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
+.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
+.proverb-list { display: flex; flex-direction: column; gap: 14px; }
+.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
+.proverb-card.expanded { border-color: var(--black); }
+.proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.proverb-pronounce {
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--mid); transition: all .12s;
+}
+.proverb-pronounce:hover { border-color: var(--black); color: var(--black); }
+.proverb-pronounce.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.proverb-words {
+  flex: 1; min-width: 0;
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 19px; line-height: 1.6; direction: rtl; text-align: right;
+}
+body.translit-mode .proverb-words { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
+.proverb-word.live { box-shadow: inset 0 -3px 0 0 currentColor; border-radius: 2px; }
+.proverb-sep { color: var(--mid); }
+.proverb-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }
+.proverb-card.expanded .proverb-chev { transform: rotate(-90deg); }
+.proverb-explain { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--rule); display: flex; flex-direction: column; gap: 10px; }
+.proverb-explain-row { display: flex; flex-direction: column; gap: 3px; }
+.proverb-explain-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); }
+/* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
+   isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. */
+.proverb-explain-text { font-size: 14px; line-height: 1.6; }
+.stub-view { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; }
+
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
