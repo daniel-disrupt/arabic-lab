@@ -3,54 +3,1376 @@
     "slug": "favorite-proverbs",
     "title": "My Favorite Arabic Proverbs",
     "subtitle": "A personal collection, chosen to learn",
-    "tabs": ["proverbs", "flashcards", "fillblank", "scramble", "about"]
+    "tabs": [
+      "proverbs",
+      "flashcards",
+      "fillblank",
+      "scramble",
+      "about"
+    ]
   },
   "proverbs": [
     {
-      "id": "onion-peel",
-      "reviewed": false,
+      "id": "ma-bhukkak-illa-dufrak",
+      "order": 1,
+      "reviewed": true,
       "arWords": [
-        { "w": "يَا" },
-        { "w": "دَاخِل" },
-        { "w": "بِين" },
-        { "w": "البَصَلَة" },
-        { "w": "وِقِشْرِتْها", "punct": "،" },
-        { "w": "مَا" },
-        { "w": "إِلَك" },
-        { "w": "إِلّا" },
-        { "w": "رِيحِتْها" }
+        {
+          "w": "ما"
+        },
+        {
+          "w": "بِحُكّك"
+        },
+        {
+          "w": "إلّا"
+        },
+        {
+          "w": "ضُفرَك"
+        }
       ],
-      "literalHe": "מי שנכנס בין הבצל לקליפה שלו, לא מקבל אלא את הריח שלו",
-      "literalEn": "Whoever comes between the onion and its peel gets nothing but its smell",
-      "heGloss": "אל תתערבו בריב שלא שייך לכם — כל מה שתרוויחו מזה זה צרות",
-      "enGloss": "Don't meddle in a dispute that isn't yours — all you'll get out of it is trouble",
-      "usageHe": "אומרים את זה למי שדוחף את עצמו למחלוקת בין אנשים אחרים, כדי להזהיר אותו שהוא רק ייפגע מזה",
-      "usageEn": "Said to warn someone inserting themselves into an argument between other people that doesn't concern them",
-      "blankIdx": 8,
-      "blankChoices": ["رِيحِتْها", "طَعْمِتْها", "لَوْنِتْها"],
+      "literalHe": "אף אחד לא יגרד אותך חוץ מהציפורן שלך",
+      "literalEn": "Nothing scratches you but your own fingernail.",
+      "heGloss": "בסוף אתה סומך רק על עצמך.",
+      "enGloss": "Only you truly look after your own needs — rely on yourself.",
+      "blankIdx": null,
+      "blankChoices": null,
       "audio": null
     },
     {
-      "id": "hand-in-fire",
-      "reviewed": false,
+      "id": "il-ird-bi-en",
+      "order": 2,
+      "reviewed": true,
       "arWords": [
-        { "w": "اِللِّي" },
-        { "w": "إِيدُه" },
-        { "w": "بِالْمَيّ" },
-        { "w": "مِش" },
-        { "w": "مِتْل" },
-        { "w": "اِللِّي" },
-        { "w": "إِيدُه" },
-        { "w": "بِالنَّار" }
+        {
+          "w": "القِرْد"
+        },
+        {
+          "w": "بعينِ"
+        },
+        {
+          "w": "إمّه"
+        },
+        {
+          "w": "غزال"
+        }
       ],
-      "literalHe": "מי שידו במים אינו כמו מי שידו באש",
-      "literalEn": "The one whose hand is in water is not like the one whose hand is in fire",
-      "heGloss": "מי שנמצא במצב נוח לא באמת יכול להבין את מי שסובל",
-      "enGloss": "Someone comfortable can't truly understand someone who's suffering",
-      "usageHe": "אומרים על מי ששופט את הקושי של האחר מתוך מקום בטוח ונוח, בלי אמפתיה אמיתית",
-      "usageEn": "Said about someone judging another's hardship from a position of safety and comfort, without real empathy",
-      "blankIdx": 7,
-      "blankChoices": ["بِالنَّار", "بِالْمَيّ", "بِالتَّلْج"],
+      "literalHe": "הקוף בעיני אמו הוא צבי",
+      "literalEn": "The monkey in his mother's eye is a gazelle.",
+      "heGloss": "כל אחד רואה את שלו כיפה מכולם.",
+      "enGloss": "Everyone thinks their own is beautiful; love blinds judgment.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "id-la-halha-ma",
+      "order": 3,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "إيدٍ"
+        },
+        {
+          "w": "لِحالها"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "بِتصَفِّق"
+        }
+      ],
+      "literalHe": "יד אחת לבדה לא מוחאת כף",
+      "literalEn": "One hand alone doesn't clap.",
+      "heGloss": "צריך שניים בשביל שזה יעבוד.",
+      "enGloss": "Nothing gets done alone; it takes cooperation (or two to tango).",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-bab-illi-bijilak",
+      "order": 4,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الباب"
+        },
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "بِجيلَك"
+        },
+        {
+          "w": "مِنّه"
+        },
+        {
+          "w": "الرّيح",
+          "punct": "،"
+        },
+        {
+          "w": "سِدّه"
+        },
+        {
+          "w": "واستَريح"
+        }
+      ],
+      "literalHe": "הדלת שממנה בא הרוח",
+      "literalEn": "The door the wind comes from — shut it and rest.",
+      "heGloss": "סגור אותה ותנוח. חתוך את מקור הצרות.",
+      "enGloss": "Cut off the source of your troubles and you'll have peace.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "baad-ma-shab-wadduh",
+      "order": 5,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "بعد"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "شاب"
+        },
+        {
+          "w": "وَدّوه"
+        },
+        {
+          "w": "عالكُتّاب"
+        }
+      ],
+      "literalHe": "אחרי שהשׂיב שלחו אותו לבית הספר",
+      "literalEn": "After he went gray they sent him to school.",
+      "heGloss": "לעשות משהו מאוחר מדי.",
+      "enGloss": "Doing something far too late; teaching an old dog new tricks.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "ij-jar-abl-id",
+      "order": 6,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الجّار"
+        },
+        {
+          "w": "قَبْل"
+        },
+        {
+          "w": "الدّار"
+        }
+      ],
+      "literalHe": "השכן לפני הבית",
+      "literalEn": "The neighbor before the house.",
+      "heGloss": "בדוק מי השכנים לפני שתבחר בית.",
+      "enGloss": "Check who your neighbors are before you pick the home.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "jarak-il-arib-wala",
+      "order": 7,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "جارَك"
+        },
+        {
+          "w": "القَريب"
+        },
+        {
+          "w": "ولا"
+        },
+        {
+          "w": "أخوك"
+        },
+        {
+          "w": "البعيد"
+        }
+      ],
+      "literalHe": "שכן קרוב עדיף על אח רחוק",
+      "literalEn": "Your near neighbor rather than your faraway brother.",
+      "heGloss": "מי שקרוב ונמצא שם עוזר יותר מקרוב־משפחה רחוק.",
+      "enGloss": "The one close by who shows up beats blood relations far away.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "tit-tit-zayy-ma",
+      "order": 8,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "تِيتْ"
+        },
+        {
+          "w": "تِيتْ"
+        },
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "رُحتي"
+        },
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "جيتي"
+        }
+      ],
+      "literalHe": "כמו שהלכת ככה חזרת",
+      "literalEn": "Teet-teet: same way you went is the way you came back.",
+      "heGloss": "הרבה מאמץ ובסוף חזרת בדיוק לאותו מקום.",
+      "enGloss": "A lot of effort and you end up exactly where you started.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "illi-ido-bil-mayy",
+      "order": 9,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "إيدُه"
+        },
+        {
+          "w": "بِالمَيّ"
+        },
+        {
+          "w": "مِش"
+        },
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "إيدُه"
+        },
+        {
+          "w": "بِالنّار"
+        }
+      ],
+      "literalHe": "מי שידו במים לא כמו מי שידו באש",
+      "literalEn": "One whose hand is in water isn't like one whose hand is in fire.",
+      "heGloss": "מי שלא סובל לא מבין את הכואב.",
+      "enGloss": "The comfortable onlooker can't feel what the sufferer feels.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "dukhul-il-hammam-mish",
+      "order": 10,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "دُخول"
+        },
+        {
+          "w": "الحَمّام"
+        },
+        {
+          "w": "مِش"
+        },
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "طُلوعه"
+        }
+      ],
+      "literalHe": "להיכנס למרחץ זה לא כמו לצאת ממנו",
+      "literalEn": "Entering the bathhouse isn't like leaving it.",
+      "heGloss": "קל להסתבך, קשה להשתחרר.",
+      "enGloss": "Getting into something is easy; getting out is the hard part.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "ya-dakhil-ben-il",
+      "order": 11,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "يا"
+        },
+        {
+          "w": "داخِل"
+        },
+        {
+          "w": "بين"
+        },
+        {
+          "w": "البَصلة"
+        },
+        {
+          "w": "وقِشرِتها",
+          "punct": "،"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "بِيصيبَك"
+        },
+        {
+          "w": "إلّا"
+        },
+        {
+          "w": "صَنّتها"
+        }
+      ],
+      "literalHe": "מי שנכנס בין הבצל לקליפה",
+      "literalEn": "You who step between the onion and its peel get only its stink.",
+      "heGloss": "יקבל רק את הריח. אל תתערב בריב של אחרים.",
+      "enGloss": "Meddle in others' private quarrels and you'll only get grief.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-haki-mish-zayy",
+      "order": 12,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الحَكي"
+        },
+        {
+          "w": "مِش"
+        },
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "الشّوف"
+        }
+      ],
+      "literalHe": "לדבר זה לא כמו לראות",
+      "literalEn": "Talking isn't like seeing.",
+      "heGloss": "שמיעה על משהו זה לא כמו לראות במו עיניך.",
+      "enGloss": "Hearing about something isn't the same as seeing it yourself.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "tizen-b-libas",
+      "order": 13,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "طيزين"
+        },
+        {
+          "w": "بِلِباس"
+        }
+      ],
+      "literalHe": "שני אחוריים בתחתון אחד",
+      "literalEn": "Two backsides in one pair of underwear.",
+      "heGloss": "שני אנשים דבוקים, תמיד ביחד.",
+      "enGloss": "Two people joined at the hip — inseparable, always together.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "illi-biddo-yilab-ma",
+      "order": 14,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "بِدّه"
+        },
+        {
+          "w": "يِلعَب"
+        },
+        {
+          "w": "مع"
+        },
+        {
+          "w": "القِطّ",
+          "punct": "،"
+        },
+        {
+          "w": "بِستَحمِل"
+        },
+        {
+          "w": "خَربَشْتُه"
+        }
+      ],
+      "literalHe": "מי שרוצה לשחק עם החתול",
+      "literalEn": "Who wants to play with the cat bears its scratches.",
+      "heGloss": "שיסבול את השריטות. נכנסת לסיכון, תספוג.",
+      "enGloss": "If you take on something risky, accept the consequences.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-irsh-il-abyad",
+      "order": 15,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "القِرْش"
+        },
+        {
+          "w": "الأبيَض"
+        },
+        {
+          "w": "بِنفَع"
+        },
+        {
+          "w": "باليوم"
+        },
+        {
+          "w": "الإسوَد"
+        }
+      ],
+      "literalHe": "הגרוש הלבן מועיל ביום השחור",
+      "literalEn": "The white penny is useful on the black day.",
+      "heGloss": "תחסוך היום, זה יעזור ביום קשה.",
+      "enGloss": "Save now; the money you put aside helps on your worst day.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "zayy-is-samake-bass",
+      "order": 16,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "زَيْ"
+        },
+        {
+          "w": "السّمَكة",
+          "punct": "،"
+        },
+        {
+          "w": "بَسّ"
+        },
+        {
+          "w": "تِطلَع"
+        },
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "المَيّ"
+        },
+        {
+          "w": "بِتموت"
+        }
+      ],
+      "literalHe": "כמו הדג",
+      "literalEn": "Like a fish: the moment it leaves the water it dies.",
+      "heGloss": "ברגע שיצא מהמים מת. מישהו ששורד רק בסביבה שלו.",
+      "enGloss": "Someone who can't survive outside their own element.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "isal-mijarrib-wala-tisal",
+      "order": 17,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اسأل"
+        },
+        {
+          "w": "مِجَرِّب"
+        },
+        {
+          "w": "ولا"
+        },
+        {
+          "w": "تِسأل"
+        },
+        {
+          "w": "حكيم"
+        }
+      ],
+      "literalHe": "שאל מנוסה ולא חכם",
+      "literalEn": "Ask one who's tried, not one who's learned.",
+      "heGloss": "ניסיון עדיף על תיאוריה.",
+      "enGloss": "Experience beats theory — ask someone who's actually done it.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "id-dinya-dawwara",
+      "order": 18,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الدِّنيا"
+        },
+        {
+          "w": "دَوّارة"
+        }
+      ],
+      "literalHe": "העולם מסתובב",
+      "literalEn": "The world turns.",
+      "heGloss": "המזל מתחלף, גלגל חוזר.",
+      "enGloss": "Fortunes rotate; today's high is tomorrow's low, and vice versa.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "yom-ilak-w-yom",
+      "order": 19,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "يوم"
+        },
+        {
+          "w": "إلَك"
+        },
+        {
+          "w": "ويوم"
+        },
+        {
+          "w": "عليك"
+        }
+      ],
+      "literalHe": "יום שלך ויום נגדך",
+      "literalEn": "A day for you and a day against you.",
+      "heGloss": "ככה זה בחיים, פעם ככה פעם ככה.",
+      "enGloss": "Some days you win, some you lose — that's life.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "kill-takhira-fiha-khira",
+      "order": 20,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "كِلّ"
+        },
+        {
+          "w": "تَأخيرة"
+        },
+        {
+          "w": "فيها"
+        },
+        {
+          "w": "خيرة"
+        }
+      ],
+      "literalHe": "בכל עיכוב יש טובה",
+      "literalEn": "In every delay there's a good.",
+      "heGloss": "לפעמים העיכוב מסתבר כברכה.",
+      "enGloss": "Delays often turn out to be blessings in disguise.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "is-sabir-miftah-il",
+      "order": 21,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الصّبِر"
+        },
+        {
+          "w": "مِفتاح"
+        },
+        {
+          "w": "الفَرَج"
+        }
+      ],
+      "literalHe": "הסבלנות היא מפתח להקלה",
+      "literalEn": "Patience is the key to relief.",
+      "heGloss": "תתאזר בסבלנות והכל ייפתח.",
+      "enGloss": "Hold on patiently and things will open up.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "ta-yiji-is-sabi",
+      "order": 22,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "تا"
+        },
+        {
+          "w": "يجي"
+        },
+        {
+          "w": "الصّبي"
+        },
+        {
+          "w": "مِنصَلّي"
+        },
+        {
+          "w": "عَ"
+        },
+        {
+          "w": "النّبي"
+        }
+      ],
+      "literalHe": "עד שהילד יגיע נמשיך להעביר את הזמן",
+      "literalEn": "Until the boy comes, we keep passing the time.",
+      "heGloss": "ממלאים את ההמתנה במשהו עד שהדבר שמחכים לו סוף־סוף מגיע.",
+      "enGloss": "Keep busy with filler until the thing you're waiting for finally shows up.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "umr-ish-shai-baa",
+      "order": 23,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "عُمْر"
+        },
+        {
+          "w": "الشّقي"
+        },
+        {
+          "w": "بقى"
+        }
+      ],
+      "literalHe": "החיים של הרשע ארוכים",
+      "literalEn": "The rascal's life endures.",
+      "heGloss": "דווקא המציקים תמיד שורדים.",
+      "enGloss": "The troublesome ones somehow always survive/stick around.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "hatt-rasak-ben-ir",
+      "order": 24,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "حَطّ"
+        },
+        {
+          "w": "راسَك"
+        },
+        {
+          "w": "بين"
+        },
+        {
+          "w": "الرّوس"
+        },
+        {
+          "w": "وقول"
+        },
+        {
+          "w": "يا"
+        },
+        {
+          "w": "قَطّاع"
+        },
+        {
+          "w": "الرّوس"
+        }
+      ],
+      "literalHe": "שים את ראשך בין הראשים",
+      "literalEn": "Put your head among the heads and say 'O head-chopper.'",
+      "heGloss": "הצטרף לקבוצה וחלוק את גורלה.",
+      "enGloss": "Go along with the crowd and share their fate.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "min-barra-rukham-w",
+      "order": 25,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "بَرّا"
+        },
+        {
+          "w": "رُخام"
+        },
+        {
+          "w": "ومِن"
+        },
+        {
+          "w": "جُوّا"
+        },
+        {
+          "w": "سَخام"
+        }
+      ],
+      "literalHe": "מבחוץ שיש ומבפנים פיח",
+      "literalEn": "Marble on the outside, soot on the inside.",
+      "heGloss": "נראה מבריק, ובפנים בלגן.",
+      "enGloss": "Looks polished on the surface, a mess underneath.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "min-barra-tasha-tasha",
+      "order": 26,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "بَرّا"
+        },
+        {
+          "w": "طَقشة"
+        },
+        {
+          "w": "طَقشة"
+        },
+        {
+          "w": "ومِن"
+        },
+        {
+          "w": "جُوّا"
+        },
+        {
+          "w": "خَرا"
+        },
+        {
+          "w": "مَحشي"
+        }
+      ],
+      "literalHe": "מבחוץ מקושט ומבפנים חרא ממולא",
+      "literalEn": "All dolled up outside, stuffed filth inside.",
+      "heGloss": "גרסה בוטה ומצחיקה: חזות נוצצת שמסתירה פנים רקובות.",
+      "enGloss": "Blunter, funnier version: flashy exterior hiding a rotten interior.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "tihki-ma-it-tanjara",
+      "order": 27,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "تِحْكي"
+        },
+        {
+          "w": "مع"
+        },
+        {
+          "w": "الطّنجرة"
+        },
+        {
+          "w": "بِتِسمَعَك"
+        },
+        {
+          "w": "القُدرة"
+        }
+      ],
+      "literalHe": "תדבר עם הסיר והקדרה שומעת אותך",
+      "literalEn": "Talk to the pot and the cauldron hears you.",
+      "heGloss": "מילה עוברת מהר, אמרת לאחד יודעים כולם.",
+      "enGloss": "Word travels fast; say it to one and everyone knows.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-haki-ilik-ya",
+      "order": 28,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الحَكي"
+        },
+        {
+          "w": "إلِك"
+        },
+        {
+          "w": "يا"
+        },
+        {
+          "w": "كِنّة"
+        },
+        {
+          "w": "واسمَعي"
+        },
+        {
+          "w": "يا"
+        },
+        {
+          "w": "جارة"
+        }
+      ],
+      "literalHe": "הדברים אלייך, כלה, אבל תקשיבי, שכנה",
+      "literalEn": "The words are for you, daughter-in-law, but listen up, neighbor.",
+      "heGloss": "לומר משהו לאדם אחד כשהוא מכוון למישהו אחר ששומע.",
+      "enGloss": "Say something to one person meaning it for another who's listening.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "illi-ma-byirif-yirus",
+      "order": 29,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "بِعرِف"
+        },
+        {
+          "w": "يِرقُص"
+        },
+        {
+          "w": "بقول"
+        },
+        {
+          "w": "الأرض"
+        },
+        {
+          "w": "عوجا"
+        }
+      ],
+      "literalHe": "מי שלא יודע לרקוד אומר שהרצפה עקומה",
+      "literalEn": "Who can't dance says the floor is crooked.",
+      "heGloss": "מאשים את הנסיבות במקום את עצמו.",
+      "enGloss": "Blaming circumstances for your own shortcomings.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-haraka-baraka",
+      "order": 30,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الحَرَكة"
+        },
+        {
+          "w": "بَرَكة"
+        }
+      ],
+      "literalHe": "תנועה זה ברכה",
+      "literalEn": "Movement is blessing.",
+      "heGloss": "תמשיך לזוז ולעשות, מזה יוצא טוב.",
+      "enGloss": "Keep moving and doing — activity brings good things.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "ala-add-lihafak-midd",
+      "order": 31,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "على"
+        },
+        {
+          "w": "قَدّ"
+        },
+        {
+          "w": "لِحافَك"
+        },
+        {
+          "w": "مِدّ"
+        },
+        {
+          "w": "رِجليك"
+        }
+      ],
+      "literalHe": "פשוט את רגליך לפי אורך השמיכה",
+      "literalEn": "Stretch your legs to the length of your blanket.",
+      "heGloss": "חיה לפי היכולת שלך.",
+      "enGloss": "Live within your means; don't overreach.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "illi-fat-mat",
+      "order": 32,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "فات"
+        },
+        {
+          "w": "مات"
+        }
+      ],
+      "literalHe": "מה שעבר מת",
+      "literalEn": "What has passed is dead.",
+      "heGloss": "עזוב את העבר, זה נגמר.",
+      "enGloss": "Let the past go; it's over and done with.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-hitan-ilha-widan",
+      "order": 33,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الحيطان"
+        },
+        {
+          "w": "إلها"
+        },
+        {
+          "w": "وِدان"
+        }
+      ],
+      "literalHe": "לקירות יש אוזניים",
+      "literalEn": "The walls have ears.",
+      "heGloss": "היזהר במה שאתה אומר.",
+      "enGloss": "Careful what you say — someone may be listening.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "bedit-il-yom-ahsan",
+      "order": 34,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "بيضة"
+        },
+        {
+          "w": "اليوم"
+        },
+        {
+          "w": "أحسَن"
+        },
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "دَجاجة"
+        },
+        {
+          "w": "بُكرة"
+        }
+      ],
+      "literalHe": "ביצה של היום עדיפה על תרנגולת של מחר",
+      "literalEn": "Today's egg is better than tomorrow's hen.",
+      "heGloss": "ציפור ביד שווה שתיים על העץ.",
+      "enGloss": "A bird in the hand is worth two in the bush.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "usfur-bil-id-wala",
+      "order": 35,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "عُصفور"
+        },
+        {
+          "w": "بالإيد"
+        },
+        {
+          "w": "ولا"
+        },
+        {
+          "w": "عَشرة"
+        },
+        {
+          "w": "عَ"
+        },
+        {
+          "w": "الشّجرة"
+        }
+      ],
+      "literalHe": "ציפור ביד ולא עשר על העץ",
+      "literalEn": "A bird in the hand, not ten on the tree.",
+      "heGloss": "מה שיש לך ביד עדיף על סיכוי גדול ולא בטוח.",
+      "enGloss": "The Arabic 'bird in hand': what you hold beats bigger uncertain prospects.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "is-sahib-illi-ma",
+      "order": 36,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الصّاحِب"
+        },
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "بِنفَع"
+        },
+        {
+          "w": "بالضّيق",
+          "punct": "،"
+        },
+        {
+          "w": "عُمرُه"
+        },
+        {
+          "w": "ما"
+        },
+        {
+          "w": "نِفِع"
+        }
+      ],
+      "literalHe": "חבר שלא מועיל בצרה מעולם לא הועיל",
+      "literalEn": "A friend useless in hard times was never any use.",
+      "heGloss": "חבר אמת מתגלה בקושי.",
+      "enGloss": "A true friend shows up when things get tough.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "ija-ykahhilha-amaha",
+      "order": 37,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "إجا"
+        },
+        {
+          "w": "يِكحِّلها"
+        },
+        {
+          "w": "عَماها"
+        }
+      ],
+      "literalHe": "בא לאפר לה את העיניים ועיוור אותה",
+      "literalEn": "He came to line her eyes with kohl and blinded her.",
+      "heGloss": "ניסה לעזור ורק הרס.",
+      "enGloss": "Tried to help and only made things far worse.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "illi-ija-min-ger",
+      "order": 38,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "إجا"
+        },
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "غير"
+        },
+        {
+          "w": "تعَب"
+        },
+        {
+          "w": "بِروح"
+        },
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "غير"
+        },
+        {
+          "w": "أسَف"
+        }
+      ],
+      "literalHe": "מה שבא בלי מאמץ הולך בלי צער",
+      "literalEn": "What came without effort leaves without regret.",
+      "heGloss": "קל בא, קל הולך.",
+      "enGloss": "Easy come, easy go.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "mithl-il-itta-btakul",
+      "order": 39,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "مِثِل"
+        },
+        {
+          "w": "القِطّة"
+        },
+        {
+          "w": "بِتاكُل"
+        },
+        {
+          "w": "عَشاها"
+        },
+        {
+          "w": "وبِتِنكُر"
+        }
+      ],
+      "literalHe": "כמו החתולה",
+      "literalEn": "Like the cat: eats its dinner then denies it.",
+      "heGloss": "אוכלת את ארוחתה ומתכחשת. כפוי טובה.",
+      "enGloss": "Ungrateful — takes the favor then acts like it never happened.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-biss-bokil-ashah",
+      "order": 40,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "البِسّ"
+        },
+        {
+          "w": "بوكِل"
+        },
+        {
+          "w": "عَشاه"
+        }
+      ],
+      "literalHe": "החתול אוכל את ארוחתו",
+      "literalEn": "The cat eats its own dinner (then denies it).",
+      "heGloss": "צורה מקומית קצרה: כפוי הטובה שלוקח ושוכח.",
+      "enGloss": "Short local form: the ingrate who takes the favor and forgets it.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "khudh-il-asile-w",
+      "order": 41,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "خُذ"
+        },
+        {
+          "w": "الأصيلة"
+        },
+        {
+          "w": "ونام"
+        },
+        {
+          "w": "عَ"
+        },
+        {
+          "w": "الحصيرة"
+        }
+      ],
+      "literalHe": "קח את בעלת השורשים הטובים ותישן על מחצלת",
+      "literalEn": "Marry the well-rooted one and sleep on a straw mat.",
+      "heGloss": "אופי חשוב מעושר.",
+      "enGloss": "Good character matters more than wealth.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "tanjara-w-laat-gataha",
+      "order": 42,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "طَنجرة"
+        },
+        {
+          "w": "ولاقت"
+        },
+        {
+          "w": "غَطاها"
+        }
+      ],
+      "literalHe": "סיר שמצא את המכסה שלו",
+      "literalEn": "A pot that found its lid.",
+      "heGloss": "שני אנשים שמתאימים בול, לרוב אותו טיפוס.",
+      "enGloss": "Two people perfectly matched — often two of a kind.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "btifrah-lal-id-wil",
+      "order": 43,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "بِتِفرَح"
+        },
+        {
+          "w": "للعيد"
+        },
+        {
+          "w": "والعيد"
+        },
+        {
+          "w": "راح"
+        }
+      ],
+      "literalHe": "אתה שמח לחג והחג כבר עבר",
+      "literalEn": "You rejoice for the holiday when the holiday's gone.",
+      "heGloss": "התלהבות ממשהו שכבר חלף.",
+      "enGloss": "Getting excited for something that's already passed.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "rayih-a-l-hajj",
+      "order": 44,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "رايِح"
+        },
+        {
+          "w": "عَ"
+        },
+        {
+          "w": "الحَجّ"
+        },
+        {
+          "w": "والنّاس"
+        },
+        {
+          "w": "مِروِّحة"
+        }
+      ],
+      "literalHe": "יוצא לעלייה לרגל בזמן שכולם כבר חוזרים",
+      "literalEn": "Setting off for the pilgrimage as everyone's heading home.",
+      "heGloss": "לגמרי לא בתזמון, מתחיל בדיוק כשכולם מסיימים.",
+      "enGloss": "Hopelessly out of step — starting just as everyone else finishes.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "min-kuthr-it-tabbakhin",
+      "order": 45,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "كُثْر"
+        },
+        {
+          "w": "الطّبّاخين"
+        },
+        {
+          "w": "بِتِحرَق"
+        },
+        {
+          "w": "الطّبخة"
+        }
+      ],
+      "literalHe": "מרוב טבחים המאכל נשרף",
+      "literalEn": "From too many cooks the dish burns.",
+      "heGloss": "יותר מדי מבשלים מקלקלים את התבשיל.",
+      "enGloss": "Too many cooks spoil the broth.",
+      "blankIdx": null,
+      "blankChoices": null,
+      "audio": null
+    },
+    {
+      "id": "il-id-illi-btiti",
+      "order": 46,
+      "reviewed": true,
+      "arWords": [
+        {
+          "w": "الإيد"
+        },
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "بتِعطي"
+        },
+        {
+          "w": "أحسَن"
+        },
+        {
+          "w": "مِن"
+        },
+        {
+          "w": "الإيد"
+        },
+        {
+          "w": "اللي"
+        },
+        {
+          "w": "بتاخُذ"
+        }
+      ],
+      "literalHe": "היד שנותנת טובה מהיד שמקבלת",
+      "literalEn": "The hand that gives is better than the hand that takes.",
+      "heGloss": "עדיף להיות הנותן.",
+      "enGloss": "It's better to be the giver than the receiver.",
+      "blankIdx": null,
+      "blankChoices": null,
       "audio": null
     }
   ],
@@ -63,7 +1385,7 @@
           "heading": "A personal collection of proverbs",
           "paragraphs": [
             "These are favorite Palestinian/Levantine Arabic proverbs, gathered to study the same way as the other lesson in this app: full tashkeel, Hebrew-primary glossing with English available, and audio to support pronunciation.",
-            "This is a placeholder starter set (2 proverbs) built to prove out the reading, flashcard, fill-in-the-blank, and word-scramble tabs — the real curated list is still being added."
+            "46 proverbs, reviewed with a native Palestinian speaker. Flashcards, fill-in-the-blank, and word-scramble are being built out next — for now this lesson covers reading each proverb, hearing it, and seeing its literal and idiomatic meaning."
           ]
         }
       ]
@@ -76,7 +1398,7 @@
           "heading": "אוסף אישי של פתגמים",
           "paragraphs": [
             "אלה פתגמים אהובים בערבית פלסטינית/לבנטינית מדוברת, שנאספו כדי ללמוד אותם באותה שיטה כמו בשיעור האחר באפליקציה: תשכיל מלא, תרגום בעברית כשפה ראשית עם אנגלית זמינה, ושמע לתמיכה בהגייה.",
-            "זהו סט התחלתי זמני (2 פתגמים) שנבנה כדי לבדוק את לשוניות הקריאה, הכרטיסיות, השלמת המילים ומשחק סידור המילים — הרשימה המלאה עדיין בבנייה."
+            "46 פתגמים, שנבדקו מול דובר פלסטיני יליד. הכרטיסיות, השלמת המילים ומשחק סידור המילים עדיין בבנייה — בינתיים השיעור הזה מאפשר לקרוא כל פתגם, לשמוע אותו, ולראות את המשמעות המילולית והאידיומטית שלו."
           ]
         }
       ]
