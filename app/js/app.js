@@ -1895,6 +1895,18 @@ function toggleProverbExpand(id) {
   if (expandedProverbIds.has(id)) expandedProverbIds.delete(id); else expandedProverbIds.add(id);
   renderProverbsView();
 }
+// Theme groups start CLOSED -- the list used to dump all ~46 cards open at once, which read as an
+// undifferentiated wall of text. Collapsed by default, every group's own state independently
+// toggleable (a Set, not a single "active" key) so more than one topic can be open at a time, same
+// multi-open pattern as expandedProverbIds above. Nothing is pre-opened on load: instead each closed
+// row shows a one-line "teaser" (the first proverb's literal translation) so the learner picks a
+// topic by what's actually in it -- often the odd literal image ("a monkey is a gazelle to its
+// mother") is the hook -- rather than tapping blind through a list of bare category names.
+let expandedThemeKeys = new Set();
+function toggleThemeExpand(key) {
+  if (expandedThemeKeys.has(key)) expandedThemeKeys.delete(key); else expandedThemeKeys.add(key);
+  renderProverbsView();
+}
 // data-gi is LOCAL to this proverb (0..N-1), not a lesson-global index like the Reader's --
 // matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
 // forceArabic bypasses the global scriptMode toggle and always renders raw Arabic -- used by
@@ -1959,11 +1971,17 @@ function renderProverbsView() {
   if (other.proverbs.length) groups.push(other);
 
   list.innerHTML = groups.filter(g => g.proverbs.length).map(g => {
-    const heading = '<div class="proverb-theme-head">' +
-      '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
-      '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+    const isOpen = expandedThemeKeys.has(g.theme.key);
+    const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
+    const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
+      '<div class="proverb-theme-head-row">' +
+        '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
+        '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+        '<span class="proverb-theme-chev">›</span>' +
+      '</div>' +
+      (isOpen ? '' : '<div class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</div>') +
     '</div>';
-    return heading + g.proverbs.map(proverbCardHtml).join('');
+    return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');
 }
 

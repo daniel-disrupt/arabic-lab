@@ -499,10 +499,17 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
-.proverb-theme-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 9px; border-bottom: 1px solid var(--rule); }
-.proverb-theme-head:not(:first-child) { margin-top: 22px; }
-.proverb-theme-name { font-size: 18px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; color: var(--black); }
+.proverb-theme-head { display: flex; flex-direction: column; gap: 5px; padding: 8px 2px 9px; border-bottom: 1px solid var(--rule); cursor: pointer; user-select: none; }
+.proverb-theme-head:not(:first-child) { margin-top: 14px; }
+.proverb-theme-head-row { display: flex; align-items: baseline; gap: 10px; }
+.proverb-theme-name { flex: 1; min-width: 0; font-size: 18px; font-weight: 700; letter-spacing: .01em; text-transform: uppercase; color: var(--black); }
 .proverb-theme-count { flex-shrink: 0; font-size: 13px; color: var(--mid); font-variant-numeric: tabular-nums; }
+/* Only shown while the group is collapsed -- see PROVERBS TAB render note in app.js -- a taste of
+   what's inside so picking a topic doesn't mean tapping in blind. Single line, ellipsized: it's a
+   hook, not a summary. */
+.proverb-theme-teaser { font-size: 13px; font-style: italic; color: var(--mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.proverb-theme-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }
+.proverb-theme-head.open .proverb-theme-chev { transform: rotate(-90deg); }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
