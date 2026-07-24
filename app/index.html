@@ -22,8 +22,8 @@
   .lang-switch { display: flex; direction: ltr; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; flex-shrink: 0; }
   .lang-switch-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--mid); padding: 5px 12px; border-radius: 13px; cursor: pointer; transition: background .12s, color .12s; }
   .lang-switch-btn.active { background: var(--black); color: #fff; }
-  .lib-list { direction: ltr; display: flex; flex-direction: column; gap: 14px; }
-  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; text-align: left; }
+  .lib-list { display: flex; flex-direction: column; gap: 14px; }
+  .lib-card { display: block; border: 1px solid var(--rule); border-radius: 10px; padding: 18px 20px; text-decoration: none; color: inherit; transition: background .12s, border-color .12s; text-align: start; }
   .lib-card:hover { background: var(--active-bg); border-color: var(--black); }
   .lib-card-title { font-size: 16px; font-weight: 600; }
   .lib-card-subtitle { font-size: 13px; color: var(--mid); margin-top: 4px; }
@@ -63,6 +63,27 @@ const SITE_STRINGS = {
   },
 };
 let siteLang = localStorage.getItem('arabicLabLang') || 'he';
+let loadedLessons = null; // populated once the manifest fetch resolves; re-rendered on language change
+
+// Card title/subtitle in the manifest may be a plain string (untranslated content) or an
+// {en, he} object -- fall back to whichever language is available if the current one is missing.
+function localize(field) {
+  if (field == null) return '';
+  if (typeof field === 'string') return field;
+  return field[siteLang] || field.en || field.he || '';
+}
+
+function renderLessonList() {
+  const list = document.getElementById('lib-list');
+  const emptyEl = document.getElementById('lib-empty');
+  if (!loadedLessons || !loadedLessons.length) return;
+  list.innerHTML = loadedLessons.map(l => `
+    <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
+      <div class="lib-card-title">${localize(l.title)}</div>
+      <div class="lib-card-subtitle">${localize(l.subtitle)}</div>
+    </a>
+  `).join('');
+}
 
 function applySiteLang() {
   document.documentElement.lang = siteLang;
@@ -71,6 +92,7 @@ function applySiteLang() {
   document.querySelectorAll('.lang-switch-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === siteLang));
   const emptyEl = document.getElementById('lib-empty');
   if (emptyEl.dataset.state) emptyEl.textContent = SITE_STRINGS[siteLang][emptyEl.dataset.state];
+  renderLessonList();
 }
 
 function setSiteLang(lang) {
@@ -84,7 +106,6 @@ applySiteLang();
 fetch('lessons/manifest.json')
   .then(r => r.json())
   .then(lessons => {
-    const list = document.getElementById('lib-list');
     if (!lessons.length) {
       const emptyEl = document.getElementById('lib-empty');
       emptyEl.dataset.state = 'empty';
@@ -92,12 +113,8 @@ fetch('lessons/manifest.json')
       emptyEl.style.display = 'block';
       return;
     }
-    list.innerHTML = lessons.map(l => `
-      <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
-        <div class="lib-card-title">${l.title}</div>
-        <div class="lib-card-subtitle">${l.subtitle || ''}</div>
-      </a>
-    `).join('');
+    loadedLessons = lessons;
+    renderLessonList();
   })
   .catch(err => {
     console.error('Failed to load lesson manifest', err);
