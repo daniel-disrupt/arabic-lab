@@ -216,6 +216,7 @@ function applyAppLang() {
   renderVocabView();
   renderVerbsView();
   renderProverbsView();
+  renderFlashcardsView();
   if (document.getElementById('view-about').classList.contains('active')) renderAboutView();
 }
 
@@ -364,6 +365,7 @@ function applyScriptMode() {
   renderVocabView();
   renderVerbsView();
   renderProverbsView();
+  renderFlashcardsView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
 
@@ -1825,11 +1827,15 @@ function toggleProverbExpand(id) {
 }
 // data-gi is LOCAL to this proverb (0..N-1), not a lesson-global index like the Reader's --
 // matches the per-proverb audio/wordTimes model (see PROVERB AUDIO above).
-function proverbWordsHtml(p) {
+// forceArabic bypasses the global scriptMode toggle and always renders raw Arabic -- used by
+// Flashcards, whose front face is deliberately always the Arabic-script recall challenge
+// regardless of the site's current learning-alphabet setting.
+function proverbWordsHtml(p, forceArabic) {
   let gi = 0;
   return p.arWords.map((tok) => {
     if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
-    const html = '<span class="proverb-word" data-gi="' + (gi++) + '">' + arText(tok.w) + '</span>' + (tok.punct || '');
+    const text = forceArabic ? tok.w : arText(tok.w);
+    const html = '<span class="proverb-word" data-gi="' + (gi++) + '">' + text + '</span>' + (tok.punct || '');
     return html;
   }).join(' ');
 }
@@ -1876,9 +1882,65 @@ function renderProverbsView() {
 function stubViewHtml() {
   return '<div class="stub-view">' + (appLang === 'en' ? 'Coming soon.' : 'בקרוב.') + '</div>';
 }
+
+/* ─────────────── FLASHCARDS TAB ───────────────
+   One card per proverb, sequential deck. Front is deliberately ALWAYS Arabic script -- it's the
+   recall challenge -- independent of the global learning-alphabet toggle (scriptMode), with a
+   tap-to-peek Hebrew transliteration hint and a listen button (both reusing Proverbs-tab
+   machinery verbatim: proverbWordsHtml for the data-gi word spans, playProverbAudio for karaoke
+   playback). Back face reuses proverbExplainHtml() verbatim, per the shared-panel design. */
+let flashcardIdx = 0;
+let flashcardFlipped = false;
+let flashcardTranslitPeek = false;
+function goToFlashcard(delta) {
+  const next = flashcardIdx + delta;
+  if (next < 0 || next >= PROVERBS.length) return;
+  flashcardIdx = next;
+  flashcardFlipped = false;
+  flashcardTranslitPeek = false;
+  stopPronunciation();
+  renderFlashcardsView();
+}
+function toggleFlashcardFlip() {
+  flashcardFlipped = !flashcardFlipped;
+  renderFlashcardsView();
+}
+function toggleFlashcardTranslitPeek(e) {
+  e.stopPropagation();
+  flashcardTranslitPeek = !flashcardTranslitPeek;
+  renderFlashcardsView();
+}
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
-  if (el) el.innerHTML = stubViewHtml();
+  if (!el) return;
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
+  if (flashcardIdx >= PROVERBS.length) flashcardIdx = 0;
+  const p = PROVERBS[flashcardIdx];
+  const hasAudio = !!(p.audio && p.audio.src);
+  const plainText = p.arWords.map(t => t.w).join(' ');
+  const peekLine = flashcardTranslitPeek
+    ? '<div class="flashcard-peek-line" dir="rtl">' + transliterateArabicHebrew(plainText) + '</div>'
+    : '';
+  const face = flashcardFlipped
+    ? '<div class="flashcard-back">' + proverbExplainHtml(p) + '</div>'
+    : '<div class="flashcard-front">' +
+        '<div class="flashcard-front-controls">' +
+          (hasAudio
+            ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+            : '<span></span>') +
+          '<button class="flashcard-translit-btn" onclick="toggleFlashcardTranslitPeek(event)">' + (appLang === 'en' ? 'aA' : 'תעתיק') + '</button>' +
+        '</div>' +
+        '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true) + '</div>' +
+        peekLine +
+        '<div class="flashcard-tap-hint">' + (appLang === 'en' ? 'Tap card to reveal meaning' : 'הקישו על הכרטיס לגילוי המשמעות') + '</div>' +
+      '</div>';
+  el.innerHTML =
+    '<div class="flashcard-progress">' + (flashcardIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
+    '<div class="flashcard' + (flashcardFlipped ? ' flipped' : '') + '" onclick="toggleFlashcardFlip()">' + face + '</div>' +
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (appLang === 'en' ? '‹ Prev' : '‹ הקודם') + '</button>' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === PROVERBS.length - 1 ? ' disabled' : '') + ' onclick="goToFlashcard(1)">' + (appLang === 'en' ? 'Next ›' : 'הבא ›') + '</button>' +
+    '</div>';
 }
 function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');

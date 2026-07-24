@@ -523,6 +523,41 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 .proverb-explain-text { font-size: 14px; line-height: 1.6; }
 .stub-view { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; }
 
+/* ── FLASHCARDS TAB ── */
+.flashcard-progress { text-align: center; font-size: 12px; color: var(--mid); letter-spacing: .04em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+.flashcard {
+  border: 1px solid var(--rule); border-radius: 14px; background: #fff;
+  min-height: 220px; padding: 28px 22px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  transition: border-color .12s;
+}
+.flashcard:hover { border-color: var(--black); }
+.flashcard-front { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
+.flashcard-front-controls { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.flashcard-words { font-size: 22px; }
+/* The card front is always real Arabic script regardless of the global learning-alphabet toggle
+   (see proverbWordsHtml's forceArabic param) -- these two overrides win over the general
+   .proverb-words translit-mode/translit-en-mode rules (same specificity, declared later) so the
+   font/direction don't flip just because the rest of the app is in a transliteration mode. */
+body.translit-mode .flashcard-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
+.flashcard-translit-btn {
+  font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 6px 12px; border-radius: 14px;
+  border: 1px solid var(--rule); background: transparent; color: var(--mid); cursor: pointer; transition: all .12s;
+}
+.flashcard-translit-btn:hover { border-color: var(--black); color: var(--black); }
+.flashcard-peek-line { font-size: 14px; color: var(--mid); direction: ltr; }
+.flashcard-tap-hint { font-size: 11px; color: var(--light); margin-top: 4px; }
+.flashcard-back { width: 100%; text-align: start; }
+.flashcard-back .proverb-explain { margin-top: 0; border-top: none; padding-top: 0; }
+.flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.flashcard-nav-btn {
+  flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
+  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+}
+.flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
+.flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
+
 /* WATCH VIEW */
 .watch-scroll { flex: 1; overflow-y: auto; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
