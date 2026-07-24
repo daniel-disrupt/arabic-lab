@@ -234,23 +234,35 @@ const TRANSLIT_SUKUN = 'ْ';
 const TRANSLIT_SHADDA = 'ّ';
 
 const TRANSLIT_CONSONANTS = {
-  'ا':{letter:'א'}, 'ب':{letter:'ב'}, 'ت':{letter:'ת'}, 'ث':{letter:'ת'},
+  'ا':{letter:'א'}, 'ب':{letter:'ב',forceDagesh:true}, 'ت':{letter:'ת'}, 'ث':{letter:'ת'},
   'ج':{letter:'ג',mod:'׳'}, 'ح':{letter:'ח'}, 'خ':{letter:'ח',mod:'׳'},
   'د':{letter:'ד'}, 'ذ':{letter:'ד'}, 'ر':{letter:'ר'}, 'ز':{letter:'ז'},
   'س':{letter:'ס'}, 'ش':{letter:'ש'}, 'ص':{letter:'צ'}, 'ض':{letter:'צ',mod:'׳'},
   'ط':{letter:'ט'}, 'ظ':{letter:'צ',mod:'׳'}, 'ع':{letter:'ע'}, 'غ':{letter:'ע',mod:'׳'},
-  'ف':{letter:'פ'}, 'ق':{letter:'ק'}, 'ك':{letter:'כ'}, 'ل':{letter:'ל'},
+  'ف':{letter:'פ'}, 'ق':{letter:'ק'}, 'ك':{letter:'כ',forceDagesh:true}, 'ل':{letter:'ל'},
   'م':{letter:'מ'}, 'ن':{letter:'נ'}, 'ه':{letter:'ה'}, 'و':{letter:'ו'},
   'ي':{letter:'י'}, 'ء':{letter:'א'}, 'آ':{letter:'א'}, 'أ':{letter:'א'},
   'ؤ':{letter:'א'}, 'إ':{letter:'א'}, 'ئ':{letter:'א'},
   'ة':{letter:'ה'}, // ة ta marbuta -- overridden to ת in construct state below
-  'ى':{letter:'י'}, // ى alif maksura
+  'ى':{letter:'א'}, // ى alif maksura -- a spelling variant of long "a" (e.g. عَلَى), not "i"/"y"; confirmed against Madrasa's guide table (عَلَى -> עַלַא, ending in bare א)
 };
 const TRANSLIT_VOWEL_MARKS = {
   'َ':'ַ', 'ُ':'ֻ', 'ِ':'ִ', // fatha/damma/kasra -> patach/qubuts/hiriq
   'ً':'ַ', 'ٌ':'ֻ', 'ٍ':'ִ', // tanwin -> same, case ending dropped (not pronounced in dialect)
 };
 const TRANSLIT_PUNCT = { '،':',', '؟':'?', '؛':';' };
+const TRANSLIT_GEMINATION_MARK = 'ّ'; // U+0651 ARABIC SHADDA, reused directly on the Hebrew letter -- confirmed against Madrasa's live dictionary entries (not their guide table, which uses a dagesh inconsistently)
+const TRANSLIT_DAGESH = 'ּ'; // U+05BC -- forced onto ב/כ (Arabic ب/ك are always hard b/k, never v/kh) and reused as-is for שׁוּרוּק (dot IN a mater vav = long u)
+const TRANSLIT_CHOLAM = 'ֹ'; // U+05B9 -- חוֹלם מלא (dot ON a mater vav = long o)
+const TRANSLIT_YOD_DIPHTHONG_LONG = 'ֵ'; // fatha + silent ي glide (bay) -> tsere stays on the PRECEDING consonant, e.g. بَيْت "bayt" -> בֵּית "beit" -- unlike vav below, Hebrew yod-niqqud doesn't move onto the mater letter itself
+const TRANSLIT_FINAL_FORMS = { 'מ':'ם', 'נ':'ן', 'צ':'ץ', 'פ':'ף', 'כ':'ך' };
+// Word-final מ/נ/צ/פ/כ -> sofit form. Matches the letter (optionally followed by its own niqqud/
+// dagesh/gemination-mark/geresh) only when what comes next is NOT another Hebrew letter or mark --
+// i.e. it's genuinely the last letter of a word, not mid-word.
+const TRANSLIT_SOFIT_RE = /([מנצפכ])([֑-ׇّ׳״]*)(?=$|[^א-ת֑-ׇّ׳״])/g;
+function applyHebrewSofitForms(s) {
+  return s.replace(TRANSLIT_SOFIT_RE, (m, letter, trail) => TRANSLIT_FINAL_FORMS[letter] + trail);
+}
 
 function transliterateArabicHebrew(str) {
   if (!str) return str;
@@ -267,20 +279,45 @@ function transliterateArabicHebrew(str) {
     const u = units[i];
     // Silent lam of the definite article: لْ immediately before an assimilating sun letter
     // that itself carries shadda (e.g. اَلشَّمْس "ash-shams") -- written but not pronounced.
+    // Kept visible in parens rather than dropped outright (Madrasa convention: "(ל)").
     if (u.base === 'ل' && u.marks.includes(TRANSLIT_SUKUN)) {
       const next = units[i + 1];
-      if (next && TRANSLIT_SUN_LETTERS.has(next.base) && next.marks.includes(TRANSLIT_SHADDA)) continue;
+      if (next && TRANSLIT_SUN_LETTERS.has(next.base) && next.marks.includes(TRANSLIT_SHADDA)) { out += '(ל)'; continue; }
     }
     if (TRANSLIT_PUNCT[u.base]) { out += TRANSLIT_PUNCT[u.base]; continue; }
+    // آ (alif-madda, hamza + long "a") is inherently long -- rendered as patach+bare-alef ("אַא"),
+    // not a single bare א, to visually distinguish it from a plain short/long a. Confirmed against
+    // Madrasa's guide table (آخر -> אַאחֵ׳ר).
+    if (u.base === 'آ') { out += 'אַא'; continue; }
     const entry = TRANSLIT_CONSONANTS[u.base];
     if (!entry) { out += u.base; continue; } // space/Latin/digits/other punctuation -- passthrough
+    // A mater vav directly after this consonant: Hebrew moves the vowel mark onto the vav itself
+    // (שׁוּרוּק / חוֹלם מלא) rather than leaving it on the preceding consonant (קוּבּוץ / חוֹלם חסר),
+    // which is only correct when there's no following mater at all. Yod-niqqud doesn't behave this
+    // way (handled separately below) -- this vav-specific move is real, not a simplification.
     const vowelMark = u.marks.find(m => TRANSLIT_VOWEL_MARKS[m]);
-    const niqqud = vowelMark ? TRANSLIT_VOWEL_MARKS[vowelMark] : '';
+    let niqqud = vowelMark ? TRANSLIT_VOWEL_MARKS[vowelMark] : '';
+    const next = units[i + 1];
+    const nextIsMaterVav = next && next.base === 'و' && !next.marks.find(m => TRANSLIT_VOWEL_MARKS[m]);
+    if (nextIsMaterVav && (vowelMark === 'ُ' || vowelMark === 'ٌ')) { niqqud = ''; next.renderVavAs = 'shuruk'; }
+    else if (nextIsMaterVav && (vowelMark === 'َ' || vowelMark === 'ً')) { niqqud = ''; next.renderVavAs = 'cholam'; }
+    else if (vowelMark === 'َ' || vowelMark === 'ً') {
+      const nextIsMaterYod = next && next.base === 'ي' && next.marks.includes(TRANSLIT_SUKUN) && !next.marks.find(m => TRANSLIT_VOWEL_MARKS[m]);
+      if (nextIsMaterYod) niqqud = TRANSLIT_YOD_DIPHTHONG_LONG;
+    }
+    if (u.base === 'و' && u.renderVavAs) {
+      out += entry.letter + (u.renderVavAs === 'shuruk' ? TRANSLIT_DAGESH : TRANSLIT_CHOLAM);
+      continue;
+    }
     const mod = entry.mod || '';
     const letter = (u.base === 'ة' && vowelMark) ? 'ת' : entry.letter;
-    out += u.marks.includes(TRANSLIT_SHADDA) ? (letter + mod + letter + niqqud + mod) : (letter + niqqud + mod);
+    const dagesh = entry.forceDagesh ? TRANSLIT_DAGESH : '';
+    // Gemination (shadda): single letter + niqqud + the actual Arabic shadda mark reused on top
+    // of it, not a doubled letter -- matches Madrasa's live dictionary data and is far less dense
+    // on screen than the old letter+mod+letter+niqqud+mod.
+    out += u.marks.includes(TRANSLIT_SHADDA) ? (letter + dagesh + niqqud + TRANSLIT_GEMINATION_MARK + mod) : (letter + dagesh + niqqud + mod);
   }
-  return out;
+  return applyHebrewSofitForms(out);
 }
 
 const TRANSLIT_EN_CONSONANTS = {

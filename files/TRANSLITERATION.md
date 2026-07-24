@@ -52,13 +52,29 @@ to Madrasa's use case:
 | و | ו | consonant /w/; also long vowel /u,o/ — see vowels below |
 | ي | י | consonant /y/; also long vowel /i,e/ — see vowels below |
 | ء (hamza) | א | |
+| آ (alif-madda) | אַא | Hamza + inherent long *a* — rendered as **two** characters (patach+bare-alef), not a single א, to distinguish it visually from a plain a. Confirmed against Madrasa's guide table (آخر → אַאחֵ׳ר). |
+| ى (alif maksura) | א | A spelling variant of long *a* (e.g. عَلَى "on"), **not** an i/y sound — despite looking like a dotless ي. Confirmed against Madrasa's guide table (على → עַלַא, ending in bare א, not י). |
 
 ## Hebrew vowels
 
 Use full Hebrew niqqud on the transliteration, matching the app's existing tashkīl-first
 philosophy (this is not a bare consonant skeleton):
-- Short vowels → niqqud points on the preceding consonant (patach/a, chirik/i, kubutz/u)
-- Long vowels → matres lectionis (א for ā, ו for ū/ō, י for ī/ē)
+- Short vowels → niqqud points on the preceding consonant (patach/a, chirik/i, kubutz/u).
+- **ב and כ always take a dagesh** (בּ/כּ), unconditionally — Arabic ب/ك are always the
+  hard b/k sound, never Hebrew's own soft v/kh alternation, so this doesn't follow
+  Hebrew grammar's positional dagesh rule (only after a sukun or word-initially); it's
+  every occurrence, regardless of position.
+- Long vowels → matres lectionis, but **vav-based long vowels move the niqqud mark onto
+  the vav itself**, matching real Hebrew orthography's distinction between "no mater"
+  (קוּבּוץ / חוֹלם-חסר, mark on the consonant) and "mater present" (שׁוּרוּק / חוֹלם-מלא,
+  mark on the vav): damma + a following bare mater-ו → שׁוּרוּק (dot inside the ו, e.g.
+  أَبُو → אַבּוּ, not אַבֻו); fatha + a silent glide-و (dialectal *aw→o*) → **cholam moves
+  onto the ו** (e.g. يَوْم → יוֹם-shape). **Yod does not behave this way** — hiriq/tsere
+  before a mater-י stay on the preceding consonant regardless (fatha + silent glide-ي,
+  dialectal *ay→e* → tsere stays on the consonant, e.g. بَيْت → בֵּית "beit"). This
+  vav/yod asymmetry is standard Hebrew spelling, not a simplification worth "fixing."
+- **Word-final מ/נ/צ/פ/כ → sofit forms** (ם/ן/ץ/ף/ך), including when the letter carries
+  trailing niqqud, a gemination mark, or a geresh mod (e.g. أَرْض → אַרץ׳).
 
 Because the source Arabic is already fully voweled to reflect real dialect pronunciation
 (including shadda and ال-assimilation), transliteration can mostly be a **mechanical
@@ -135,14 +151,19 @@ Hebrew got two things for free that Latin script doesn't:
 
 - **ال (definite article)**: reflect actual pronunciation, not the written ل — i.e. if the
   voweled Arabic already shows sun-letter assimilation (e.g. النهار pronounced "in-nhar"),
-  transliterate the assimilated form (doubled consonant), not a literal ל/l.
+  transliterate the assimilated form (doubled consonant), not a literal ל/l. In Hebrew the
+  silent lam is kept visible in parentheses rather than dropped outright — `(ל)` — e.g.
+  `אֵ(ל)שַّמֵס` for الشمس, matching Madrasa's convention for a written-but-unpronounced letter.
 - **ة (ta marbuta)**: construct state (followed by a vowel/suffix in the voweled text) →
   ת / **t**. Pause form (word-final, no following vowel) → ה in Hebrew; in English there's
   no equally clean silent-letter equivalent, so it's **dropped** (just the preceding vowel,
   no trailing consonant) — flagged as an open item below.
-- **Shadda (gemination)**: double the corresponding letter, driven directly by the shadda
-  already marked in the voweled Arabic. In English this can double a digraph (e.g. ش
-  geminated → "shsh"), which is intentional, not a bug.
+- **Shadda (gemination)**: in English, double the corresponding letter (can double a
+  digraph, e.g. ش geminated → "shsh" — intentional, not a bug). **In Hebrew this is NOT a
+  doubled letter** — it's a single letter + niqqud + the literal Arabic shadda character
+  (U+0651) reused directly on top of the Hebrew letter, e.g. דّ. Confirmed against
+  Madrasa's live dictionary entries (their guide page's own illustrative table uses a
+  dagesh instead, inconsistently with their real data — that's the outlier, not the rule).
 
 ## Open items to revisit against real audio
 
