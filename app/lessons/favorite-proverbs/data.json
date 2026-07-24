@@ -41,7 +41,27 @@
         "يَدَك",
         "رِجلَك"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ma-bhukkak-illa-dufrak.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.34
+          },
+          {
+            "idx": 2,
+            "t": 1.22
+          },
+          {
+            "idx": 3,
+            "t": 1.96
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "לא / כלום",
@@ -94,7 +114,27 @@
         "أسَد",
         "ذيب"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-ird-bi-en.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.74
+          },
+          {
+            "idx": 2,
+            "t": 1.48
+          },
+          {
+            "idx": 3,
+            "t": 2.1
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הקוף",
@@ -148,7 +188,27 @@
         "بِترقُص",
         "بِتِشتغِل"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/id-la-halha-ma.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.16
+          },
+          {
+            "idx": 2,
+            "t": 1.98
+          },
+          {
+            "idx": 3,
+            "t": 2.18
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "יד",
@@ -211,7 +271,39 @@
         "الشّمس",
         "البَرْد"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-bab-illi-bijilak.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.58
+          },
+          {
+            "idx": 2,
+            "t": 0.92
+          },
+          {
+            "idx": 3,
+            "t": 1.34
+          },
+          {
+            "idx": 4,
+            "t": 1.78
+          },
+          {
+            "idx": 5,
+            "t": 2.14
+          },
+          {
+            "idx": 6,
+            "t": 3.14
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הדלת",
@@ -280,7 +372,31 @@
         "عالجامِع",
         "عالسّوق"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/baad-ma-shab-wadduh.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.52
+          },
+          {
+            "idx": 2,
+            "t": 0.9
+          },
+          {
+            "idx": 3,
+            "t": 2.12
+          },
+          {
+            "idx": 4,
+            "t": 3.36
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "אחרי",
@@ -335,7 +451,23 @@
         "الصّاحِب",
         "الأَخ"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ij-jar-abl-id.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.34
+          },
+          {
+            "idx": 2,
+            "t": 2.1
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "השכן",
@@ -387,7 +519,31 @@
         "صاحِبَك",
         "عَمَّك"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/jarak-il-arib-wala.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.56
+          },
+          {
+            "idx": 2,
+            "t": 1.3
+          },
+          {
+            "idx": 3,
+            "t": 1.72
+          },
+          {
+            "idx": 4,
+            "t": 2.32
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "שכנך",
@@ -457,7 +613,43 @@
         "بَقيتي",
         "مَشيتي"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/tit-tit-zayy-ma.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.92
+          },
+          {
+            "idx": 2,
+            "t": 1.54
+          },
+          {
+            "idx": 3,
+            "t": 2.22
+          },
+          {
+            "idx": 4,
+            "t": 2.38
+          },
+          {
+            "idx": 5,
+            "t": 2.76
+          },
+          {
+            "idx": 6,
+            "t": 3.82
+          },
+          {
+            "idx": 7,
+            "t": 3.88
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "טית (קריאה קצבית)",
@@ -540,7 +732,43 @@
         "بِالتَّلج",
         "بِالهوا"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/illi-ido-bil-mayy.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.4
+          },
+          {
+            "idx": 2,
+            "t": 0.88
+          },
+          {
+            "idx": 3,
+            "t": 1.46
+          },
+          {
+            "idx": 4,
+            "t": 2.18
+          },
+          {
+            "idx": 5,
+            "t": 2.74
+          },
+          {
+            "idx": 6,
+            "t": 3
+          },
+          {
+            "idx": 7,
+            "t": 3.3
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מי ש-",
@@ -614,7 +842,31 @@
         "البَيْت",
         "السّجن"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/dukhul-il-hammam-mish.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.94
+          },
+          {
+            "idx": 2,
+            "t": 1.66
+          },
+          {
+            "idx": 3,
+            "t": 2.42
+          },
+          {
+            "idx": 4,
+            "t": 3.18
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "כניסה",
@@ -688,7 +940,47 @@
         "طَعمِتها",
         "لَونِتها"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ya-dakhil-ben-il.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.2
+          },
+          {
+            "idx": 2,
+            "t": 1.12
+          },
+          {
+            "idx": 3,
+            "t": 1.34
+          },
+          {
+            "idx": 4,
+            "t": 2.14
+          },
+          {
+            "idx": 5,
+            "t": 3.08
+          },
+          {
+            "idx": 6,
+            "t": 3.68
+          },
+          {
+            "idx": 7,
+            "t": 4.56
+          },
+          {
+            "idx": 8,
+            "t": 4.94
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הו / אתה",
@@ -763,7 +1055,27 @@
         "السّمع",
         "الفَهم"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-haki-mish-zayy.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.06
+          },
+          {
+            "idx": 2,
+            "t": 1.46
+          },
+          {
+            "idx": 3,
+            "t": 1.9
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הדיבור",
@@ -811,7 +1123,19 @@
         "بِقميص",
         "بِجاكيت"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/tizen-b-libas.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.68
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "שני אחוריים",
@@ -866,7 +1190,39 @@
         "الكِلب",
         "الأسَد"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/illi-biddo-yilab-ma.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.58
+          },
+          {
+            "idx": 2,
+            "t": 0.98
+          },
+          {
+            "idx": 3,
+            "t": 1.52
+          },
+          {
+            "idx": 4,
+            "t": 1.64
+          },
+          {
+            "idx": 5,
+            "t": 2.28
+          },
+          {
+            "idx": 6,
+            "t": 3.28
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מי ש-",
@@ -935,7 +1291,31 @@
         "الأحمَر",
         "الأصفَر"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-irsh-il-abyad.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.94
+          },
+          {
+            "idx": 2,
+            "t": 1.76
+          },
+          {
+            "idx": 3,
+            "t": 2.96
+          },
+          {
+            "idx": 4,
+            "t": 3.62
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הגרוש / המטבע",
@@ -1003,7 +1383,39 @@
         "العُصفور",
         "القِطّة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/zayy-is-samake-bass.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.66
+          },
+          {
+            "idx": 2,
+            "t": 1.72
+          },
+          {
+            "idx": 3,
+            "t": 2.78
+          },
+          {
+            "idx": 4,
+            "t": 3.52
+          },
+          {
+            "idx": 5,
+            "t": 3.64
+          },
+          {
+            "idx": 6,
+            "t": 4.36
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "כמו",
@@ -1073,7 +1485,31 @@
         "دُكتور",
         "مُعَلِّم"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/isal-mijarrib-wala-tisal.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.2
+          },
+          {
+            "idx": 2,
+            "t": 1.78
+          },
+          {
+            "idx": 3,
+            "t": 2.84
+          },
+          {
+            "idx": 4,
+            "t": 3.56
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "שאל",
@@ -1125,7 +1561,19 @@
         "كْبيرة",
         "غَريبة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/id-dinya-dawwara.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.28
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "העולם",
@@ -1170,7 +1618,27 @@
         "مَعَك",
         "قُدّامَك"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/yom-ilak-w-yom.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.96
+          },
+          {
+            "idx": 2,
+            "t": 1.32
+          },
+          {
+            "idx": 3,
+            "t": 2.2
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "יום",
@@ -1223,7 +1691,27 @@
         "مُصيبة",
         "حِكاية"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/kill-takhira-fiha-khira.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.84
+          },
+          {
+            "idx": 2,
+            "t": 1.84
+          },
+          {
+            "idx": 3,
+            "t": 2.56
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "כל",
@@ -1273,7 +1761,23 @@
         "طَريق",
         "سِرّ"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/is-sabir-miftah-il.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.64
+          },
+          {
+            "idx": 2,
+            "t": 1.96
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הסבלנות",
@@ -1328,7 +1832,35 @@
         "البِنت",
         "الشّيخ"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ta-yiji-is-sabi.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.24
+          },
+          {
+            "idx": 2,
+            "t": 1.26
+          },
+          {
+            "idx": 3,
+            "t": 2.02
+          },
+          {
+            "idx": 4,
+            "t": 2.8
+          },
+          {
+            "idx": 5,
+            "t": 3.02
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "עד",
@@ -1387,7 +1919,23 @@
         "الطّيّب",
         "الغَني"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/umr-ish-shai-baa.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.72
+          },
+          {
+            "idx": 2,
+            "t": 1.48
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "החיים",
@@ -1448,7 +1996,43 @@
         "حَامِي",
         "مَلِك"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/hatt-rasak-ben-ir.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.36
+          },
+          {
+            "idx": 2,
+            "t": 1.14
+          },
+          {
+            "idx": 3,
+            "t": 1.42
+          },
+          {
+            "idx": 4,
+            "t": 2.24
+          },
+          {
+            "idx": 5,
+            "t": 3.02
+          },
+          {
+            "idx": 6,
+            "t": 3.3
+          },
+          {
+            "idx": 7,
+            "t": 4.1
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "שים",
@@ -1525,7 +2109,35 @@
         "ذَهَب",
         "فِضّة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/min-barra-rukham-w.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.3
+          },
+          {
+            "idx": 2,
+            "t": 0.76
+          },
+          {
+            "idx": 3,
+            "t": 1.96
+          },
+          {
+            "idx": 4,
+            "t": 2.64
+          },
+          {
+            "idx": 5,
+            "t": 3.12
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מ-",
@@ -1599,7 +2211,43 @@
         "تِبن",
         "رَماد"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/min-barra-tasha-tasha.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.32
+          },
+          {
+            "idx": 2,
+            "t": 0.9
+          },
+          {
+            "idx": 3,
+            "t": 1.7
+          },
+          {
+            "idx": 4,
+            "t": 2.38
+          },
+          {
+            "idx": 5,
+            "t": 3.16
+          },
+          {
+            "idx": 6,
+            "t": 3.7
+          },
+          {
+            "idx": 7,
+            "t": 4.4
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מ-",
@@ -1673,7 +2321,31 @@
         "الصّحن",
         "الكاس"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/tihki-ma-it-tanjara.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.92
+          },
+          {
+            "idx": 2,
+            "t": 1.32
+          },
+          {
+            "idx": 3,
+            "t": 2.22
+          },
+          {
+            "idx": 4,
+            "t": 3.54
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "תדבר",
@@ -1740,7 +2412,39 @@
         "بِنتي",
         "أُختي"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-haki-ilik-ya.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.76
+          },
+          {
+            "idx": 2,
+            "t": 1.16
+          },
+          {
+            "idx": 3,
+            "t": 1.8
+          },
+          {
+            "idx": 4,
+            "t": 2.52
+          },
+          {
+            "idx": 5,
+            "t": 3.38
+          },
+          {
+            "idx": 6,
+            "t": 3.56
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הדברים",
@@ -1815,7 +2519,39 @@
         "يِغَنّي",
         "يِلعَب"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/illi-ma-byirif-yirus.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.46
+          },
+          {
+            "idx": 2,
+            "t": 0.58
+          },
+          {
+            "idx": 3,
+            "t": 1.3
+          },
+          {
+            "idx": 4,
+            "t": 2.16
+          },
+          {
+            "idx": 5,
+            "t": 3.26
+          },
+          {
+            "idx": 6,
+            "t": 4.22
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מי ש-",
@@ -1875,7 +2611,19 @@
         "مُشكِلة",
         "تَعَب"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-haraka-baraka.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "התנועה",
@@ -1923,7 +2671,31 @@
         "جيبَك",
         "بيتَك"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ala-add-lihafak-midd.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.68
+          },
+          {
+            "idx": 2,
+            "t": 1.46
+          },
+          {
+            "idx": 3,
+            "t": 2.36
+          },
+          {
+            "idx": 4,
+            "t": 3.68
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "לפי",
@@ -1978,7 +2750,23 @@
         "رَجَع",
         "نِسي"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/illi-fat-mat.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.76
+          },
+          {
+            "idx": 2,
+            "t": 1.22
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מה ש-",
@@ -2024,7 +2812,15 @@
         "عُيون",
         "قُلوب"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-hitan-ilha-widan.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הקירות",
@@ -2079,7 +2875,35 @@
         "بَطّة",
         "حَمامة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/bedit-il-yom-ahsan.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.64
+          },
+          {
+            "idx": 2,
+            "t": 1.5
+          },
+          {
+            "idx": 3,
+            "t": 2.34
+          },
+          {
+            "idx": 4,
+            "t": 2.52
+          },
+          {
+            "idx": 5,
+            "t": 3.36
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "ביצה",
@@ -2147,7 +2971,35 @@
         "خَمسة",
         "مِيّة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/usfur-bil-id-wala.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.18
+          },
+          {
+            "idx": 2,
+            "t": 2.1
+          },
+          {
+            "idx": 3,
+            "t": 2.94
+          },
+          {
+            "idx": 4,
+            "t": 3.52
+          },
+          {
+            "idx": 5,
+            "t": 3.64
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "ציפור",
@@ -2222,7 +3074,43 @@
         "القَريب",
         "الجّار"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/is-sahib-illi-ma.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.88
+          },
+          {
+            "idx": 2,
+            "t": 1.62
+          },
+          {
+            "idx": 3,
+            "t": 1.72
+          },
+          {
+            "idx": 4,
+            "t": 2.32
+          },
+          {
+            "idx": 5,
+            "t": 3.04
+          },
+          {
+            "idx": 6,
+            "t": 3.98
+          },
+          {
+            "idx": 7,
+            "t": 4.1
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "החבר",
@@ -2290,7 +3178,23 @@
         "فَرَّحها",
         "وَجَّعها"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/ija-ykahhilha-amaha.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1
+          },
+          {
+            "idx": 2,
+            "t": 2.14
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "בא",
@@ -2354,7 +3258,47 @@
         "فْلوس",
         "وَقِت"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/illi-ija-min-ger.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.84
+          },
+          {
+            "idx": 2,
+            "t": 1.2
+          },
+          {
+            "idx": 3,
+            "t": 1.34
+          },
+          {
+            "idx": 4,
+            "t": 1.8
+          },
+          {
+            "idx": 5,
+            "t": 2.3
+          },
+          {
+            "idx": 6,
+            "t": 3.16
+          },
+          {
+            "idx": 7,
+            "t": 3.38
+          },
+          {
+            "idx": 8,
+            "t": 3.86
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מה ש-",
@@ -2432,7 +3376,31 @@
         "الكِلبة",
         "الفار"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/mithl-il-itta-btakul.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.66
+          },
+          {
+            "idx": 2,
+            "t": 1.64
+          },
+          {
+            "idx": 3,
+            "t": 2.62
+          },
+          {
+            "idx": 4,
+            "t": 3.24
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "כמו",
@@ -2487,7 +3455,23 @@
         "الكِلب",
         "الحِمار"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-biss-bokil-ashah.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.02
+          },
+          {
+            "idx": 2,
+            "t": 1.54
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "החתול",
@@ -2539,7 +3523,31 @@
         "السّرير",
         "الكَنَبة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/khudh-il-asile-w.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.48
+          },
+          {
+            "idx": 2,
+            "t": 1.44
+          },
+          {
+            "idx": 3,
+            "t": 2.88
+          },
+          {
+            "idx": 4,
+            "t": 2.94
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "קח",
@@ -2594,7 +3602,23 @@
         "صَحن",
         "كاس"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/tanjara-w-laat-gataha.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 1.06
+          },
+          {
+            "idx": 2,
+            "t": 2.02
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "סיר",
@@ -2643,7 +3667,27 @@
         "للعُرس",
         "للسّفر"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/btifrah-lal-id-wil.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.92
+          },
+          {
+            "idx": 2,
+            "t": 1.64
+          },
+          {
+            "idx": 3,
+            "t": 2.82
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "אתה שמח",
@@ -2699,7 +3743,27 @@
         "السّوق",
         "المَدرَسة"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/rayih-a-l-hajj.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 2,
+            "t": 0.6
+          },
+          {
+            "idx": 3,
+            "t": 1.26
+          },
+          {
+            "idx": 4,
+            "t": 1.92
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "הולך",
@@ -2760,7 +3824,31 @@
         "السّوّاقين",
         "الخيّاطين"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/min-kuthr-it-tabbakhin.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.24
+          },
+          {
+            "idx": 2,
+            "t": 0.92
+          },
+          {
+            "idx": 3,
+            "t": 1.8
+          },
+          {
+            "idx": 4,
+            "t": 2.82
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "מ-",
@@ -2830,7 +3918,43 @@
         "بتِشتغِل",
         "بتِسرِق"
       ],
-      "audio": null,
+      "audio": {
+        "src": "audio/il-id-illi-btiti.mp3",
+        "wordTimes": [
+          {
+            "idx": 0,
+            "t": 0
+          },
+          {
+            "idx": 1,
+            "t": 0.6
+          },
+          {
+            "idx": 2,
+            "t": 0.8
+          },
+          {
+            "idx": 3,
+            "t": 1.22
+          },
+          {
+            "idx": 4,
+            "t": 1.7
+          },
+          {
+            "idx": 5,
+            "t": 1.8
+          },
+          {
+            "idx": 6,
+            "t": 2.28
+          },
+          {
+            "idx": 7,
+            "t": 2.46
+          }
+        ]
+      },
       "wordGlosses": [
         {
           "he": "היד",
