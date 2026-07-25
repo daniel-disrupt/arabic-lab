@@ -17,12 +17,12 @@
      corner (outside normal flow) so it never travels, and the title/subtitle are centered so
      flipping their direction/alignment (via body.lang-en below) changes how the text reads in
      place instead of yanking it from one edge of the screen to the other. */
-  .lib-wrap { position: relative; max-width: 720px; margin: 0 auto; padding: 48px 24px 64px; }
+  .lib-wrap { position: relative; max-width: 720px; margin: 0 auto; padding: 88px 24px 64px; }
   .lib-header { text-align: center; margin-bottom: 40px; }
   .lib-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
   .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; }
   body.lang-en .lib-subtitle { direction: ltr; }
-  .lang-switch { position: absolute; top: 48px; right: 24px; display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; }
+  .lang-switch { position: absolute; top: 20px; right: 20px; display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; }
   .lang-switch-btn { border: none; background: none; font: inherit; font-size: 13px; color: var(--mid); padding: 5px 12px; border-radius: 13px; cursor: pointer; transition: background .12s, color .12s; }
   .lang-switch-btn.active { background: var(--black); color: #fff; }
   .lib-list { display: flex; flex-direction: column; gap: 14px; }
