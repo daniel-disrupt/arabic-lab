@@ -61,7 +61,10 @@ body.lang-en .mobile-header-title { direction: ltr; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 20px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0;
 }
-.side-menu-title { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+.side-menu-title {
+  font-size: 15px; font-weight: 700; letter-spacing: .02em;
+  color: inherit; text-decoration: none; cursor: pointer;
+}
 .side-menu-close {
   width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent;
   color: var(--mid); font-size: 20px; line-height: 1; cursor: pointer;
