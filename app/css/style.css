@@ -13,6 +13,28 @@ html, body {
 }
 button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action: manipulation; }
 
+/* ── BRAND MARK (عربي joined to ערבי letter-by-letter, + LAB) ──
+   Design requirement: any new lesson view/menu gets this mark at the top, not a plain "Arabic Lab"
+   text label -- it's the one piece of the UI that reads the same regardless of site language. */
+.brand-mark {
+  display: inline-flex; align-items: center; gap: 0.32em;
+  direction: ltr; /* keeps the totem row before LAB regardless of the page's own RTL direction */
+  line-height: 1; user-select: none;
+}
+.brand-mark .bm-row { display: flex; gap: 0.13em; }
+.brand-mark .bm-totem { display: flex; flex-direction: column; align-items: center; }
+.brand-mark .bm-ar {
+  font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+  font-size: 1em; line-height: 0.78;
+}
+.brand-mark .bm-he {
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  font-weight: 600; font-size: 0.78em; line-height: 0.78; margin-top: -0.16em;
+}
+.brand-mark .bm-lab { font-weight: 800; letter-spacing: 0.03em; font-size: 1.55em; }
+.brand-mark.lg { font-size: 34px; }
+.brand-mark.sm { font-size: 18px; }
+
 /* ── HEADER ── */
 .header {
   flex-shrink: 0; height: 52px; background: #fff;
