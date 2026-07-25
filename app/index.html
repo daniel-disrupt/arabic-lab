@@ -19,7 +19,25 @@
      place instead of yanking it from one edge of the screen to the other. */
   .lib-wrap { position: relative; max-width: 720px; margin: 0 auto; padding: 88px 24px 64px; }
   .lib-header { text-align: center; margin-bottom: 40px; }
-  .lib-title { font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  /* Brand mark (عربي joined to ערבי letter-by-letter, + LAB) -- kept identical to the copy in
+     css/style.css since this page doesn't link that stylesheet. Design requirement: any new
+     lesson view/menu gets this mark at the top instead of a plain "Arabic Lab" text label. */
+  .brand-mark {
+    display: inline-flex; align-items: center; gap: 0.32em;
+    direction: ltr; line-height: 1; user-select: none;
+  }
+  .brand-mark .bm-row { display: flex; gap: 0.13em; }
+  .brand-mark .bm-totem { display: flex; flex-direction: column; align-items: center; }
+  .brand-mark .bm-ar {
+    font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+    font-size: 1em; line-height: 0.78;
+  }
+  .brand-mark .bm-he {
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    font-weight: 600; font-size: 0.78em; line-height: 0.78; margin-top: -0.16em;
+  }
+  .brand-mark .bm-lab { font-weight: 800; letter-spacing: 0.03em; font-size: 1.55em; }
+  .brand-mark.lg { font-size: 34px; }
   .lib-subtitle { font-size: 14px; color: var(--mid); margin-top: 6px; direction: rtl; }
   body.lang-en .lib-subtitle { direction: ltr; }
   .lang-switch { position: absolute; top: 20px; right: 20px; display: flex; border: 1px solid var(--rule); border-radius: 16px; padding: 2px; }
@@ -39,7 +57,15 @@
 <div class="lib-wrap">
   <div class="lib-header">
     <div>
-      <div class="lib-title">Arabic Lab</div>
+      <div class="lib-title brand-mark lg">
+        <div class="bm-row" dir="rtl">
+          <div class="bm-totem"><span class="bm-ar">ع</span><span class="bm-he">ע</span></div>
+          <div class="bm-totem"><span class="bm-ar">ر</span><span class="bm-he">ר</span></div>
+          <div class="bm-totem"><span class="bm-ar">ب</span><span class="bm-he">בּ</span></div>
+          <div class="bm-totem"><span class="bm-ar">ي</span><span class="bm-he">י</span></div>
+        </div>
+        <span class="bm-lab">LAB</span>
+      </div>
       <div class="lib-subtitle" id="lib-subtitle"></div>
     </div>
     <div class="lang-switch" id="lang-switch">
