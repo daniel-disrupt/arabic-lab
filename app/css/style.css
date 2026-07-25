@@ -544,8 +544,11 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 .proverb-explain-row.icon-row { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; }
 .proverb-explain-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: var(--mid); }
 /* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
-   isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. */
-.proverb-explain-text { flex: 1; min-width: 0; overflow-wrap: break-word; font-size: 16px; line-height: 1.6; }
+   isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. min-width: 0
+   is the same flex-shrink fix .proverb-words needs above -- without it this text, as a row
+   sibling of the fixed-width icon, won't shrink below its own content width and can overflow
+   the card instead of wrapping. overflow-wrap covers any single token too long to fit at all. */
+.proverb-explain-text { flex: 1; min-width: 0; font-size: 16px; line-height: 1.6; overflow-wrap: break-word; }
 .stub-view { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; }
 
 /* ── FLASHCARDS TAB ── */
