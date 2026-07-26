@@ -1964,6 +1964,23 @@ function proverbWordsHtml(p, forceArabic, clickableWords) {
     return html;
   }).join(' ');
 }
+// Flashcards-only, mirrors proverbWordsHtml's gi indexing word-for-word so a tapped Arabic word
+// (handleFlashcardWordTap) can highlight its matching transliterated word too -- the two lines
+// describe the very same word, so both should light up together, not just the Arabic. Each word is
+// transliterated on its own (not the whole line at once, like preferredTranslit's other caller) --
+// fine in practice since this app's cross-word transliteration rules (e.g. assimilation) are
+// about letters within a single word, not across word boundaries.
+function proverbTranslitWordsHtml(p, highlightGi) {
+  let gi = 0;
+  return p.arWords.map((tok) => {
+    if (tok.sep !== undefined) return preferredTranslit(tok.sep);
+    const idx = gi++;
+    const text = preferredTranslit(tok.w);
+    const punct = tok.punct ? preferredTranslit(tok.punct) : '';
+    const cls = 'flashcard-translit-word' + (highlightGi === idx ? ' tapped' : '');
+    return '<span class="' + cls + '" data-gi="' + idx + '">' + text + '</span>' + punct;
+  }).join(' ');
+}
 function proverbExplainHtml(p) {
   const en = appLang === 'en';
   const literal = en ? p.literalEn : p.literalHe;
@@ -2171,25 +2188,51 @@ function toggleFlashcardFlip() {
       const trayEl = document.getElementById('flashcard-word-tray');
       if (trayEl) trayEl.classList.remove('open');
       document.querySelectorAll('#flashcard-words .proverb-word-clickable.tapped').forEach(w => w.classList.remove('tapped'));
+      document.querySelectorAll('#flashcard-translit-line .flashcard-translit-word.tapped').forEach(w => w.classList.remove('tapped'));
       flashcardWordTrayGi = null;
     }
   } else {
     document.getElementById('flashcard-reveal-info').classList.toggle('open', flashcardFlipped);
   }
 }
+// Anchors the gloss tray directly above the tapped word (below it instead, if there isn't room
+// above) rather than pinning it to a fixed spot on the card -- a fixed placement used to sit right
+// on top of the transliteration line regardless of where the tapped word actually was. Pure pixel
+// geometry via getBoundingClientRect, which is already physical left/right regardless of RTL, so
+// no direction-specific math is needed. Full screen only -- the normal in-page card's tray stays
+// the original accordion below the text, which has room to scroll if needed.
+function positionFlashcardWordTray(wordEl, trayEl) {
+  const front = document.querySelector('.flashcard-face-front');
+  if (!front) return;
+  const frontRect = front.getBoundingClientRect();
+  const wordRect = wordEl.getBoundingClientRect();
+  const trayRect = trayEl.getBoundingClientRect();
+  const margin = 10;
+  let top = wordRect.top - frontRect.top - trayRect.height - margin;
+  if (top < margin) top = wordRect.bottom - frontRect.top + margin;
+  let left = wordRect.left - frontRect.left + wordRect.width / 2 - trayRect.width / 2;
+  left = Math.max(margin, Math.min(left, frontRect.width - trayRect.width - margin));
+  trayEl.style.top = top + 'px';
+  trayEl.style.left = left + 'px';
+}
 function handleFlashcardWordTap(e, gi) {
   e.stopPropagation();
   const p = PROVERBS[flashcardOrder[flashcardIdx]];
   const trayEl = document.getElementById('flashcard-word-tray');
   document.querySelectorAll('#flashcard-words .proverb-word-clickable.tapped').forEach(w => w.classList.remove('tapped'));
+  document.querySelectorAll('#flashcard-translit-line .flashcard-translit-word.tapped').forEach(w => w.classList.remove('tapped'));
   if (flashcardWordTrayGi === gi) { flashcardWordTrayGi = null; trayEl.classList.remove('open'); return; }
   flashcardWordTrayGi = gi;
   const wordEl = document.querySelector('#flashcard-words [data-gi="' + gi + '"]');
   if (wordEl) wordEl.classList.add('tapped');
+  // Same word, other script -- see .flashcard-translit-word.tapped in style.css.
+  const translitWordEl = document.querySelector('#flashcard-translit-line [data-gi="' + gi + '"]');
+  if (translitWordEl) translitWordEl.classList.add('tapped');
   const en = appLang === 'en';
   const gloss = p.wordGlosses && p.wordGlosses[gi];
   trayEl.textContent = gloss ? (en ? gloss.en : gloss.he) : (en ? 'Not glossed yet' : 'טרם תורגם');
   trayEl.dir = en ? 'ltr' : 'rtl';
+  if (flashcardFullscreenOn && wordEl) positionFlashcardWordTray(wordEl, trayEl);
   trayEl.classList.add('open');
 }
 // Always the Hebrew transliteration unless the site's learning-alphabet toggle is specifically
@@ -2270,7 +2313,6 @@ function renderFlashcardsView() {
   const p = PROVERBS[gi];
   const starred = flashcardStarred.has(gi);
   const hasAudio = !!(p.audio && p.audio.src);
-  const plainText = p.arWords.map(t => t.w).join(' ');
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
   const proseDir = en ? 'ltr' : 'rtl';
   const fullscreen = flashcardFullscreenOn;
@@ -2308,7 +2350,7 @@ function renderFlashcardsView() {
   const frontFaceHtml =
     '<div class="flashcard-text-group">' +
       '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
-      '<div class="flashcard-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
+      '<div class="flashcard-translit-line" id="flashcard-translit-line" dir="' + translitDir + '">' + proverbTranslitWordsHtml(p, flashcardWordTrayGi) + '</div>' +
     '</div>' +
     '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>';
   const infoRowsHtml =

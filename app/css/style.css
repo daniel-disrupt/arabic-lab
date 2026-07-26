@@ -779,12 +779,20 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .proverb-word-clickable { cursor: pointer; transition: background .1s; }
 .proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
 .proverb-word-clickable.tapped { background: var(--black); color: var(--on-accent); border-radius: 4px; }
+/* Mirrors .proverb-word-clickable.tapped so tapping a word highlights both scripts as the same
+   word -- see proverbTranslitWordsHtml/handleFlashcardWordTap in app.js. Not itself clickable
+   (the Arabic word is the tap target both texts describe the same underlying word), just the
+   highlight half of that pair. */
+.flashcard-translit-word.tapped { background: var(--black); color: var(--on-accent); border-radius: 3px; }
 .flashcard-translit-line { font-size: 19px; color: var(--mid); }
 #flashcards-inner .flashcard-translit-line { font-size: calc(19px * var(--fc-text-scale)); }
 /* Word-gloss tray and the info reveal panel both use the same animated max-height accordion as
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
-   already in the DOM (see toggleFlashcardInfo/handleFlashcardWordTap), so the browser has a
-   real starting height to transition from instead of the layout just snapping. */
+   already in the DOM (see toggleFlashcardFlip/handleFlashcardWordTap), so the browser has a
+   real starting height to transition from instead of the layout just snapping. In full screen,
+   the word-gloss tray becomes a positioned popover instead -- see .flashcard-face-front
+   .flashcard-word-tray further down -- but the info-reveal accordion here still applies as-is to
+   the normal in-page card. */
 .flashcard-word-tray {
   max-height: 0; overflow: hidden; opacity: 0; width: 100%;
   font-size: 15px; background: var(--active-bg); border-radius: 8px;
@@ -841,34 +849,61 @@ body.lang-en .flashcard-nav { direction: ltr; }
 /* ── FLASHCARDS FULL SCREEN: FLIP CARD ── (renderFlashcardsView's full-screen branch only -- these
    classes never render outside full screen, so they don't touch the plain .flashcard/
    .flashcard-icon-row/.flashcard-reveal that the normal in-page card and the Fill-in-the-Blank/
-   Word-Scramble tabs still use unchanged.) Grid-stacking both faces in the same cell
-   (grid-area: 1 / 1) lets the container auto-size to the taller face with no JS height
-   measurement, while still cooperating with the full-screen .flashcard's own flex:1 sizing below. */
+   Word-Scramble tabs still use unchanged.) flex:1 lets the flip-inner grow to fill the full-screen
+   .flashcard's own flex:1 height (rather than shrink-wrapping to content and leaving .flashcard to
+   center a shorter block, which used to leave each face's own box only as tall as its text --
+   too little headroom for positionFlashcardWordTray, in app.js, to ever place the gloss popover
+   above a word instead of below it). grid-template-rows/columns: minmax(0,1fr) then makes the
+   single grid cell -- both faces stack into it via grid-area: 1 / 1 -- stretch to fill that full
+   height, so each face's own justify-content: center still centers its content, just within the
+   whole card's height instead of a shrink-wrapped one. */
 .flashcard-flippable { perspective: 1400px; }
 .flashcard-flip-inner {
-  display: grid; width: 100%;
+  display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 1fr);
+  width: 100%; flex: 1 1 auto; min-height: 0;
   transition: transform .5s cubic-bezier(.4,.2,.2,1);
   transform-style: preserve-3d;
 }
 .flashcard-flip-inner.flipped { transform: rotateY(180deg); }
 .flashcard-face {
-  grid-area: 1 / 1; width: 100%; min-height: 0; position: relative;
+  grid-area: 1 / 1; width: 100%; height: 100%; min-height: 0; position: relative;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .flashcard-face-back { transform: rotateY(180deg); }
 .flashcard-face-front .flashcard-text-group { margin-bottom: 0; }
-/* Word-gloss tray floats over the front face instead of pushing it taller (the normal card's
-   accordion approach) -- this is what lets the proverb sit centered and full-sized while still
-   leaving the tap-a-word gloss reachable without scrolling. Overrides the base accordion rule's
-   max-height/margin -- see .flashcard-word-tray above -- for this context specifically. */
+/* The gloss tray is positioned per-tap by positionFlashcardWordTray (app.js), anchored directly
+   above/below the tapped word instead of pinned to a fixed spot on the card -- a fixed bottom
+   placement used to sit right on top of the transliteration line. top/left here are just
+   placeholder defaults; JS overwrites them inline every time the tray opens. Floating freely over
+   the text (rather than the previous edge-pinned bar) is why this gets its own shadow/z-index --
+   it needs to read as a popover, not part of the card's flat layout. Overrides the base accordion
+   rule's max-height/width -- see .flashcard-word-tray above -- for this context specifically. */
+/* padding is set unconditionally here (unlike the base rule's .open-only padding) -- this popover
+   doesn't animate its own size open/closed like the accordion does, only opacity/transform, and
+   positionFlashcardWordTray (app.js) measures this element's real rendered box (including padding)
+   to place it, before the .open class is added -- if padding only appeared once .open lands, that
+   measurement would be too small and the popover would end up a few px off from where it was
+   actually aimed. */
 .flashcard-face-front .flashcard-word-tray {
-  position: absolute; left: 12px; right: 12px; bottom: 8px; margin: 0; max-height: none; overflow: visible;
-  opacity: 0; transform: translateY(6px) scale(.97); pointer-events: none;
-  transition: opacity .18s, transform .18s;
+  position: absolute; top: 0; left: 0; width: auto; max-width: 82%; margin: 0; max-height: none; overflow: visible;
+  padding: 10px 16px; opacity: 0; transform: scale(.94); pointer-events: none;
+  box-shadow: 0 6px 20px rgba(0,0,0,.18); z-index: 2;
+  transition: opacity .16s, transform .16s;
 }
-.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
-.flashcard-face-back .flashcard-info-rows { width: 100%; }
+.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+/* Base .flashcard-face centers everything (fine for the front's Arabic+translit block), but
+   info-rows' prose reads better justified to the reading-direction edge -- RTL/Hebrew flush right,
+   LTR/English flush left -- like the normal card's .flashcard-reveal-inner already does (text-align:
+   start there). This back face skips that wrapper (see its divider/margin-top note further up), so
+   it needs its own text-align: start rather than inheriting .flashcard's centered default. Bigger,
+   viewport-scaled text (clamp, matching how .flashcard-words/-translit-line scale in full screen)
+   puts the back face's own generous whitespace to use instead of sitting at a fixed small size. */
+.flashcard-face-back .flashcard-info-rows { width: 100%; text-align: start; }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: clamp(14px, 3vw, 30px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: clamp(10px, 2vw, 18px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: clamp(20px, 3vw, 30px); height: clamp(20px, 3vw, 30px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: clamp(16px, 3.4vw, 27px); line-height: 1.65; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
    A CSS-driven fixed overlay rather than relying solely on the real Fullscreen API -- the
