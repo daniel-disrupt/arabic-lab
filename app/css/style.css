@@ -616,16 +616,19 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    its border-bottom rule lines up edge to edge with the cards instead of reading as a narrower,
    floating strip. The text column keeps its own fixed width (--theme-card-w, set in app.js off
    the widest theme title across BOTH languages -- see computeThemeCardWidth's note in app.js for
-   why the width can't just track the current language), and the whole group (text + chevron) is
-   pinned to the row's *start* edge via justify-content: flex-start rather than centered --
-   centering read as decorative rather than a scannable list, and stranded the tap target in the
-   middle of a wide row. The chevron sits outside the text column as its own flex item at the
-   side of the group (previously it was stacked between the title and teaser, which read as
-   clutter rather than an "expand this group" control). A hover/focus background on the full row
-   gives this collapsed state the same "yes, tap here" affordance every other tappable card in
-   the app already has. */
+   why the width can't just track the current language), and justify-content: space-between (the
+   row has exactly two flex children -- .proverb-theme-text and .proverb-theme-side) pins the
+   text to the row's start edge and pushes the count+chevron all the way to the far edge, flush
+   with the row's own border rather than sitting close beside the title. That mirrors where the
+   expand chevron lands on each individual .proverb-card below (pushed to the card's true edge by
+   its own flex:1 text group) instead of floating in the middle of a wide row the way a plain
+   centered or flex-start layout would. The chevron sits outside the text column as its own flex
+   item at the side of the group (previously it was stacked between the title and teaser, which
+   read as clutter rather than an "expand this group" control). A hover/focus background on the
+   full row gives this collapsed state the same "yes, tap here" affordance every other tappable
+   card in the app already has. */
 .proverb-theme-head {
-  display: flex; align-items: center; justify-content: flex-start; gap: 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
   width: 100%; padding: 12px 16px; border-radius: 10px; border-bottom: 1px solid var(--rule);
   cursor: pointer; user-select: none; transition: background .12s;
 }
@@ -635,8 +638,9 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    so this row's flex order -- text column, then the count+chevron side -- puts the side on the
    left by default, matching Hebrew's right-to-left flow. English UI reads left-to-right, where
    the count+chevron (the row's trailing "expand" control) belongs on the right instead, so flip
-   just this row's own direction rather than the app-wide layout. flex-start above then follows
-   that same flip: right-aligned in Hebrew, left-aligned in English, instead of centered. */
+   just this row's own direction rather than the app-wide layout. space-between above then follows
+   that same flip: text right-aligned with the chevron flush left in Hebrew, text left-aligned
+   with the chevron flush right in English, instead of centered or clustered together. */
 body.lang-en .proverb-theme-head { direction: ltr; }
 .proverb-theme-text {
   display: flex; flex-direction: column; gap: 7px; align-items: flex-start; text-align: start;
