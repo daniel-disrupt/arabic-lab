@@ -1944,20 +1944,17 @@ function proverbWordsHtml(p, forceArabic, clickableWords) {
 function proverbExplainHtml(p) {
   const en = appLang === 'en';
   const literal = en ? p.literalEn : p.literalHe;
-  const meaning = en ? p.enGloss : p.heGloss;
-  const usage = en ? p.usageEn : p.usageHe;
-  // All three rows reuse an icon instead of a spelled-out label -- literal/meaning match the same
+  const explanation = en ? p.explanationEn : p.explanationHe;
+  // Both rows reuse an icon instead of a spelled-out label -- literal/explanation match the same
   // book/bulb icons as the Flashcards/Fill-in-the-Blank/Scramble reveal buttons (FC_BOOK_ICON_SVG /
-  // FC_BULB_ICON_SVG), usage gets its own speech-bubble icon (FC_USAGE_ICON_SVG) since no other tab
-  // surfaces a usage row -- one visual vocabulary for "literal translation" / "what it means" /
-  // "when you'd say it" across the whole lesson.
+  // FC_BULB_ICON_SVG) -- one visual vocabulary for "literal translation" and "what it means and
+  // when you'd say it" across the whole lesson. Meaning and usage are one combined field, not two.
   const iconRow = (icon, iconLabel, text) => text
     ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + (en ? 'ltr' : 'rtl') + '">' + text + '</span></div>'
     : '';
   return '<div class="proverb-explain">' +
     iconRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literal) +
-    iconRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaning) +
-    iconRow(FC_USAGE_ICON_SVG, en ? 'When to use it' : 'מתי אומרים את זה', usage) +
+    iconRow(FC_BULB_ICON_SVG, en ? 'Explanation' : 'הסבר', explanation) +
     '</div>';
 }
 function proverbCardHtml(p) {
@@ -2139,7 +2136,6 @@ function preferredTranslit(text) {
 }
 const FC_BOOK_ICON_SVG = '<svg width="17" height="15" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2C8 1.6 5 1.1 1.5 1.5V13.3c3.5-.4 6.5.1 8.5 1.7"/><path d="M10 3.2c2-1.6 5-2.1 8.5-1.7V13.3c-3.5-.4-6.5.1-8.5 1.7"/><path d="M10 3.2v11.8"/></svg>';
 const FC_BULB_ICON_SVG = '<svg width="14" height="17" viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1a5 5 0 00-3 9c.7.6 1 1.3 1 2.2v.6h4v-.6c0-.9.3-1.6 1-2.2A5 5 0 008 1z"/><path d="M6 15.5h4M6.5 17.5h3"/></svg>';
-const FC_USAGE_ICON_SVG = '<svg width="17" height="14" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.2c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v7.6c0 1.1-.9 2-2 2H8l-4 3.2v-3.2h-1.5c-1.1 0-2-.9-2-2V3.2z"/></svg>';
 const FC_STAR_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 1.5l2.5 5.6 6 .6-4.5 4.1 1.3 6.1-5.3-3.2-5.3 3.2 1.3-6.1-4.5-4.1 6-.6z"/></svg>';
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
@@ -2169,7 +2165,7 @@ function renderFlashcardsView() {
   const proseDir = en ? 'ltr' : 'rtl';
 
   const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
-  const meaningText = en ? p.enGloss : p.heGloss;
+  const meaningText = en ? p.explanationEn : p.explanationHe;
   const reveal = (which, open, label, text) =>
     '<div class="flashcard-reveal' + (open ? ' open' : '') + '" id="flashcard-reveal-' + which + '">' +
       '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
@@ -2344,7 +2340,7 @@ function renderFillBlankView() {
   let payoffHtml = '';
   if (answered) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
-    const meaningText = en ? p.enGloss : p.heGloss;
+    const meaningText = en ? p.explanationEn : p.explanationHe;
     const revealPanel = (which, show, label, text) =>
       '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="fillblank-reveal-' + which + '">' +
         '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
@@ -2497,7 +2493,7 @@ function renderScrambleView() {
   let payoffHtml = '';
   if (solved) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
-    const meaningText = en ? p.enGloss : p.heGloss;
+    const meaningText = en ? p.explanationEn : p.explanationHe;
     const revealPanel = (which, show, label, text) =>
       '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="scramble-reveal-' + which + '">' +
         '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
