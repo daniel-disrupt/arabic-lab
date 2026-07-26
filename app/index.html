@@ -48,6 +48,12 @@
   body.lang-en .lib-card { direction: ltr; text-align: left; }
   .lib-card:hover { background: var(--active-bg); border-color: var(--black); }
   .lib-card-title { font-size: 16px; font-weight: 600; }
+  /* Constant across the site-language toggle -- Arabic script reads the same either way, so unlike
+     .lib-card-title (localize()'d per siteLang) this line never changes when the switch is used. */
+  .lib-card-title-ar {
+    font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
+    font-size: 19px; font-weight: 600; direction: rtl; margin-bottom: 3px;
+  }
   .lib-card-subtitle { font-size: 13px; color: var(--mid); margin-top: 4px; }
   .lib-empty { font-size: 14px; color: var(--mid); }
 </style>
@@ -108,6 +114,7 @@ function renderLessonList() {
   if (!loadedLessons || !loadedLessons.length) return;
   list.innerHTML = loadedLessons.map(l => `
     <a class="lib-card" href="lesson.html?slug=${encodeURIComponent(l.slug)}">
+      ${l.titleAr ? `<div class="lib-card-title-ar">${l.titleAr}</div>` : ''}
       <div class="lib-card-title">${localize(l.title)}</div>
       <div class="lib-card-subtitle">${localize(l.subtitle)}</div>
     </a>

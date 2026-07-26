@@ -1,7 +1,7 @@
 {
   "meta": {
     "slug": "favorite-proverbs",
-    "title": "My Favorite Arabic Proverbs",
+    "title": "Everyday Palestinian Proverbs — أَمْثَال فِلَسطينِيّة",
     "subtitle": "A personal collection, chosen to learn",
     "tabs": [
       "proverbs",
@@ -4002,11 +4002,19 @@
       "dir": "ltr",
       "sections": [
         {
-          "eyebrow": "About this lesson",
-          "heading": "A personal collection of proverbs",
+          "eyebrow": "Why proverbs",
+          "heading": "A lot said in a few words",
           "paragraphs": [
-            "These are favorite Palestinian/Levantine Arabic proverbs, gathered to study the same way as the other lesson in this app: full tashkeel, Hebrew-primary glossing with English available, and audio to support pronunciation.",
-            "46 proverbs, reviewed with a native Palestinian speaker. Flashcards, fill-in-the-blank, and word-scramble are being built out next — for now this lesson covers reading each proverb, hearing it, and seeing its literal and idiomatic meaning."
+            "Proverbs are beautiful because they compress so much into so little — a handful of words carrying real weight, and along the way teaching you what a culture values and how it sees the world.",
+            "They're worth learning because pulling out the right one, for the right person, at the right moment, is its own small act of connection. It surprises people, it makes them smile, and it shows you've actually gone deep into Palestinian culture — not just the vocabulary, but the sensibility behind it. And the words themselves stay useful well beyond the proverb they came from."
+          ]
+        },
+        {
+          "eyebrow": "Why these proverbs",
+          "heading": "Proverbs I'd actually say",
+          "paragraphs": [
+            "I picked proverbs that map onto day-to-day life — neighbors, patience, hard work, luck — rather than ones I'd never realistically reach for.",
+            "I've also mostly left out proverbs that lean on Allah or overt religious framing. I'm not Muslim, I'm not religious, and I wouldn't talk that way in Hebrew — so there's no reason to start in Arabic. I'd rather express myself authentically, as I am, in this new language, which means favoring proverbs that are more universal and secular."
           ]
         }
       ]
@@ -4015,14 +4023,26 @@
       "dir": "rtl",
       "sections": [
         {
-          "eyebrow": "אודות השיעור הזה",
-          "heading": "אוסף אישי של פתגמים",
+          "eyebrow": "למה פתגמים",
+          "heading": "הרבה במעט מילים",
           "paragraphs": [
-            "אלה פתגמים אהובים בערבית פלסטינית/לבנטינית מדוברת, שנאספו כדי ללמוד אותם באותה שיטה כמו בשיעור האחר באפליקציה: תשכיל מלא, תרגום בעברית כשפה ראשית עם אנגלית זמינה, ושמע לתמיכה בהגייה.",
-            "46 פתגמים, שנבדקו מול דובר פלסטיני יליד. הכרטיסיות, השלמת המילים ומשחק סידור המילים עדיין בבנייה — בינתיים השיעור הזה מאפשר לקרוא כל פתגם, לשמוע אותו, ולראות את המשמעות המילולית והאידיומטית שלו."
+            "פתגמים יפים כי הם דוחסים המון למעט מאוד מילים — כמה מילים שנושאות משקל אמיתי, ובדרך גם מלמדות אותך מה תרבות מסוימת מעריכה ואיך היא רואה את העולם.",
+            "שווה ללמוד אותם כי לשלוף את הפתגם הנכון, לאדם הנכון, ברגע הנכון, זה רגע קטן משל עצמו של חיבור. זה מפתיע, זה גורם לבן אדם לחייך, וזה מראה שבאמת צללת לתוך התרבות הפלסטינית — לא רק לאוצר המילים, אלא לתחושה שמאחוריו. והמילים עצמן נשארות שימושיות הרבה מעבר לפתגם שממנו הן הגיעו."
+          ]
+        },
+        {
+          "eyebrow": "למה דווקא הפתגמים האלה",
+          "heading": "פתגמים שבאמת הייתי אומר",
+          "paragraphs": [
+            "בחרתי פתגמים שקשורים לחיי היומיום — שכנים, סבלנות, עבודה קשה, מזל — ולא כאלה שלעולם לא הייתי נזקק להם באמת.",
+            "כמעט ולא נכנסו לכאן פתגמים שנשענים על אללה או על מסגרת דתית מפורשת. אני לא מוסלמי, אני לא דתי, ולא הייתי מדבר ככה בעברית — אז אין סיבה שאתחיל לדבר ככה בערבית. אני מעדיף לבטא את עצמי בצורה אותנטית, כפי שאני, גם בשפה החדשה הזאת — וזה אומר להעדיף פתגמים אוניברסליים וחילוניים יותר."
           ]
         }
       ]
     }
+  },
+  "proverbsIntro": {
+    "en": "Everyday Palestinian proverbs, chosen for real day-to-day life rather than textbook piety — no religious language required. Tap a theme below to open it up.",
+    "he": "פתגמים פלסטיניים יומיומיים, שנבחרו לחיי היומיום האמיתיים ולא לאדיקות של ספר לימוד — בלי צורך בשפה דתית. הקישו על נושא כדי לפתוח אותו."
   }
 }
