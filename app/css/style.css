@@ -146,7 +146,14 @@ body.lang-en .mobile-header-title { direction: ltr; }
 /* The drawer is only ~260px wide after padding -- a label plus 3 buttons side by side (the
    header popover's layout) doesn't fit at any reasonable button text length, so stack label
    above buttons here instead of shrinking text to chase a moving target. */
-.side-menu-settings .switch-group { flex-direction: column; align-items: flex-start; gap: 8px; }
+.side-menu-settings .switch-group { flex-direction: column; align-items: flex-end; gap: 8px; }
+/* The drawer itself is RTL-oriented regardless of UI language -- .side-menu-item above stays
+   text-align:right and border-right-highlighted even in English, since it's anchored to the
+   hamburger's side. These settings rows match that same unconditional RTL treatment: label
+   right-aligned and the button row itself reversed, in both Hebrew and English, rather than
+   flipping to LTR in English like the desktop popover's .lang-switch/.script-switch do. */
+.side-menu-settings .lang-switch,
+.side-menu-settings .script-switch { flex-direction: row-reverse; }
 
 /* ── HEADER BRAND LINK (desktop only — mobile already reaches the library via the
    side-menu title's own .brand-mark, see side-menu-title above) ──
