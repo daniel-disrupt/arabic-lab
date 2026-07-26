@@ -2202,8 +2202,7 @@ let fillblankOrder = [];
 let fillblankIdx = 0;
 let fillblankChoiceOrder = [];
 let fillblankSelectedIdx = null;
-let fillblankShowLiteral = false;
-let fillblankShowMeaning = false;
+let fillblankShowInfo = false;
 // Cycle-retry state: cycle 1 is the full 46-proverb deck; every subsequent cycle's pool is only
 // the proverbs missed (wrong OR skipped) last time around, shuffled fresh, until a whole cycle
 // comes back with nothing wrong. fillblankResults is keyed by the proverb's PROVERBS-array index
@@ -2227,8 +2226,7 @@ function setupFillBlankCard() {
   const p = PROVERBS[fillblankOrder[fillblankIdx]];
   fillblankChoiceOrder = shuffleArray(p.blankChoices);
   fillblankSelectedIdx = null;
-  fillblankShowLiteral = false;
-  fillblankShowMeaning = false;
+  fillblankShowInfo = false;
 }
 function goToFillBlank(delta) {
   if (delta > 0 && fillblankIdx === fillblankOrder.length - 1) { advanceFillBlankCycle(); return; }
@@ -2263,13 +2261,13 @@ function selectFillBlankChoice(orderIdx) {
   fillblankResults[fillblankOrder[fillblankIdx]] = fillblankChoiceOrder[orderIdx] === p.blankChoices[0];
   renderFillBlankView();
 }
-// Same non-destructive class-toggle approach as toggleFlashcardInfo -- these fire AFTER the
-// answer-lock render already happened, so the icon row/reveal panels are already in the DOM;
-// toggling them must not re-render the whole card or the reveal loses its animation again.
-function toggleFillBlankReveal(which) {
-  const show = which === 'literal' ? (fillblankShowLiteral = !fillblankShowLiteral) : (fillblankShowMeaning = !fillblankShowMeaning);
-  document.getElementById('fillblank-reveal-' + which).classList.toggle('open', show);
-  document.querySelector('.fillblank-icon-row [data-fb-btn="' + which + '"]').classList.toggle('active', show);
+// Same non-destructive class-toggle approach as toggleFlashcardInfo -- this fires AFTER the
+// answer-lock render already happened, so the icon row/reveal panel are already in the DOM;
+// toggling it must not re-render the whole card or the reveal loses its animation again.
+function toggleFillBlankInfo() {
+  fillblankShowInfo = !fillblankShowInfo;
+  document.getElementById('fillblank-reveal-info').classList.toggle('open', fillblankShowInfo);
+  document.querySelector('.fillblank-icon-row [data-fb-btn="info"]').classList.toggle('active', fillblankShowInfo);
 }
 function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
@@ -2328,32 +2326,34 @@ function renderFillBlankView() {
     ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
     : '';
 
-  // Payoff after answering: icon buttons (same book/lightbulb pattern as Flashcards) rather than
-  // dumping both the literal breakdown and the full explanation at once -- a learner who just
-  // wants to confirm they got it right isn't forced past a wall of text to reach Next.
+  // Payoff after answering: single "i" info button revealing both rows at once (same merged
+  // pattern as Flashcards) rather than a wall of text dumped immediately -- a learner who just
+  // wants to confirm they got it right isn't forced past it to reach Next.
   let payoffHtml = '';
   if (answered) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
     const meaningText = en ? p.explanationEn : p.explanationHe;
-    const revealPanel = (which, show, label, text) =>
-      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="fillblank-reveal-' + which + '">' +
-        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
-      '</div>';
+    const explainRow = (icon, iconLabel, text) => text
+      ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + proseDir + '">' + text + '</span></div>'
+      : '';
     payoffHtml =
       '<div class="flashcard-icon-row fillblank-icon-row">' +
-        '<button class="flashcard-icon-btn' + (fillblankShowLiteral ? ' active' : '') + '" data-fb-btn="literal" onclick="toggleFillBlankReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
-        '<button class="flashcard-icon-btn' + (fillblankShowMeaning ? ' active' : '') + '" data-fb-btn="meaning" onclick="toggleFillBlankReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+        (hasAudio
+          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<button class="flashcard-icon-btn' + (fillblankShowInfo ? ' active' : '') + '" data-fb-btn="info" onclick="toggleFillBlankInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
       '</div>' +
-      revealPanel('literal', fillblankShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
-      revealPanel('meaning', fillblankShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+      '<div class="flashcard-reveal' + (fillblankShowInfo ? ' open' : '') + '" id="fillblank-reveal-info">' +
+        '<div class="flashcard-reveal-inner flashcard-info-rows">' +
+          explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
+          explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText) +
+        '</div>' +
+      '</div>';
   }
 
   el.innerHTML =
     '<div class="flashcard-progress">' + (en ? 'Cycle ' : 'מחזור ') + fillblankCycle + ' · ' + (fillblankIdx + 1) + ' / ' + fillblankOrder.length + '</div>' +
     '<div class="flashcard">' +
-      (hasAudio && answered
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
-        : '') +
       '<div class="flashcard-text-group">' +
         '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
         '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
@@ -2384,13 +2384,12 @@ function renderFillBlankView() {
    order by construction, so "the next expected chunk" is simply scramblePlaced.length -- no
    separate lookup array needed the way word-level indices required.
    Same shuffled-deck-per-entry + arrow-key paging as Flashcards/Fill-in-the-Blank, and the same
-   book/lightbulb icon reveal for the payoff once solved. */
+   merged info-button reveal for the payoff once solved. */
 let scrambleOrder = [];
 let scrambleIdx = 0;
 let scrambleTileOrder = [];
 let scramblePlaced = [];
-let scrambleShowLiteral = false;
-let scrambleShowMeaning = false;
+let scrambleShowInfo = false;
 // [startIdx, endIdx] (inclusive) into arWords for each chunk -- falls back to one word per chunk
 // if a proverb somehow lacks scrambleChunks, rather than crashing.
 function scrambleChunkRanges(p) {
@@ -2419,8 +2418,7 @@ function setupScrambleCard() {
     scrambleTileOrder = shuffleArray(chunkIndices);
   }
   scramblePlaced = [];
-  scrambleShowLiteral = false;
-  scrambleShowMeaning = false;
+  scrambleShowInfo = false;
 }
 function shuffleScrambleDeck() {
   scrambleOrder = shuffleArray(PROVERBS.map((_, i) => i));
@@ -2439,10 +2437,10 @@ function resetScrambleCard() {
   setupScrambleCard();
   renderScrambleView();
 }
-function toggleScrambleReveal(which) {
-  const show = which === 'literal' ? (scrambleShowLiteral = !scrambleShowLiteral) : (scrambleShowMeaning = !scrambleShowMeaning);
-  document.getElementById('scramble-reveal-' + which).classList.toggle('open', show);
-  document.querySelector('.scramble-icon-row [data-sc-btn="' + which + '"]').classList.toggle('active', show);
+function toggleScrambleInfo() {
+  scrambleShowInfo = !scrambleShowInfo;
+  document.getElementById('scramble-reveal-info').classList.toggle('open', scrambleShowInfo);
+  document.querySelector('.scramble-icon-row [data-sc-btn="info"]').classList.toggle('active', scrambleShowInfo);
 }
 function handleScrambleTap(ci, btnEl) {
   if (ci === scramblePlaced.length) {
@@ -2488,26 +2486,28 @@ function renderScrambleView() {
   if (solved) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
     const meaningText = en ? p.explanationEn : p.explanationHe;
-    const revealPanel = (which, show, label, text) =>
-      '<div class="flashcard-reveal' + (show ? ' open' : '') + '" id="scramble-reveal-' + which + '">' +
-        '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
-      '</div>';
+    const explainRow = (icon, iconLabel, text) => text
+      ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + proseDir + '">' + text + '</span></div>'
+      : '';
     payoffHtml =
       '<div class="fillblank-feedback">' + (en ? 'Solved!' : 'פתרת!') + '</div>' +
       '<div class="flashcard-icon-row scramble-icon-row">' +
-        '<button class="flashcard-icon-btn' + (scrambleShowLiteral ? ' active' : '') + '" data-sc-btn="literal" onclick="toggleScrambleReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
-        '<button class="flashcard-icon-btn' + (scrambleShowMeaning ? ' active' : '') + '" data-sc-btn="meaning" onclick="toggleScrambleReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+        (hasAudio
+          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
+        '<button class="flashcard-icon-btn' + (scrambleShowInfo ? ' active' : '') + '" data-sc-btn="info" onclick="toggleScrambleInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
       '</div>' +
-      revealPanel('literal', scrambleShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
-      revealPanel('meaning', scrambleShowMeaning, en ? 'Meaning' : 'משמעות', meaningText);
+      '<div class="flashcard-reveal' + (scrambleShowInfo ? ' open' : '') + '" id="scramble-reveal-info">' +
+        '<div class="flashcard-reveal-inner flashcard-info-rows">' +
+          explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
+          explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText) +
+        '</div>' +
+      '</div>';
   }
 
   el.innerHTML =
     '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
     '<div class="flashcard">' +
-      (hasAudio && solved
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
-        : '') +
       '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
       (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
       (!solved
