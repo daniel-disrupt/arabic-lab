@@ -567,6 +567,7 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
+.proverbs-intro { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 24px; }
 /* Width is fixed (--theme-card-w, set in app.js off the widest theme title across BOTH languages)
    and the card is centered under that title's own text rather than stretched full-bleed -- see
    computeThemeCardWidth's note in app.js for why the width can't just track the current language. */

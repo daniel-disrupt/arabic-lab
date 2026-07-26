@@ -12,9 +12,10 @@
   },
   {
     "slug": "favorite-proverbs",
+    "titleAr": "أَمْثَال فِلَسطينِيّة",
     "title": {
-      "en": "My Favorite Arabic Proverbs",
-      "he": "הפתגמים הערביים האהובים עליי"
+      "en": "Everyday Palestinian Proverbs",
+      "he": "פתגמים יומיומיים"
     },
     "subtitle": {
       "en": "A personal collection, chosen to learn",

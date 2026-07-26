@@ -9,6 +9,7 @@ let LESSON_BASE = ''; // 'lessons/<slug>/' -- needed to resolve each proverb's o
 let HOME_CONTENT = { en: { title: '', subtitle: '', intro: [] }, he: { title: '', subtitle: '', intro: [] } };
 let INTRO_CONTENT = { en: { title: '', text: '' }, he: { title: '', text: '' } };
 let ABOUT_CONTENT = { en: { dir: 'ltr', sections: [] }, he: { dir: 'rtl', sections: [] } };
+let PROVERBS_INTRO = { en: '', he: '' };
 let HEADER_GLOSS = { title: null, location: null };
 
 /* ─────────────── READER STATE ─────────────── */
@@ -2007,6 +2008,11 @@ function renderProverbsView() {
   const list = document.getElementById('proverbs-list');
   if (!list) return;
   const en = appLang === 'en';
+  const introEl = document.getElementById('proverbs-intro');
+  if (introEl) {
+    introEl.textContent = PROVERBS_INTRO[appLang] || '';
+    introEl.dir = en ? 'ltr' : 'rtl';
+  }
   const groups = PROVERB_THEME_ORDER.map(t => ({ theme: t, proverbs: [] }));
   const groupByKey = new Map(groups.map(g => [g.theme.key, g]));
   const other = { theme: { key: 'other', en: 'Other', he: 'שונות' }, proverbs: [] };
@@ -2579,6 +2585,7 @@ function initLesson(bundle) {
   HOME_CONTENT = bundle.homeContent || HOME_CONTENT;
   INTRO_CONTENT = bundle.introContent || INTRO_CONTENT;
   ABOUT_CONTENT = bundle.aboutContent || ABOUT_CONTENT;
+  PROVERBS_INTRO = bundle.proverbsIntro || PROVERBS_INTRO;
   HEADER_GLOSS = bundle.headerGloss || HEADER_GLOSS;
   PROVERBS = bundle.proverbs || [];
 
