@@ -2037,7 +2037,7 @@ function stubViewHtml() {
    Reveal panels and the word-gloss tray are ALWAYS present in the DOM (built once per card by
    renderFlashcardsView) and animate open/closed via a CSS max-height transition -- same pattern
    as the Vocab tab's .vocab-expand/.open. Toggling them only flips a class on the existing
-   element (toggleFlashcardReveal / handleFlashcardWordTap), it does NOT re-render the card --
+   element (toggleFlashcardInfo / handleFlashcardWordTap), it does NOT re-render the card --
    that's what made the earlier version feel like it was jumping: a full innerHTML rebuild on
    every click has no starting height to transition from, so the layout just snaps. */
 // Shared by Flashcards and Fill-in-the-Blank -- both browse PROVERBS through a shuffled index
@@ -2053,8 +2053,7 @@ function shuffleArray(arr) {
 }
 let flashcardOrder = [];
 let flashcardIdx = 0;
-let flashcardShowLiteral = false;
-let flashcardShowMeaning = false;
+let flashcardShowInfo = false;
 let flashcardWordTrayGi = null;
 // Round-retry state, same shape as Fill-in-the-Blank's cycle-retry (fillblankCycle/Results/Done):
 // round 1 is the full 46-proverb deck; every later round's pool is only the proverbs still
@@ -2069,8 +2068,7 @@ let flashcardDone = false;
 function shuffleFlashcardDeck() {
   flashcardOrder = shuffleArray(PROVERBS.map((_, i) => i));
   flashcardIdx = 0;
-  flashcardShowLiteral = false;
-  flashcardShowMeaning = false;
+  flashcardShowInfo = false;
   flashcardWordTrayGi = null;
   flashcardRound = 1;
   flashcardStarred = new Set();
@@ -2081,8 +2079,7 @@ function goToFlashcard(delta) {
   const next = flashcardIdx + delta;
   if (next < 0 || next >= flashcardOrder.length) return;
   flashcardIdx = next;
-  flashcardShowLiteral = false;
-  flashcardShowMeaning = false;
+  flashcardShowInfo = false;
   flashcardWordTrayGi = null;
   stopPronunciation();
   renderFlashcardsView();
@@ -2100,8 +2097,7 @@ function advanceFlashcardRound() {
     flashcardRound += 1;
     flashcardOrder = shuffleArray(remaining);
     flashcardIdx = 0;
-    flashcardShowLiteral = false;
-    flashcardShowMeaning = false;
+    flashcardShowInfo = false;
     flashcardWordTrayGi = null;
   }
   renderFlashcardsView();
@@ -2111,10 +2107,10 @@ function toggleFlashcardStar() {
   if (flashcardStarred.has(gi)) flashcardStarred.delete(gi); else flashcardStarred.add(gi);
   renderFlashcardsView();
 }
-function toggleFlashcardReveal(which) {
-  const show = which === 'literal' ? (flashcardShowLiteral = !flashcardShowLiteral) : (flashcardShowMeaning = !flashcardShowMeaning);
-  document.getElementById('flashcard-reveal-' + which).classList.toggle('open', show);
-  document.querySelector('.flashcard-icon-btn[data-fc-btn="' + which + '"]').classList.toggle('active', show);
+function toggleFlashcardInfo() {
+  flashcardShowInfo = !flashcardShowInfo;
+  document.getElementById('flashcard-reveal-info').classList.toggle('open', flashcardShowInfo);
+  document.querySelector('.flashcard-icon-btn[data-fc-btn="info"]').classList.toggle('active', flashcardShowInfo);
 }
 function handleFlashcardWordTap(e, gi) {
   e.stopPropagation();
@@ -2139,6 +2135,7 @@ function preferredTranslit(text) {
 }
 const FC_BOOK_ICON_SVG = '<svg width="17" height="15" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.2C8 1.6 5 1.1 1.5 1.5V13.3c3.5-.4 6.5.1 8.5 1.7"/><path d="M10 3.2c2-1.6 5-2.1 8.5-1.7V13.3c-3.5-.4-6.5.1-8.5 1.7"/><path d="M10 3.2v11.8"/></svg>';
 const FC_BULB_ICON_SVG = '<svg width="14" height="17" viewBox="0 0 16 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 1a5 5 0 00-3 9c.7.6 1 1.3 1 2.2v.6h4v-.6c0-.9.3-1.6 1-2.2A5 5 0 008 1z"/><path d="M6 15.5h4M6.5 17.5h3"/></svg>';
+const FC_INFO_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.3"/><path d="M10 9.2v5"/><circle cx="10" cy="6.3" r="0.9" fill="currentColor" stroke="none"/></svg>';
 const FC_USAGE_ICON_SVG = '<svg width="17" height="14" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.2c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v7.6c0 1.1-.9 2-2 2H8l-4 3.2v-3.2h-1.5c-1.1 0-2-.9-2-2V3.2z"/></svg>';
 const FC_STAR_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 1.5l2.5 5.6 6 .6-4.5 4.1 1.3 6.1-5.3-3.2-5.3 3.2 1.3-6.1-4.5-4.1 6-.6z"/></svg>';
 function renderFlashcardsView() {
@@ -2170,10 +2167,12 @@ function renderFlashcardsView() {
 
   const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
   const meaningText = en ? p.enGloss : p.heGloss;
-  const reveal = (which, open, label, text) =>
-    '<div class="flashcard-reveal' + (open ? ' open' : '') + '" id="flashcard-reveal-' + which + '">' +
-      '<div class="flashcard-reveal-inner"><div class="flashcard-reveal-label">' + label + '</div><div class="flashcard-reveal-text" dir="' + proseDir + '">' + (text || '') + '</div></div>' +
-    '</div>';
+  // Icon + text rows, no spelled-out label -- same visual vocabulary as the Proverbs tab's
+  // proverbExplainHtml (FC_BOOK_ICON_SVG / FC_BULB_ICON_SVG, .proverb-explain-row/-icon/-text),
+  // so "literal translation" and "what it means" read identically across both tabs.
+  const explainRow = (icon, iconLabel, text) => text
+    ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + proseDir + '">' + text + '</span></div>'
+    : '';
 
   el.innerHTML =
     '<div class="flashcard-progress">' + (en ? 'Round ' : 'סבב ') + flashcardRound + ' · ' + (flashcardIdx + 1) + ' / ' + flashcardOrder.length + '</div>' +
@@ -2187,12 +2186,15 @@ function renderFlashcardsView() {
         (hasAudio
           ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
           : '') +
-        '<button class="flashcard-icon-btn' + (flashcardShowLiteral ? ' active' : '') + '" data-fc-btn="literal" onclick="toggleFlashcardReveal(\'literal\')" aria-label="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '" title="' + (en ? 'Literal meaning' : 'פירוש מילולי') + '">' + FC_BOOK_ICON_SVG + '</button>' +
-        '<button class="flashcard-icon-btn' + (flashcardShowMeaning ? ' active' : '') + '" data-fc-btn="meaning" onclick="toggleFlashcardReveal(\'meaning\')" aria-label="' + (en ? 'Explanation' : 'הסבר') + '" title="' + (en ? 'Explanation' : 'הסבר') + '">' + FC_BULB_ICON_SVG + '</button>' +
+        '<button class="flashcard-icon-btn' + (flashcardShowInfo ? ' active' : '') + '" data-fc-btn="info" onclick="toggleFlashcardInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
         '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>' +
       '</div>' +
-      reveal('literal', flashcardShowLiteral, en ? 'Literally' : 'פירוש מילולי', literalText) +
-      reveal('meaning', flashcardShowMeaning, en ? 'Meaning' : 'משמעות', meaningText) +
+      '<div class="flashcard-reveal' + (flashcardShowInfo ? ' open' : '') + '" id="flashcard-reveal-info">' +
+        '<div class="flashcard-reveal-inner flashcard-info-rows">' +
+          explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
+          explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText) +
+        '</div>' +
+      '</div>' +
     '</div>' +
     '<div class="flashcard-nav">' +
       '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
@@ -2273,7 +2275,7 @@ function selectFillBlankChoice(orderIdx) {
   fillblankResults[fillblankOrder[fillblankIdx]] = fillblankChoiceOrder[orderIdx] === p.blankChoices[0];
   renderFillBlankView();
 }
-// Same non-destructive class-toggle approach as toggleFlashcardReveal -- these fire AFTER the
+// Same non-destructive class-toggle approach as toggleFlashcardInfo -- these fire AFTER the
 // answer-lock render already happened, so the icon row/reveal panels are already in the DOM;
 // toggling them must not re-render the whole card or the reveal loses its animation again.
 function toggleFillBlankReveal(which) {

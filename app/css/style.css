@@ -598,9 +598,9 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
 .proverb-word-clickable.tapped { background: var(--black); color: #fff; border-radius: 4px; }
 .flashcard-translit-line { font-size: 19px; color: var(--mid); }
-/* Word-gloss tray and the two reveal panels all use the same animated max-height accordion as
+/* Word-gloss tray and the info reveal panel both use the same animated max-height accordion as
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
-   already in the DOM (see toggleFlashcardReveal/handleFlashcardWordTap), so the browser has a
+   already in the DOM (see toggleFlashcardInfo/handleFlashcardWordTap), so the browser has a
    real starting height to transition from instead of the layout just snapping. */
 .flashcard-word-tray {
   max-height: 0; overflow: hidden; opacity: 0; width: 100%;
@@ -627,6 +627,10 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .flashcard-reveal-inner { width: 100%; text-align: start; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--rule); }
 .flashcard-reveal-label { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--mid); margin-bottom: 4px; }
 .flashcard-reveal-text { font-size: 16px; line-height: 1.6; }
+/* Flashcards' single info reveal stacks icon-rows the same way as the Proverbs tab's
+   .proverb-explain -- reuses .proverb-explain-row/-icon/-text directly for one consistent
+   "icon + text, no label" visual language across both tabs. */
+.flashcard-info-rows { display: flex; flex-direction: column; gap: 10px; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 .flashcard-nav-btn {
   flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
