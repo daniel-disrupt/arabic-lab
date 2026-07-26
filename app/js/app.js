@@ -2293,17 +2293,19 @@ function renderFillBlankView() {
   const hasAudio = !!(p.audio && p.audio.src);
   const answered = fillblankSelectedIdx != null;
   const correctWord = p.blankChoices[0];
-  const dir = scriptDir();
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
   const proseDir = en ? 'ltr' : 'rtl';
 
+  // Card sentence is always real Arabic script regardless of the global learning-alphabet
+  // toggle (same forceArabic convention as Flashcards' proverbWordsHtml) -- the transliteration
+  // line right below it is what follows scriptMode, so the two never show the same script twice.
   const sentenceHtml = p.arWords.map((tok, i) => {
     if (tok.sep !== undefined) return '<span class="proverb-sep">' + tok.sep + '</span>';
     if (i === p.blankIdx) {
-      const shown = answered ? arText(correctWord) : '____';
+      const shown = answered ? correctWord : '____';
       return '<span class="fillblank-blank' + (answered ? ' filled' : '') + '" data-gi="' + i + '">' + shown + '</span>' + (tok.punct || '');
     }
-    return '<span class="proverb-word" data-gi="' + i + '">' + arText(tok.w) + '</span>' + (tok.punct || '');
+    return '<span class="proverb-word" data-gi="' + i + '">' + tok.w + '</span>' + (tok.punct || '');
   }).join(' ');
   // Mirrors the sentence's own blanking -- the transliteration must not give away the answer
   // before it's picked, so it masks the same word rather than transliterating the full phrase.
@@ -2355,7 +2357,7 @@ function renderFillBlankView() {
     '<div class="flashcard-progress">' + (en ? 'Cycle ' : 'מחזור ') + fillblankCycle + ' · ' + (fillblankIdx + 1) + ' / ' + fillblankOrder.length + '</div>' +
     '<div class="flashcard">' +
       '<div class="flashcard-text-group">' +
-        '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
+        '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="rtl">' + sentenceHtml + '</div>' +
         '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
       '</div>' +
       '<div class="fillblank-choices">' + choicesHtml + '</div>' +
@@ -2399,12 +2401,17 @@ function scrambleChunkRanges(p) {
   sizes.forEach((size) => { ranges.push([start, start + size - 1]); start += size; });
   return ranges;
 }
-function scrambleChunkText(p, ci, useTranslit) {
+// forceArabic bypasses the global learning-alphabet toggle for the built/answer row -- like
+// Flashcards' proverbWordsHtml, that row is always real Arabic with its own translit line below
+// it, so the two never show the same script twice. The scramble-tile pool keeps following
+// scriptMode (arText) since those tiles have no separate translit line of their own.
+function scrambleChunkText(p, ci, useTranslit, forceArabic) {
   const [s, e] = scrambleChunkRanges(p)[ci];
   const parts = [];
   for (let i = s; i <= e; i++) {
     const tok = p.arWords[i];
-    parts.push((useTranslit ? preferredTranslit(tok.w) : arText(tok.w)) + (tok.punct || ''));
+    const text = useTranslit ? preferredTranslit(tok.w) : (forceArabic ? tok.w : arText(tok.w));
+    parts.push(text + (tok.punct || ''));
   }
   return parts.join(' ');
 }
@@ -2461,7 +2468,6 @@ function renderScrambleView() {
   const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const proseDir = en ? 'ltr' : 'rtl';
-  const dir = scriptDir();
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
 
   const chunkCount = scrambleChunkRanges(p).length;
@@ -2470,7 +2476,7 @@ function renderScrambleView() {
   const builtHtml = scramblePlaced.length
     ? scramblePlaced.map((ci) => {
         const [s, e] = scrambleChunkRanges(p)[ci];
-        return '<span class="proverb-word" data-gi-start="' + s + '" data-gi-end="' + e + '">' + scrambleChunkText(p, ci, false) + '</span>';
+        return '<span class="proverb-word" data-gi-start="' + s + '" data-gi-end="' + e + '">' + scrambleChunkText(p, ci, false, true) + '</span>';
       }).join(' ')
     : '<span class="scramble-built-empty">' + (en ? 'Tap the pieces in order' : 'הקישו על החלקים לפי הסדר') + '</span>';
   const builtTranslit = scramblePlaced.length
@@ -2508,7 +2514,7 @@ function renderScrambleView() {
   el.innerHTML =
     '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
     '<div class="flashcard">' +
-      '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
+      '<div class="scramble-built proverb-words" id="scramble-built" dir="rtl">' + builtHtml + '</div>' +
       (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
       (!solved
         ? '<div class="scramble-tiles">' + poolHtml + '</div>' +
