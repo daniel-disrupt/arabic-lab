@@ -18,3 +18,24 @@ it with a plain "Arabic Lab" text label.
   every lesson (lessons are `data.json` files under `app/lessons/`, not separate HTML
   pages), so in the common case this is automatic; if a lesson ever gains its own
   standalone menu or header outside that shell, carry `.brand-mark` over to it too.
+
+## Reader mode
+
+A black-background/light-text theme, toggled from the mobile hamburger drawer (below
+the site-language and learning-alphabet switches) to cut glare and OLED battery draw
+during reading. It is a standing design element of that drawer, not a one-off lesson
+feature.
+
+- Implemented entirely via CSS custom properties in `app/css/style.css` (`--black`,
+  `--bg`, `--on-accent`/`--on-accent-rgb`, `--tint-rgb`), re-pointed by a single
+  `body.reader-mode` class — components read these variables rather than hardcoded
+  colors, so no component-level dark-mode rules are needed.
+- Toggle + persistence logic lives in `app/js/app.js` (`toggleReaderMode`/
+  `applyReaderMode`, `localStorage` key `arabicLabReaderMode`); markup is the
+  `.reader-mode-toggle` switch in `app/lesson.html`'s `.side-menu-settings`.
+- **Requirement:** same rule as `.brand-mark` above — since `app/lesson.html` is the
+  shared shell for every lesson, this toggle is automatic for every lesson (existing and
+  new) with no per-lesson work. If a lesson ever gains its own standalone menu/header
+  outside that shell, carry the reader-mode toggle over too, and make sure any new
+  colored UI in that menu is expressed through the variables above (not literal
+  `#fff`/black) so it inherits the theme instead of breaking it.
