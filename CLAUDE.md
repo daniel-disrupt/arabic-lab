@@ -39,3 +39,24 @@ feature.
   outside that shell, carry the reader-mode toggle over too, and make sure any new
   colored UI in that menu is expressed through the variables above (not literal
   `#fff`/black) so it inherits the theme instead of breaking it.
+
+## Selectable lesson text
+
+`app/css/style.css` defaults `body` to `user-select: none` so taps on buttons/tabs/tiles
+fire the intended action instead of a native text selection. Lesson *content* — anything
+meant to be read, like proverb cards, flashcards, fill-in-the-blank sentences,
+word-scramble answers, vocab entries, and verb conjugation cards — is meant to be
+highlightable and copyable, not locked down by that default.
+
+- Content containers opt back into `user-select: text` individually (see the
+  "SELECTABLE LESSON TEXT" comment above the `html, body` rule in `style.css` for the
+  full list: `.proverb-card`, `.flashcard`, `.fillblank-sentence`, `.scramble-built`,
+  `.vocab-item`, `.verb-card`, plus the existing `.lesson-head`/`.watch-head`/
+  `.about-wrap`). The rule cascades, so putting it on the card/container is enough —
+  don't add it line-by-line to every child span.
+- **Requirement:** any new lesson view or tab gets the same treatment — its readable
+  content container should carry `user-select: text` (and `-webkit-user-select: text`),
+  not just inherit the global `none`.
+- **Exception:** don't add this to text that has its own drag/tap gesture, which native
+  selection would fight with — the Reader's word-drag phrase-lookup and the Watch
+  transcript's word-range selection are deliberately left `user-select: none`.
