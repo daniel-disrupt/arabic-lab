@@ -118,6 +118,19 @@ body.lang-en .mobile-header-title { direction: ltr; }
    above buttons here instead of shrinking text to chase a moving target. */
 .side-menu-settings .switch-group { flex-direction: column; align-items: flex-start; gap: 8px; }
 
+/* ── HEADER BRAND LINK (desktop only — mobile already reaches the library via the
+   side-menu title's own .brand-mark, see side-menu-title above) ──
+   Reuses the shared .brand-mark totem (see top of file) instead of a plain text label, per the
+   same design requirement that gave the side-menu title its mark. Sits outermost in .header-side
+   (first in DOM, so first along the RTL row = rightmost), with the settings icon right after it --
+   reads as "brand at the true corner, controls just inside it" rather than the two competing for
+   the same edge. */
+.header-brand {
+  display: flex; align-items: center; color: inherit; text-decoration: none; cursor: pointer;
+  padding: 4px 6px; border-radius: 6px; flex-shrink: 0; transition: background .12s;
+}
+.header-brand:hover { background: var(--active-bg); }
+
 /* ── HEADER SETTINGS MENU (site language + learning alphabet) ──
    Both switches live behind one icon button rather than inline in the header -- with the tabs
    nav in the same row, five buttons plus two labels competed with the tabs for visual primacy
@@ -894,6 +907,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
      header it ends up near the screen edge and the panel runs off-canvas. Hidden here in favor
      of the equivalent controls duplicated into #side-menu's .side-menu-settings instead. */
   .settings-wrap { display: none; }
+  .header-brand { display: none; }
 
   /* — reader column: reclaim width, tighten spacing — */
   .reader { padding: 24px 0 40px; }
