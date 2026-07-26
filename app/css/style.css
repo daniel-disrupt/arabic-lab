@@ -627,11 +627,6 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-/* Same anchor/alignment mismatch as .vocab-card-head above: .proverb-words is flex:1 and, once
-   translit-en-mode left-aligns its text, needs the row itself flipped to ltr so the flex:1 box
-   is anchored on the same side its text hugs -- otherwise the words strand themselves next to
-   .proverb-chev on the left while a dead gap opens up between them and .proverb-pronounce. */
-body.translit-en-mode .proverb-card-head { direction: ltr; }
 .proverb-pronounce {
   flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
   border: 1px solid var(--rule); background: transparent; cursor: pointer;
@@ -640,13 +635,25 @@ body.translit-en-mode .proverb-card-head { direction: ltr; }
 }
 .proverb-pronounce:hover { border-color: var(--black); color: var(--black); }
 .proverb-pronounce.playing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
+/* Arabic line + translit line stacked as one caption-style unit, same pairing as
+   .flashcard-text-group -- so the head reads Arabic-first, translit-underneath regardless of
+   which line ends up present (see proverbCardHtml's translitLine). */
+.proverb-head-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .proverb-words {
-  flex: 1; min-width: 0;
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
   font-size: 22px; line-height: 1.6; direction: rtl; text-align: right;
 }
 body.translit-mode .proverb-words { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
 body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
+/* The card head's own Arabic line is always forced Arabic script (see proverbWordsHtml's
+   forceArabic param, same trick as .flashcard-words) -- these overrides win back over the
+   general .proverb-words translit-mode/translit-en-mode rules above (same specificity, declared
+   later) so the card head never flips font/direction just because the site's learning-alphabet
+   toggle changed; only the separate .proverb-translit-line underneath it does. */
+body.translit-mode .proverb-card-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .proverb-card-words { direction: rtl; text-align: right; }
+.proverb-translit-line { font-size: 15px; line-height: 1.4; color: var(--mid); direction: rtl; text-align: right; }
+body.translit-en-mode .proverb-translit-line { direction: ltr; text-align: left; }
 .proverb-word.live { box-shadow: inset 0 -3px 0 0 currentColor; border-radius: 2px; }
 .proverb-sep { color: var(--mid); }
 .proverb-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }

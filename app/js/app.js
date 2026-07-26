@@ -1974,12 +1974,23 @@ function proverbExplainHtml(p) {
 function proverbCardHtml(p) {
     const expanded = expandedProverbIds.has(p.id);
     const hasAudio = !!(p.audio && p.audio.src);
+    // The Arabic line is always forced (not following scriptMode) so the card head reads the
+    // same on every tab -- Arabic first, translit underneath -- matching Flashcards/Fillblank/
+    // Scramble. When scriptMode itself is 'ar' (no transliteration chosen), the translit line
+    // would just repeat the Arabic line above it, so it's dropped rather than shown empty.
+    const translitLine = scriptMode === 'ar' ? '' :
+      '<div class="proverb-translit-line" dir="' + (scriptMode === 'translit-en' ? 'ltr' : 'rtl') + '">' +
+        preferredTranslit(p.arWords.map(t => t.w).join(' ')) +
+      '</div>';
     return '<div class="proverb-card' + (expanded ? ' expanded' : '') + '">' +
       '<div class="proverb-card-head" onclick="toggleProverbExpand(\'' + p.id + '\')">' +
         (hasAudio
           ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'proverb-words-' + p.id + '\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
           : '') +
-        '<div class="proverb-words" id="proverb-words-' + p.id + '" dir="' + scriptDir() + '">' + proverbWordsHtml(p) + '</div>' +
+        '<div class="proverb-head-text">' +
+          '<div class="proverb-words proverb-card-words" id="proverb-words-' + p.id + '" dir="rtl">' + proverbWordsHtml(p, true) + '</div>' +
+          translitLine +
+        '</div>' +
         '<span class="proverb-chev">›</span>' +
       '</div>' +
       (expanded ? proverbExplainHtml(p) : '') +
