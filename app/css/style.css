@@ -605,13 +605,15 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
   display: flex; flex-direction: column; gap: 7px; align-items: center; text-align: center;
   width: var(--theme-card-w, auto); max-width: 100%;
 }
-.proverb-theme-top { display: flex; align-items: baseline; justify-content: center; gap: 7px; }
 .proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); }
-.proverb-theme-count { font-size: 12px; font-weight: 600; color: var(--mid); }
 /* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
    doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
    ellipsis) since the card is narrow rather than a full-width single line. */
 .proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; }
+/* Count sits beside the chevron rather than the bold title -- it's a hint about what the
+   control expands, not part of the theme's name. */
+.proverb-theme-side { flex-shrink: 0; display: flex; align-items: center; gap: 7px; }
+.proverb-theme-count { font-size: 12px; font-weight: 600; color: var(--mid); }
 /* Styled like a real disclosure control (bordered circle, same roundel language as
    .proverb-pronounce) rather than a bare glyph, so it reads as a button, not decoration. */
 .proverb-theme-chev {
