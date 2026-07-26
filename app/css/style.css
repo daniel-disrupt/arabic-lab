@@ -3,7 +3,7 @@
   --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
   --rule: #E4E3E0; --active-bg: #F0EFE9;
   --bg: #fff; --on-accent: #fff; --on-accent-rgb: 255,255,255; --tint-rgb: 13,13,13;
-  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1;
+  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1; --fc-text-scale: 1;
   --ar-word-spacing: 0.2em;
 }
 /* ── READER MODE (dark theme, toggled from the mobile hamburger menu) ──
@@ -765,7 +765,11 @@ body.lang-en .flashcard-progress { direction: ltr; }
    clearly bigger gap before the icon row/reveals below, so the default (nothing revealed) card
    reads as a compact, deliberate block instead of a mostly-empty box. */
 .flashcard-text-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
-.flashcard-words { font-size: 40px; line-height: 1.5; }
+/* Both scaled by the in-card text-size control (adjustFlashcardScale/--fc-text-scale) --
+   .flashcard-words is already Flashcards-only, but .flashcard-translit-line is reused by
+   Fill-in-the-Blank/Word-Scramble too, so its scaled rule is scoped to #flashcards-inner
+   specifically to avoid resizing text in those other tabs. */
+.flashcard-words { font-size: calc(40px * var(--fc-text-scale)); line-height: 1.5; }
 /* The card is always real Arabic script regardless of the global learning-alphabet toggle (see
    proverbWordsHtml's forceArabic param) -- these two overrides win over the general .proverb-words
    translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
@@ -776,6 +780,7 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
 .proverb-word-clickable.tapped { background: var(--black); color: var(--on-accent); border-radius: 4px; }
 .flashcard-translit-line { font-size: 19px; color: var(--mid); }
+#flashcards-inner .flashcard-translit-line { font-size: calc(19px * var(--fc-text-scale)); }
 /* Word-gloss tray and the info reveal panel both use the same animated max-height accordion as
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
    already in the DOM (see toggleFlashcardInfo/handleFlashcardWordTap), so the browser has a
@@ -825,6 +830,51 @@ body.lang-en .flashcard-nav { direction: ltr; }
 }
 .flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
 .flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
+
+/* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
+   A CSS-driven fixed overlay rather than relying solely on the real Fullscreen API -- the
+   overlay alone already delivers "the card fills the screen" and reflows automatically when the
+   phone is rotated (plain flexbox + viewport units, no JS orientation handling needed), so the
+   feature still works on browsers/webviews where element.requestFullscreen() is unsupported or
+   rejected (older iOS Safari in particular). Where the real API IS available, JS calls it too, to
+   also hide the browser chrome -- this class is applied either way and is what does the layout
+   work. */
+#view-flashcards.flashcard-fullscreen {
+  position: fixed; inset: 0; z-index: 60; background: var(--bg);
+}
+#view-flashcards.flashcard-fullscreen .flashcards-scroll { height: 100%; }
+#view-flashcards.flashcard-fullscreen .flashcards-inner {
+  height: 100%; max-width: none; margin: 0; padding: 20px 24px;
+  display: flex; flex-direction: column;
+}
+#view-flashcards.flashcard-fullscreen .flashcard-progress,
+#view-flashcards.flashcard-fullscreen .flashcard-nav { flex: 0 0 auto; }
+/* The card itself is the part that "fills up the screen" -- grows to take all the leftover
+   height between the progress line and the nav buttons, with its own text scrolling internally
+   (min-height:0 is required for a flex child to shrink below its content size and scroll instead
+   of overflowing). */
+/* justify-content: safe center -- centers the card's content when it fits, but (per the CSS Box
+   Alignment "safe" keyword) falls back to start-alignment instead of centering when the content
+   overflows. Plain `center` here would center-clip a tall card in landscape/short-viewport cases,
+   leaving its scrollable start permanently out of reach (scrollTop stuck mid-content, top
+   unreachable) -- `safe` is the standard fix. Browsers that don't yet parse the `safe` keyword
+   drop the whole declaration as invalid and fall back to flex's default start-alignment, which
+   has the same no-clipping property, just without the centering when content does fit. */
+#view-flashcards.flashcard-fullscreen .flashcard {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; justify-content: safe center;
+}
+/* Bigger base sizes than the normal in-flow card, scaling with viewport width so rotating into
+   landscape (more width, less height) grows rather than shrinks the text -- still multiplied by
+   the same manual --fc-text-scale control. */
+#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(clamp(48px, 9vw, 120px) * var(--fc-text-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(clamp(20px, 3.5vw, 48px) * var(--fc-text-scale)); }
+/* Landscape has little spare height, so trims the card's own padding/gaps to leave more of it to
+   the text and reveal panel rather than shrinking the text itself. */
+@media (orientation: landscape) {
+  #view-flashcards.flashcard-fullscreen .flashcards-inner { padding: 12px 32px; }
+  #view-flashcards.flashcard-fullscreen .flashcard { padding: 20px 32px 16px; }
+  #view-flashcards.flashcard-fullscreen .flashcard-text-group { margin-bottom: 14px; }
+}
 
 /* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
    .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
