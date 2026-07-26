@@ -133,6 +133,7 @@ const STRINGS = {
     hideTranslation: 'Hide translation', showTranslation: 'Show translation',
     playPassage: 'Play this passage',
     siteLanguageLabel: 'Site language', learningAlphabetLabel: 'Learning alphabet',
+    readerModeLabel: 'Reader mode',
   },
   he: {
     vocabTitle: 'אוצר מילים שמור',
@@ -159,6 +160,8 @@ const STRINGS = {
     hideTranslation: 'הסתר תרגום', showTranslation: 'הצג תרגום',
     playPassage: 'נגן את הקטע הזה',
     siteLanguageLabel: 'שפת האתר', learningAlphabetLabel: 'אלפבית הלימוד',
+    // First draft, not yet reviewed by the user -- flag for real wording before treating as final.
+    readerModeLabel: 'תצוגה כהה',
   },
 };
 function t(key) { return STRINGS[appLang][key]; }
@@ -211,6 +214,7 @@ function applyAppLang() {
   document.querySelectorAll('.chunk-time').forEach(el => el.title = t('jumpToAudio'));
   document.querySelectorAll('[data-label="site-lang"]').forEach(el => el.textContent = t('siteLanguageLabel'));
   document.querySelectorAll('[data-label="learning-alphabet"]').forEach(el => el.textContent = t('learningAlphabetLabel'));
+  document.querySelectorAll('[data-label="reader-mode"]').forEach(el => el.textContent = t('readerModeLabel'));
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // avoid a stale mixed-language tray after switching mid-selection (header-gloss trays have no currentSelectionCtx)
   applyWatchTranslationLang();
   renderVocabView();
@@ -400,6 +404,24 @@ function applyScriptMode() {
   renderScrambleView();
   if (document.getElementById('tray').classList.contains('open')) closeTray(); // same "avoid stale mixed content" rule applyAppLang() uses
 }
+
+/* ─────────────── READER MODE (black background, white text -- glare/battery-friendly) ───────────────
+   Toggled only from the mobile hamburger drawer (see .side-menu-settings in lesson.html) -- the
+   toggle itself touches nothing lesson-specific, just the static header/menu chrome already in
+   the page, so it applies immediately at load rather than waiting for initLesson(). */
+let readerModeOn = localStorage.getItem('arabicLabReaderMode') === 'on';
+function toggleReaderMode() {
+  readerModeOn = !readerModeOn;
+  localStorage.setItem('arabicLabReaderMode', readerModeOn ? 'on' : 'off');
+  applyReaderMode();
+}
+function applyReaderMode() {
+  document.body.classList.toggle('reader-mode', readerModeOn);
+  const btn = document.getElementById('reader-mode-toggle');
+  btn.classList.toggle('on', readerModeOn);
+  btn.setAttribute('aria-checked', String(readerModeOn));
+}
+applyReaderMode();
 
 // #lesson-title-ar/#lesson-location-ar are hardcoded per-lesson markup in lesson.html, not
 // populated by JS -- capture the pristine Arabic once so applyScriptMode() can re-derive

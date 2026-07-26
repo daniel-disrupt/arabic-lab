@@ -117,6 +117,12 @@
         <button class="script-switch-btn" data-script="translit-en" onclick="setScriptMode('translit-en')">Translit</button>
       </div>
     </div>
+    <div class="switch-group" title="Black background, white text -- easier on the eyes and battery in low light">
+      <span class="switch-label" data-label="reader-mode">Reader mode</span>
+      <button class="reader-mode-toggle" id="reader-mode-toggle" onclick="toggleReaderMode()" role="switch" aria-checked="false" aria-label="Reader mode">
+        <span class="reader-mode-toggle-knob"></span>
+      </button>
+    </div>
   </div>
 </nav>
 
