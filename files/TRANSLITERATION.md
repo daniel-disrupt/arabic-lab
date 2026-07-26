@@ -73,8 +73,11 @@ philosophy (this is not a bare consonant skeleton):
   before a mater-י stay on the preceding consonant regardless (fatha + silent glide-ي,
   dialectal *ay→e* → tsere stays on the consonant, e.g. بَيْت → בֵּית "beit"). This
   vav/yod asymmetry is standard Hebrew spelling, not a simplification worth "fixing."
-- **Word-final מ/נ/צ/פ/כ → sofit forms** (ם/ן/ץ/ף/ך), including when the letter carries
-  trailing niqqud, a gemination mark, or a geresh mod (e.g. أَرْض → אַרץ׳).
+- **Word-final מ/נ/צ/פ/כ stay in their regular (non-sofit) form** — no ם/ן/ץ/ף/ך at the
+  end of a transliterated word, even when the letter carries trailing niqqud, a
+  gemination mark, or a geresh mod (e.g. أَرْض → אַרצ׳, not אַרץ׳). Deliberate choice for
+  this app: sofit forms are a Hebrew spelling convention, not part of the phonetic value
+  being taught, so they're dropped to keep תעתיק a transparent letter-for-sound mapping.
 
 Because the source Arabic is already fully voweled to reflect real dialect pronunciation
 (including shadda and ال-assimilation), transliteration can mostly be a **mechanical
