@@ -675,6 +675,11 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 body.translit-mode .proverb-card .proverb-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
 body.translit-en-mode .proverb-card .proverb-words { direction: rtl; text-align: right; }
 .proverb-translit-line { font-size: 15px; color: var(--mid); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+/* English transliteration keeps its own dir="ltr" (see proverbCardHtml's translitDir) so the
+   Latin word order reads normally left-to-right, but the block itself is still right-justified --
+   text-align is independent of dir -- so it sits flush under the right-aligned Arabic line above
+   instead of drifting to the left edge of the card. */
+body.translit-en-mode .proverb-translit-line { text-align: right; }
 .proverb-word.live { box-shadow: inset 0 -3px 0 0 currentColor; border-radius: 2px; }
 .proverb-sep { color: var(--mid); }
 .proverb-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }
