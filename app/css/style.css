@@ -827,9 +827,48 @@ body.lang-en .flashcard-nav { direction: ltr; }
 .flashcard-nav-btn {
   flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
   border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer; transition: all .12s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
 }
 .flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
 .flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
+
+/* ── FLASHCARDS TOOLBAR ── (renderFlashcardsView in app.js) -- text-size + full-screen live here
+   in both modes; full screen additionally moves play/flip/star out of the card and into this same
+   row, since a control anchored to a face of the flip card below would have to fight being
+   mirrored/upside-down mid-flip. Sits below .flashcard-nav rather than inside .flashcard. */
+.flashcard-toolbar { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+/* ── FLASHCARDS FULL SCREEN: FLIP CARD ── (renderFlashcardsView's full-screen branch only -- these
+   classes never render outside full screen, so they don't touch the plain .flashcard/
+   .flashcard-icon-row/.flashcard-reveal that the normal in-page card and the Fill-in-the-Blank/
+   Word-Scramble tabs still use unchanged.) Grid-stacking both faces in the same cell
+   (grid-area: 1 / 1) lets the container auto-size to the taller face with no JS height
+   measurement, while still cooperating with the full-screen .flashcard's own flex:1 sizing below. */
+.flashcard-flippable { perspective: 1400px; }
+.flashcard-flip-inner {
+  display: grid; width: 100%;
+  transition: transform .5s cubic-bezier(.4,.2,.2,1);
+  transform-style: preserve-3d;
+}
+.flashcard-flip-inner.flipped { transform: rotateY(180deg); }
+.flashcard-face {
+  grid-area: 1 / 1; width: 100%; min-height: 0; position: relative;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.flashcard-face-back { transform: rotateY(180deg); }
+.flashcard-face-front .flashcard-text-group { margin-bottom: 0; }
+/* Word-gloss tray floats over the front face instead of pushing it taller (the normal card's
+   accordion approach) -- this is what lets the proverb sit centered and full-sized while still
+   leaving the tap-a-word gloss reachable without scrolling. Overrides the base accordion rule's
+   max-height/margin -- see .flashcard-word-tray above -- for this context specifically. */
+.flashcard-face-front .flashcard-word-tray {
+  position: absolute; left: 12px; right: 12px; bottom: 8px; margin: 0; max-height: none; overflow: visible;
+  opacity: 0; transform: translateY(6px) scale(.97); pointer-events: none;
+  transition: opacity .18s, transform .18s;
+}
+.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.flashcard-face-back .flashcard-info-rows { width: 100%; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
    A CSS-driven fixed overlay rather than relying solely on the real Fullscreen API -- the
@@ -874,6 +913,25 @@ body.lang-en .flashcard-nav { direction: ltr; }
   #view-flashcards.flashcard-fullscreen .flashcards-inner { padding: 12px 32px; }
   #view-flashcards.flashcard-fullscreen .flashcard { padding: 20px 32px 16px; }
   #view-flashcards.flashcard-fullscreen .flashcard-text-group { margin-bottom: 14px; }
+}
+/* Phone landscape specifically (max-height keeps this off tablets/desktop, which have height to
+   spare for the normal stacked layout) -- stacking progress + card + nav row + toolbar leaves
+   little height for the card itself, so Prev/Next move off into their own row and become an
+   overlay of two circular rail buttons at the screen edges instead -- closer to a real
+   flashcard-deck feel (big central card, side arrows) than a cramped portrait stack rotated
+   sideways. The row stays display:flex with pointer-events:none so it doesn't block taps on the
+   progress/toolbar bars it now overlaps -- only the two buttons re-enable pointer-events. */
+@media (orientation: landscape) and (max-height: 600px) {
+  #view-flashcards.flashcard-fullscreen .flashcards-inner { position: relative; }
+  #view-flashcards.flashcard-fullscreen .flashcard-nav {
+    position: absolute; inset: 0; margin: 0; padding: 0 6px;
+    align-items: center; pointer-events: none;
+  }
+  #view-flashcards.flashcard-fullscreen .flashcard-nav-btn {
+    pointer-events: auto; flex: 0 0 auto; width: 46px; height: 46px; border-radius: 50%; padding: 0;
+  }
+  #view-flashcards.flashcard-fullscreen .flashcard-nav-label { display: none; }
+  #view-flashcards.flashcard-fullscreen .flashcard-nav-arrow { font-size: 22px; }
 }
 
 /* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/

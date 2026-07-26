@@ -2068,17 +2068,25 @@ function stubViewHtml() {
 
 /* ─────────────── FLASHCARDS TAB ───────────────
    One card per proverb, sequential deck. Arabic (with tashkeel) is always shown, large, with the
-   learner's preferred transliteration automatically right underneath -- no toggle needed. Below
-   that, three small icon buttons (listen / literal meaning / explanation) sit close together
-   rather than full-width text pills, keeping the default (nothing revealed) view compact instead
-   of padded out with dead space.
+   learner's preferred transliteration automatically right underneath -- no toggle needed. Play /
+   flip / save-to-retry sit in a small icon row close together rather than full-width text pills,
+   keeping the default (nothing revealed) view compact instead of padded out with dead space --
+   in the normal in-page card that row lives inside the card itself; text-size and full-screen
+   live in a separate .flashcard-toolbar below the Prev/Next nav either way (see
+   renderFlashcardsView).
 
-   Reveal panels and the word-gloss tray are ALWAYS present in the DOM (built once per card by
-   renderFlashcardsView) and animate open/closed via a CSS max-height transition -- same pattern
-   as the Vocab tab's .vocab-expand/.open. Toggling them only flips a class on the existing
-   element (toggleFlashcardInfo / handleFlashcardWordTap), it does NOT re-render the card --
-   that's what made the earlier version feel like it was jumping: a full innerHTML rebuild on
-   every click has no starting height to transition from, so the layout just snaps. */
+   The word-gloss tray is ALWAYS present in the DOM (built once per card by renderFlashcardsView)
+   and animates open/closed via a class toggle rather than a full re-render (handleFlashcardWordTap
+   only flips a class on the existing element) -- same reasoning as the Vocab tab's
+   .vocab-expand/.open: a full innerHTML rebuild on every tap has no starting height/opacity to
+   transition from, so the layout would just snap instead of animating.
+
+   The literal-translation/meaning reveal works differently per mode, both driven by the same
+   toggleFlashcardFlip and the same flashcardFlipped state: the normal in-page card still reveals
+   it as a max-height accordion below the text (room to scroll if needed, since that card lives in
+   a scrolling page); the full-screen card instead flips the whole card over to a back face (see
+   FLASHCARDS FULL SCREEN: FLIP CARD in style.css) -- an accordion would either get clipped or
+   force scrolling in a viewport-filling card with no page scroll of its own. */
 // Shared by Flashcards and Fill-in-the-Blank -- both browse PROVERBS through a shuffled index
 // order rather than the source docx order, and reshuffle fresh every time the tab is (re)entered
 // (see switchTab()), not on every render or every Prev/Next step.
@@ -2092,7 +2100,10 @@ function shuffleArray(arr) {
 }
 let flashcardOrder = [];
 let flashcardIdx = 0;
-let flashcardShowInfo = false;
+// "Info shown" in the normal in-page card (accordion open) and "flipped to the back" in the full
+// screen card (see toggleFlashcardFlip) are the same underlying state -- which face/panel is
+// showing the literal+meaning content -- just rendered two different ways.
+let flashcardFlipped = false;
 let flashcardWordTrayGi = null;
 // Round-retry state, same shape as Fill-in-the-Blank's cycle-retry (fillblankCycle/Results/Done):
 // round 1 is the full 46-proverb deck; every later round's pool is only the proverbs still
@@ -2107,7 +2118,7 @@ let flashcardDone = false;
 function shuffleFlashcardDeck() {
   flashcardOrder = shuffleArray(PROVERBS.map((_, i) => i));
   flashcardIdx = 0;
-  flashcardShowInfo = false;
+  flashcardFlipped = false;
   flashcardWordTrayGi = null;
   flashcardRound = 1;
   flashcardStarred = new Set();
@@ -2118,7 +2129,7 @@ function goToFlashcard(delta) {
   const next = flashcardIdx + delta;
   if (next < 0 || next >= flashcardOrder.length) return;
   flashcardIdx = next;
-  flashcardShowInfo = false;
+  flashcardFlipped = false;
   flashcardWordTrayGi = null;
   stopPronunciation();
   renderFlashcardsView();
@@ -2136,7 +2147,7 @@ function advanceFlashcardRound() {
     flashcardRound += 1;
     flashcardOrder = shuffleArray(remaining);
     flashcardIdx = 0;
-    flashcardShowInfo = false;
+    flashcardFlipped = false;
     flashcardWordTrayGi = null;
   }
   renderFlashcardsView();
@@ -2146,10 +2157,25 @@ function toggleFlashcardStar() {
   if (flashcardStarred.has(gi)) flashcardStarred.delete(gi); else flashcardStarred.add(gi);
   renderFlashcardsView();
 }
-function toggleFlashcardInfo() {
-  flashcardShowInfo = !flashcardShowInfo;
-  document.getElementById('flashcard-reveal-info').classList.toggle('open', flashcardShowInfo);
-  document.querySelector('.flashcard-icon-btn[data-fc-btn="info"]').classList.toggle('active', flashcardShowInfo);
+// Same toggle either drives the normal card's accordion reveal or the full screen card's flip --
+// see flashcardFlipped's declaration above for why one state covers both. Flipping to the back
+// also closes any open word-gloss tray, since that only makes sense on the (Arabic) front face.
+function toggleFlashcardFlip() {
+  flashcardFlipped = !flashcardFlipped;
+  const btn = document.querySelector('.flashcard-icon-btn[data-fc-btn="info"]');
+  if (btn) btn.classList.toggle('active', flashcardFlipped);
+  if (flashcardFullscreenOn) {
+    const inner = document.getElementById('flashcard-flip-inner');
+    if (inner) inner.classList.toggle('flipped', flashcardFlipped);
+    if (flashcardFlipped) {
+      const trayEl = document.getElementById('flashcard-word-tray');
+      if (trayEl) trayEl.classList.remove('open');
+      document.querySelectorAll('#flashcard-words .proverb-word-clickable.tapped').forEach(w => w.classList.remove('tapped'));
+      flashcardWordTrayGi = null;
+    }
+  } else {
+    document.getElementById('flashcard-reveal-info').classList.toggle('open', flashcardFlipped);
+  }
 }
 function handleFlashcardWordTap(e, gi) {
   e.stopPropagation();
@@ -2234,8 +2260,8 @@ function renderFlashcardsView() {
           ? ('Took ' + flashcardRound + ' round' + (flashcardRound === 1 ? '' : 's'))
           : ('לקח ' + flashcardRound + ' ' + (flashcardRound === 1 ? 'סבב' : 'סבבים'))) + '</div>' +
         '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFlashcardDeck(); renderFlashcardsView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
-        '<div class="flashcard-icon-row">' + flashcardFullscreenBtnHtml(en) + '</div>' +
-      '</div>';
+      '</div>' +
+      '<div class="flashcard-toolbar">' + flashcardFullscreenBtnHtml(en) + '</div>';
     return;
   }
   if (!flashcardOrder.length) shuffleFlashcardDeck();
@@ -2247,6 +2273,7 @@ function renderFlashcardsView() {
   const plainText = p.arWords.map(t => t.w).join(' ');
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
   const proseDir = en ? 'ltr' : 'rtl';
+  const fullscreen = flashcardFullscreenOn;
 
   const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
   const meaningText = en ? p.explanationEn : p.explanationHe;
@@ -2257,40 +2284,69 @@ function renderFlashcardsView() {
     ? '<div class="proverb-explain-row icon-row"><span class="proverb-explain-icon" aria-label="' + iconLabel + '" title="' + iconLabel + '">' + icon + '</span><span class="proverb-explain-text" dir="' + proseDir + '">' + text + '</span></div>'
     : '';
 
+  // Flip button label reflects what it actually does in each mode -- "more info" accordion in the
+  // normal card, "flip to see the back" in full screen -- both driven by toggleFlashcardFlip.
+  const flipLabel = fullscreen ? (en ? 'Flip card' : 'הפוך כרטיס') : (en ? 'More' : 'עוד');
+  const playBtnHtml = hasAudio
+    ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+    : '';
+  const flipBtnHtml = '<button class="flashcard-icon-btn' + (flashcardFlipped ? ' active' : '') + '" data-fc-btn="info" onclick="toggleFlashcardFlip()" aria-label="' + flipLabel + '" title="' + flipLabel + '">' + FC_INFO_ICON_SVG + '</button>';
+  const starBtnHtml = '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>';
+  const textSizeCtrlHtml =
+    '<div class="text-size-ctrl" id="flashcard-text-size-ctrl">' +
+      '<button class="text-size-btn" id="flashcard-text-size-dec" onclick="adjustFlashcardScale(-1)" aria-label="' + (en ? 'Decrease text size' : 'הקטן טקסט') + '">A&#8315;</button>' +
+      '<span class="text-size-label" id="flashcard-text-size-label">100%</span>' +
+      '<button class="text-size-btn" id="flashcard-text-size-inc" onclick="adjustFlashcardScale(1)" aria-label="' + (en ? 'Increase text size' : 'הגדל טקסט') + '">A&#8314;</button>' +
+    '</div>';
+
+  // Full screen: every control lives in the external toolbar below the nav. Normal in-page mode
+  // keeps play/flip/star inside the card as before -- only text-size + full-screen move out,
+  // per the original ask -- so the card's own icon row is only rendered there.
+  const cardIconRowHtml = fullscreen ? '' : ('<div class="flashcard-icon-row">' + playBtnHtml + flipBtnHtml + starBtnHtml + '</div>');
+  const toolbarHtml = '<div class="flashcard-toolbar">' + (fullscreen ? (playBtnHtml + flipBtnHtml + starBtnHtml) : '') + textSizeCtrlHtml + flashcardFullscreenBtnHtml(en) + '</div>';
+
+  const frontFaceHtml =
+    '<div class="flashcard-text-group">' +
+      '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
+      '<div class="flashcard-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
+    '</div>' +
+    '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>';
+  const infoRowsHtml =
+    explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
+    explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText);
+
+  // Full screen: a real front/back flip card (see FLASHCARDS FULL SCREEN: FLIP CARD in style.css)
+  // -- front shows only the proverb + transliteration, back shows the literal/meaning rows that
+  // the normal card reveals via an expanding accordion instead. The back face is its own standalone
+  // face (not content stacked below something else), so it skips .flashcard-reveal-inner's
+  // divider/top-padding -- that's only meaningful for the accordion, which sits below the text
+  // it's separating from within the same face.
+  const cardHtml = fullscreen
+    ? '<div class="flashcard flashcard-flippable">' +
+        '<div class="flashcard-flip-inner' + (flashcardFlipped ? ' flipped' : '') + '" id="flashcard-flip-inner">' +
+          '<div class="flashcard-face flashcard-face-front">' + frontFaceHtml + '</div>' +
+          '<div class="flashcard-face flashcard-face-back"><div class="flashcard-info-rows">' + infoRowsHtml + '</div></div>' +
+        '</div>' +
+      '</div>'
+    : '<div class="flashcard">' +
+        frontFaceHtml +
+        cardIconRowHtml +
+        '<div class="flashcard-reveal' + (flashcardFlipped ? ' open' : '') + '" id="flashcard-reveal-info">' +
+          '<div class="flashcard-reveal-inner flashcard-info-rows">' + infoRowsHtml + '</div>' +
+        '</div>' +
+      '</div>';
+
+  const nextLabel = flashcardIdx === flashcardOrder.length - 1 ? (en ? 'Finish round' : 'סיום סבב') : (en ? 'Next' : 'הבא');
+  const prevLabel = en ? 'Prev' : 'הקודם';
+  const navHtml =
+    '<div class="flashcard-nav">' +
+      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' aria-label="' + prevLabel + '" onclick="goToFlashcard(-1)"><span class="flashcard-nav-arrow">‹</span><span class="flashcard-nav-label">' + prevLabel + '</span></button>' +
+      '<button class="flashcard-nav-btn" aria-label="' + nextLabel + '" onclick="goToFlashcard(1)"><span class="flashcard-nav-label">' + nextLabel + '</span><span class="flashcard-nav-arrow">›</span></button>' +
+    '</div>';
+
   el.innerHTML =
     '<div class="flashcard-progress">' + (en ? 'Round ' : 'סבב ') + flashcardRound + ' · ' + (flashcardIdx + 1) + ' / ' + flashcardOrder.length + '</div>' +
-    '<div class="flashcard">' +
-      '<div class="flashcard-text-group">' +
-        '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
-        '<div class="flashcard-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
-      '</div>' +
-      '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>' +
-      '<div class="flashcard-icon-row">' +
-        (hasAudio
-          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'flashcard-words\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
-          : '') +
-        '<button class="flashcard-icon-btn' + (flashcardShowInfo ? ' active' : '') + '" data-fc-btn="info" onclick="toggleFlashcardInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
-        '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>' +
-        '<div class="text-size-ctrl" id="flashcard-text-size-ctrl">' +
-          '<button class="text-size-btn" id="flashcard-text-size-dec" onclick="adjustFlashcardScale(-1)" aria-label="' + (en ? 'Decrease text size' : 'הקטן טקסט') + '">A&#8315;</button>' +
-          '<span class="text-size-label" id="flashcard-text-size-label">100%</span>' +
-          '<button class="text-size-btn" id="flashcard-text-size-inc" onclick="adjustFlashcardScale(1)" aria-label="' + (en ? 'Increase text size' : 'הגדל טקסט') + '">A&#8314;</button>' +
-        '</div>' +
-        flashcardFullscreenBtnHtml(en) +
-      '</div>' +
-      '<div class="flashcard-reveal' + (flashcardShowInfo ? ' open' : '') + '" id="flashcard-reveal-info">' +
-        '<div class="flashcard-reveal-inner flashcard-info-rows">' +
-          explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
-          explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText) +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="flashcard-nav">' +
-      '<button class="flashcard-nav-btn"' + (flashcardIdx === 0 ? ' disabled' : '') + ' onclick="goToFlashcard(-1)">' + (en ? '‹ Prev' : '‹ הקודם') + '</button>' +
-      '<button class="flashcard-nav-btn" onclick="goToFlashcard(1)">' + (flashcardIdx === flashcardOrder.length - 1
-        ? (en ? 'Finish round ›' : 'סיום סבב ›')
-        : (en ? 'Next ›' : 'הבא ›')) + '</button>' +
-    '</div>';
+    cardHtml + navHtml + toolbarHtml;
   flashcardScaler.apply();
 }
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
@@ -2363,8 +2419,9 @@ function selectFillBlankChoice(orderIdx) {
   fillblankResults[fillblankOrder[fillblankIdx]] = fillblankChoiceOrder[orderIdx] === p.blankChoices[0];
   renderFillBlankView();
 }
-// Same non-destructive class-toggle approach as toggleFlashcardInfo -- this fires AFTER the
-// answer-lock render already happened, so the icon row/reveal panel are already in the DOM;
+// Same non-destructive class-toggle approach as toggleFlashcardFlip's normal-mode (accordion)
+// branch -- this fires AFTER the answer-lock render already happened, so the icon row/reveal
+// panel are already in the DOM;
 // toggling it must not re-render the whole card or the reveal loses its animation again.
 function toggleFillBlankInfo() {
   fillblankShowInfo = !fillblankShowInfo;
@@ -2430,8 +2487,9 @@ function renderFillBlankView() {
     ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
     : '';
 
-  // Payoff after answering: same single merged info button as Flashcards (FC_INFO_ICON_SVG,
-  // toggleFlashcardInfo's pattern) rather than two separate book/lightbulb toggles -- one tap
+  // Payoff after answering: same single merged info button as Flashcards' normal-mode card
+  // (FC_INFO_ICON_SVG, toggleFlashcardFlip's accordion branch) rather than two separate
+  // book/lightbulb toggles -- one tap
   // reveals both the literal breakdown and the explanation together. Listen lives in the same
   // icon row instead of its own row above the card, again matching Flashcards.
   let payoffHtml = '';
