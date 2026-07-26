@@ -679,6 +679,7 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 
 /* ── WORD-SCRAMBLE TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
    .flashcard-icon-row/.flashcard-icon-btn/.flashcard-reveal* and .fillblank-feedback) */
+.scramble-icon-row { margin-top: 16px; }
 .scramble-built {
   min-height: 44px; font-size: 26px; line-height: 1.8;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
