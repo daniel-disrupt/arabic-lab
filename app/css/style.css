@@ -2,14 +2,31 @@
 :root {
   --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
   --rule: #E4E3E0; --active-bg: #F0EFE9;
+  --bg: #fff; --on-accent: #fff; --on-accent-rgb: 255,255,255; --tint-rgb: 13,13,13;
   --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1;
 }
+/* ── READER MODE (dark theme, toggled from the mobile hamburger menu) ──
+   Flips the whole app to a black background with light text/accents -- mainly to cut glare and
+   OLED battery draw. Every color below is a variable already threaded through the rest of this
+   file, so re-pointing this handful of custom properties re-themes the entire app without
+   touching individual component rules. --black doubles as both body text color AND the solid
+   "active/filled" accent used by buttons/badges/selection states, so it alone flips both at once.
+   --on-accent(-rgb) is the inverse: text/icons drawn on top of a --black-filled element, which
+   must go dark once --black itself goes light, or filled buttons would render light-on-light.
+   --tint-rgb backs the very-low-opacity hover/selection washes over reading text, which need to
+   lighten to stay visible against a near-black page instead of vanishing into it. */
+body.reader-mode {
+  --black: #EDEDEC; --mid: #9A9A9A; --light: #5C5C5C;
+  --rule: #2A2A2A; --active-bg: #1C1C1C;
+  --bg: #000; --on-accent: #0D0D0D; --on-accent-rgb: 13,13,13; --tint-rgb: 255,255,255;
+}
 html, body {
-  height: 100%; height: 100dvh; background: #fff; color: var(--black);
+  height: 100%; height: 100dvh; background: var(--bg); color: var(--black);
   font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
   overflow: hidden; display: flex; flex-direction: column;
   user-select: none; -webkit-user-select: none;
   direction: rtl;
+  transition: background .2s, color .2s;
 }
 button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action: manipulation; }
 
@@ -37,7 +54,7 @@ button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action:
 
 /* ── HEADER ── */
 .header {
-  flex-shrink: 0; height: 52px; background: #fff;
+  flex-shrink: 0; height: 52px; background: var(--bg);
   border-bottom: 1px solid var(--rule);
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   padding: 0 20px; z-index: 10;
@@ -73,7 +90,7 @@ body.lang-en .mobile-header-title { direction: ltr; }
 .menu-backdrop.open { opacity: 1; pointer-events: auto; }
 .side-menu {
   position: fixed; top: 0; bottom: 0; right: 0; width: min(78vw, 300px);
-  background: #fff; box-shadow: -6px 0 24px rgba(0,0,0,.16);
+  background: var(--bg); box-shadow: -6px 0 24px rgba(0,0,0,.16);
   transform: translateX(100%); transition: transform .26s cubic-bezier(.25,.8,.25,1);
   z-index: 41; display: flex; flex-direction: column;
   padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
@@ -133,7 +150,7 @@ body.lang-en .mobile-header-title { direction: ltr; }
 .settings-menu {
   display: none; flex-direction: column; gap: 10px;
   position: absolute; top: 44px; right: 0; min-width: 260px;
-  background: #fff; border: 1px solid var(--rule); border-radius: 10px;
+  background: var(--bg); border: 1px solid var(--rule); border-radius: 10px;
   box-shadow: 0 10px 28px rgba(0,0,0,.14); padding: 14px; z-index: 30;
 }
 .settings-menu.open { display: flex; }
@@ -147,6 +164,19 @@ body.lang-en .switch-group { flex-direction: row; }
 .switch-label { font-size: 10px; font-weight: 700; letter-spacing: .05em; color: var(--mid); white-space: nowrap; text-align: right; }
 body.lang-en .switch-label { text-align: left; }
 
+/* ── READER MODE TOGGLE (dark theme switch, mobile hamburger menu only) ── */
+.reader-mode-toggle {
+  width: 40px; height: 22px; border-radius: 11px; padding: 0; flex-shrink: 0;
+  border: 1px solid var(--rule); background: transparent; cursor: pointer;
+  position: relative; transition: background .15s, border-color .15s;
+}
+.reader-mode-toggle-knob {
+  position: absolute; top: 1px; left: 1px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--mid); transition: transform .18s cubic-bezier(.25,.8,.25,1), background .15s;
+}
+.reader-mode-toggle.on { background: var(--black); border-color: var(--black); }
+.reader-mode-toggle.on .reader-mode-toggle-knob { transform: translateX(18px); background: var(--on-accent); }
+
 /* ── GLOBAL LANGUAGE SWITCH (UI chrome + gloss language) ── */
 .lang-switch { display: flex; align-items: center; gap: 6px; }
 .lang-switch-btn {
@@ -155,7 +185,7 @@ body.lang-en .switch-label { text-align: left; }
   cursor: pointer; transition: all .12s;
 }
 .lang-switch-btn:hover { border-color: var(--black); color: var(--black); }
-.lang-switch-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
+.lang-switch-btn.active { background: var(--black); border-color: var(--black); color: var(--on-accent); }
 
 /* ── SCRIPT SWITCH (which script the Arabic learning content itself renders in) ──
    Same active-state treatment as .lang-switch-btn (solid black fill) -- the two controls sit in
@@ -168,7 +198,7 @@ body.lang-en .switch-label { text-align: left; }
   cursor: pointer; transition: all .12s;
 }
 .script-switch-btn:hover { border-color: var(--black); color: var(--black); }
-.script-switch-btn.active { background: var(--black); border-color: var(--black); color: #fff; }
+.script-switch-btn.active { background: var(--black); border-color: var(--black); color: var(--on-accent); }
 
 /* ── VIEWS ── */
 .view { display: none; flex: 1; overflow: hidden; flex-direction: column; }
@@ -212,10 +242,10 @@ body.translit-en-mode .chunk p { direction: ltr; text-align: left; }
    treatment (e.g. underline instead of background) is worth trying later. */
 .sentence { border-radius: 4px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .word { cursor: pointer; display: inline; border-radius: 3px; padding: 2px 1px; transition: background .08s; }
-.word:hover { background: rgba(13,13,13,.06); }
-.word.selected { background: var(--black); color: #fff; }
-.word.in-range { background: rgba(13,13,13,.13); }
-.word.in-range.range-start, .word.in-range.range-end { background: rgba(13,13,13,.22); }
+.word:hover { background: rgba(var(--tint-rgb),.06); }
+.word.selected { background: var(--black); color: var(--on-accent); }
+.word.in-range { background: rgba(var(--tint-rgb),.13); }
+.word.in-range.range-start, .word.in-range.range-end { background: rgba(var(--tint-rgb),.22); }
 .word.live { box-shadow: inset 0 -3px 0 0 var(--black); }
 .word.live.selected { box-shadow: none; }
 
@@ -237,7 +267,7 @@ body.translit-en-mode .chunk p { direction: ltr; text-align: left; }
 .text-size-label { font-size: 10px; color: var(--mid); min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
 
 /* ── READER BOTTOM ── */
-.reader-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
+.reader-bottom { flex-shrink: 0; background: var(--bg); padding-bottom: env(safe-area-inset-bottom); position: relative; }
 .tray { height: 0; overflow: hidden; border-top: 0px solid var(--rule); transition: height .22s cubic-bezier(.25,.8,.25,1), border-top-width .22s; display: flex; align-items: stretch; }
 .tray.open { height: var(--tray-h); border-top-width: 1px; }
 .tray-handle-row { display: none; }
@@ -255,25 +285,25 @@ body.lang-en .gloss-he { direction: ltr; }
 .root-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--black); }
 .badge { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
 .badge-idiom { color: var(--black); border: 1px solid var(--black); }
-.badge-proverb { color: #fff; background: var(--black); border: 1px solid var(--black); }
+.badge-proverb { color: var(--on-accent); background: var(--black); border: 1px solid var(--black); }
 .gloss-en-wrap { display: flex; align-items: center; gap: 8px; }
 .gloss-en { font-size: 13px; color: var(--mid); transition: opacity .15s; direction: ltr; text-align: start; }
 .gloss-en.hidden { opacity: 0; pointer-events: none; }
 .en-chip { font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 3px 8px; border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; color: var(--mid); background: transparent; transition: all .12s; }
 .en-chip:hover { border-color: var(--black); color: var(--black); }
-.en-chip.showing { background: var(--black); color: #fff; border-color: var(--black); }
+.en-chip.showing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
 .tray-actions { display: flex; flex-direction: column; gap: 8px; padding: 0 0 0 20px; align-items: flex-end; justify-content: center; flex-shrink: 0; }
 .save-btn { font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 8px 14px; border-radius: 3px; cursor: pointer; border: 1.5px solid var(--black); background: transparent; color: var(--black); transition: all .12s; white-space: nowrap; min-width: 104px; text-align: center; }
-.save-btn:hover { background: var(--black); color: #fff; }
+.save-btn:hover { background: var(--black); color: var(--on-accent); }
 .save-btn:disabled, .save-btn.saved {
   cursor: default; pointer-events: none;
   border-color: var(--rule); color: var(--mid); background: var(--active-bg);
 }
-.audio-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px; border-top: 1px solid var(--rule); background: #fff; }
-.audio-bar { height: var(--bar-h); display: flex; align-items: center; padding: 0 20px; gap: 14px; background: #fff; }
+.audio-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px; border-top: 1px solid var(--rule); background: var(--bg); }
+.audio-bar { height: var(--bar-h); display: flex; align-items: center; padding: 0 20px; gap: 14px; background: var(--bg); }
 .play-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--black); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: opacity .12s; }
 .play-btn:hover { opacity: .75; }
-.play-btn svg { fill: #fff; }
+.play-btn svg { fill: var(--on-accent); }
 .time-label { font-size: 11px; color: var(--mid); font-variant-numeric: tabular-nums; letter-spacing: .04em; flex-shrink: 0; min-width: 76px; }
 .scrubber { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; cursor: pointer; position: relative; }
 .scrubber-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--black); border-radius: 2px; }
@@ -281,9 +311,9 @@ body.lang-en .gloss-he { direction: ltr; }
 .speed-btn:hover { border-color: var(--black); color: var(--black); }
 .mute-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--mid); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; background: transparent; transition: all .12s; flex-shrink: 0; }
 .mute-btn:hover { border-color: var(--black); color: var(--black); }
-.mute-btn.muted { color: #fff; background: var(--black); border-color: var(--black); }
+.mute-btn.muted { color: var(--on-accent); background: var(--black); border-color: var(--black); }
 .audio-toggle-btn { font-size: 11px; font-weight: 600; letter-spacing: .02em; padding: 5px 10px; border-radius: 3px; cursor: pointer; transition: all .12s; flex-shrink: 0; white-space: nowrap; }
-.audio-toggle-btn.on { color: #fff; background: var(--black); border: 1px solid var(--black); }
+.audio-toggle-btn.on { color: var(--on-accent); background: var(--black); border: 1px solid var(--black); }
 .audio-toggle-btn:not(.on) { color: var(--mid); background: transparent; border: 1px solid var(--rule); }
 .audio-toggle-btn:not(.on):hover { border-color: var(--black); color: var(--black); }
 .audio-bar.audio-off { display: none; }
@@ -327,13 +357,13 @@ body.translit-en-mode .verb-group-wazn { direction: ltr; }
   cursor: pointer; background: transparent; color: var(--black);
   transition: all .12s;
 }
-.verb-pill.active { background: var(--black); color: #fff; border-color: var(--black); }
+.verb-pill.active { background: var(--black); color: var(--on-accent); border-color: var(--black); }
 .verb-pill:hover:not(.active) { border-color: var(--black); }
 .verb-pill-ar { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; font-size: 17px; direction: rtl; }
 body.translit-mode .verb-pill-ar { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
 body.translit-en-mode .verb-pill-ar, body.translit-en-mode .verb-pill-root { direction: ltr; }
 .verb-pill-root { font-size: 10px; font-weight: 600; letter-spacing: .04em; color: var(--mid); flex-shrink: 0; }
-.verb-pill.active .verb-pill-root { color: rgba(255,255,255,.6); }
+.verb-pill.active .verb-pill-root { color: rgba(var(--on-accent-rgb),.6); }
 
 /* drill-down card (left column) */
 .verb-pills + .verb-card { flex: 1; min-width: 0; }
@@ -436,7 +466,7 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
 .vocab-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 .vocab-search {
   flex: 1 1 200px; min-width: 160px; font-size: 13px; padding: 8px 12px;
-  border: 1px solid var(--rule); border-radius: 6px; background: #fff; color: var(--black);
+  border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--black);
   font-family: inherit;
 }
 .vocab-search:focus { outline: none; border-color: var(--black); }
@@ -447,17 +477,17 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
   transition: all .12s; white-space: nowrap;
 }
 .vocab-chip:hover { border-color: var(--black); color: var(--black); }
-.vocab-chip.active { background: var(--black); border-color: var(--black); color: #fff; }
+.vocab-chip.active { background: var(--black); border-color: var(--black); color: var(--on-accent); }
 .vocab-sort {
   font-size: 12px; font-weight: 500; padding: 7px 10px; border-radius: 6px;
-  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer;
   font-family: inherit;
 }
 .vocab-no-results { grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--mid); font-size: 14px; }
 .vocab-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 @media (max-width: 560px) { .vocab-list { grid-template-columns: 1fr; } }
 .vocab-item {
-  border: 1px solid var(--rule); border-radius: 10px; background: #fff;
+  border: 1px solid var(--rule); border-radius: 10px; background: var(--bg);
   padding: 16px 16px 6px; display: flex; flex-direction: column;
 }
 .vocab-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
@@ -486,7 +516,7 @@ body.lang-en .vocab-row-he { direction: ltr; }
 }
 .vocab-row-toggle:hover { border-color: var(--black); color: var(--black); }
 .vocab-row-toggle .chev { display: inline-block; transition: transform .18s; }
-.vocab-row-toggle.open { background: var(--black); border-color: var(--black); color: #fff; }
+.vocab-row-toggle.open { background: var(--black); border-color: var(--black); color: var(--on-accent); }
 .vocab-row-toggle.open .chev { transform: rotate(180deg); }
 .vocab-row-delete {
   flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
@@ -502,7 +532,7 @@ body.lang-en .vocab-row-he { direction: ltr; }
   color: var(--mid); transition: all .12s;
 }
 .vocab-row-pronounce:hover { border-color: var(--black); color: var(--black); }
-.vocab-row-pronounce.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.vocab-row-pronounce.playing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
 .vocab-expand { max-height: 0; overflow: hidden; opacity: 0; transition: max-height .25s cubic-bezier(.25,.8,.25,1), opacity .2s; }
 .vocab-expand.open { max-height: 260px; opacity: 1; }
 .vocab-expand-inner { padding: 0 0 16px; }
@@ -515,7 +545,7 @@ body.lang-en .vocab-row-he { direction: ltr; }
 }
 body.translit-mode .vocab-expand-text { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
 body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
-.chunk-preview-hl { background: var(--black); color: #fff; border-radius: 3px; padding: 1px 5px; }
+.chunk-preview-hl { background: var(--black); color: var(--on-accent); border-radius: 3px; padding: 1px 5px; }
 /* currentColor (not a fixed color) so the underline reads correctly both on plain text (dark)
    and nested inside .chunk-preview-hl's black background (white) without a separate override. */
 .chunk-preview-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
@@ -540,7 +570,7 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; }
 .proverb-theme-chev { flex-shrink: 0; color: var(--mid); font-size: 14px; transform: rotate(90deg); transition: transform .18s; }
 .proverb-theme-head.open .proverb-theme-chev { transform: rotate(-90deg); }
-.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: #fff; padding: 14px 16px; transition: border-color .12s; }
+.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .proverb-pronounce {
@@ -550,7 +580,7 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
   color: var(--mid); transition: all .12s;
 }
 .proverb-pronounce:hover { border-color: var(--black); color: var(--black); }
-.proverb-pronounce.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.proverb-pronounce.playing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
 .proverb-words {
   flex: 1; min-width: 0;
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
@@ -579,7 +609,7 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 /* ── FLASHCARDS TAB ── */
 .flashcard-progress { text-align: center; font-size: 12px; color: var(--mid); letter-spacing: .04em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
 .flashcard {
-  border: 1px solid var(--rule); border-radius: 16px; background: #fff;
+  border: 1px solid var(--rule); border-radius: 16px; background: var(--bg);
   padding: 40px 32px 28px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
 }
@@ -596,7 +626,7 @@ body.translit-mode .flashcard-words { font-family: 'Traditional Arabic','Arabic 
 body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .proverb-word-clickable { cursor: pointer; transition: background .1s; }
 .proverb-word-clickable:hover { background: var(--active-bg); border-radius: 4px; }
-.proverb-word-clickable.tapped { background: var(--black); color: #fff; border-radius: 4px; }
+.proverb-word-clickable.tapped { background: var(--black); color: var(--on-accent); border-radius: 4px; }
 .flashcard-translit-line { font-size: 19px; color: var(--mid); }
 /* Word-gloss tray and the two reveal panels all use the same animated max-height accordion as
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
@@ -616,7 +646,7 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
   color: var(--mid); transition: all .12s;
 }
 .flashcard-icon-btn:hover { border-color: var(--black); color: var(--black); }
-.flashcard-icon-btn.active, .flashcard-icon-btn.playing { background: var(--black); color: #fff; border-color: var(--black); }
+.flashcard-icon-btn.active, .flashcard-icon-btn.playing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
 /* Star (save-to-retry) uses its own amber accent rather than the black .active fill the other
    icons share, so a starred card reads as a distinct "flagged" state at a glance, not just
    another toggled-open panel. */
@@ -630,7 +660,7 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 .flashcard-nav-btn {
   flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
-  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer; transition: all .12s;
 }
 .flashcard-nav-btn:hover:not(:disabled) { border-color: var(--black); background: var(--active-bg); }
 .flashcard-nav-btn:disabled { color: var(--light); cursor: default; }
@@ -645,7 +675,7 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 .fillblank-choices { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; }
 .fillblank-choice-btn {
   font-size: 18px; padding: 12px 22px; border-radius: 10px;
-  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer; transition: all .12s;
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
 }
 body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
@@ -670,7 +700,7 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .scramble-tiles { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 24px; }
 .scramble-tile {
   font-size: 18px; padding: 12px 22px; border-radius: 10px;
-  border: 1px solid var(--rule); background: #fff; color: var(--black); cursor: pointer; transition: all .12s;
+  border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer; transition: all .12s;
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
 }
 body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
@@ -756,14 +786,14 @@ body.lang-en .watch-head { direction: ltr; }
 body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align: left; }
 .watch-word { display: inline; border-radius: 3px; padding: 2px 1px; }
 .watch-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
-.watch-word.selected { background: var(--black); color: #fff; }
+.watch-word.selected { background: var(--black); color: var(--on-accent); }
 .watch-word.selected.live { box-shadow: none; }
-.watch-word.in-range { background: rgba(13,13,13,.13); }
-.watch-word.in-range.range-start, .watch-word.in-range.range-end { background: rgba(13,13,13,.22); }
+.watch-word.in-range { background: rgba(var(--tint-rgb),.13); }
+.watch-word.in-range.range-start, .watch-word.in-range.range-end { background: rgba(var(--tint-rgb),.22); }
 /* Highlights the specific translation words estimated to correspond to a selected Arabic
    word/phrase (proportional-position mapping, not a real alignment -- see
    linkWatchSelectionToTranslation in app.js). */
-.watch-word.tr-phrase-highlight { background: var(--black); color: #fff; }
+.watch-word.tr-phrase-highlight { background: var(--black); color: var(--on-accent); }
 .watch-transcript.watch-tr-hidden { display: none; }
 
 /* Mobile-only overlay captions -- burned-in-looking (but real HTML/DOM) subtitle ribbon shown
@@ -778,7 +808,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 .watch-tr-toggle-btn:not(.active) { opacity: .35; }
 
 /* Watch tab's bottom bar mirrors the Reader's reader-bottom (tray + audio-bar), same classes reused */
-.watch-bottom { flex-shrink: 0; background: #fff; padding-bottom: env(safe-area-inset-bottom); position: relative; }
+.watch-bottom { flex-shrink: 0; background: var(--bg); padding-bottom: env(safe-area-inset-bottom); position: relative; }
 
 /* Theater/expanded mode: video + transcripts fill the whole view, no scrolling needed -- entered
    automatically on play, or via the toolbar toggle. Head/intro text hides to reclaim the space. */
@@ -842,7 +872,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 .watch-p a, .about-text a { color: var(--black); text-decoration: underline; text-underline-offset: 2px; }
 .watch-p a:hover, .about-text a:hover { color: var(--mid); }
 
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(6px); background: var(--black); color: #fff; font-size: 13px; padding: 9px 18px; border-radius: 4px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 99; white-space: nowrap; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(6px); background: var(--black); color: var(--on-accent); font-size: 13px; padding: 9px 18px; border-radius: 4px; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; z-index: 99; white-space: nowrap; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* AI-PROCESS doc modal -- keeps the long-form writeup readable inside the app itself (an iframe
@@ -854,7 +884,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
   position: fixed; top: 4vh; left: 50%; direction: ltr;
   width: min(760px, 92vw); height: min(88vh, 900px);
   transform: translate(-50%, 8px);
-  background: #fff; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.28);
+  background: var(--bg); border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.28);
   z-index: 41; opacity: 0; pointer-events: none; transition: opacity .18s, transform .18s;
   overflow: hidden;
 }
@@ -908,7 +938,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
     position: absolute; left: 0; right: 0; bottom: 100%;
     flex-direction: column;
     overflow-y: auto; -webkit-overflow-scrolling: touch;
-    border-radius: 14px 14px 0 0; border-top: none; background: #fff;
+    border-radius: 14px 14px 0 0; border-top: none; background: var(--bg);
     box-shadow: 0 -6px 20px rgba(0,0,0,.14);
     transform: translateY(14px); opacity: 0; pointer-events: none;
     transition: transform .24s cubic-bezier(.25,.8,.25,1), opacity .2s;
@@ -948,7 +978,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
   #verb-card {
     position: fixed; left: 0; right: 0; bottom: 0; width: auto; z-index: 20;
     max-height: min(70vh, 560px); overflow-y: auto; -webkit-overflow-scrolling: touch;
-    border: none; border-radius: 14px 14px 0 0; background: #fff;
+    border: none; border-radius: 14px 14px 0 0; background: var(--bg);
     box-shadow: 0 -6px 20px rgba(0,0,0,.14);
     padding-bottom: env(safe-area-inset-bottom);
     transform: translateY(14px); opacity: 0; pointer-events: none;
