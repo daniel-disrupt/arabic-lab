@@ -85,11 +85,12 @@ complete.
   dialectal *ay→e* → tsere stays on the consonant, e.g. بَيْت → בֵּית "beit").
   This vav/yod asymmetry is real, standard Hebrew spelling behavior, not a
   simplification — don't "fix" it into symmetry.
-- **Word-final מ/נ/צ/פ/כ → sofit forms** (ם/ן/ץ/ף/ך), including when the
-  letter carries trailing niqqud, a gemination mark, or a geresh mod (e.g.
-  أَرْض → אַרץ׳, sofit tsadi *with* its geresh intact). Word boundary = end of
-  string or the next character isn't a Hebrew letter/mark — not just
-  whitespace, since a lesson string can end in Arabic punctuation.
+- **Word-final מ/נ/צ/פ/כ stay in their regular (non-sofit) form** — never
+  converted to ם/ן/ץ/ף/ך, even when the letter carries trailing niqqud, a
+  gemination mark, or a geresh mod (e.g. أَرْض → אַרצ׳, plain tsadi *with* its
+  geresh intact, not sofit tsadi). Deliberate choice for this app: sofit forms
+  are a Hebrew spelling convention, not part of the phonetic value being
+  taught.
 
 ## Auditing a lesson's data.json for missing tashkeel
 

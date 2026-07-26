@@ -256,15 +256,6 @@ const TRANSLIT_GEMINATION_MARK = 'ּ'; // U+05BC HEBREW DAGESH -- Madrasa's live
 const TRANSLIT_DAGESH = 'ּ'; // U+05BC -- forced onto ב/כ (Arabic ب/ك are always hard b/k, never v/kh) and reused as-is for שׁוּרוּק (dot IN a mater vav = long u)
 const TRANSLIT_CHOLAM = 'ֹ'; // U+05B9 -- חוֹלם מלא (dot ON a mater vav = long o)
 const TRANSLIT_YOD_DIPHTHONG_LONG = 'ֵ'; // fatha + silent ي glide (bay) -> tsere stays on the PRECEDING consonant, e.g. بَيْت "bayt" -> בֵּית "beit" -- unlike vav below, Hebrew yod-niqqud doesn't move onto the mater letter itself
-const TRANSLIT_FINAL_FORMS = { 'מ':'ם', 'נ':'ן', 'צ':'ץ', 'פ':'ף', 'כ':'ך' };
-// Word-final מ/נ/צ/פ/כ -> sofit form. Matches the letter (optionally followed by its own niqqud/
-// dagesh/gemination-mark/geresh) only when what comes next is NOT another Hebrew letter or mark --
-// i.e. it's genuinely the last letter of a word, not mid-word.
-const TRANSLIT_SOFIT_RE = /([מנצפכ])([֑-ׇّ׳״]*)(?=$|[^א-ת֑-ׇّ׳״])/g;
-function applyHebrewSofitForms(s) {
-  return s.replace(TRANSLIT_SOFIT_RE, (m, letter, trail) => TRANSLIT_FINAL_FORMS[letter] + trail);
-}
-
 function transliterateArabicHebrew(str) {
   if (!str) return str;
   const units = [];
@@ -318,7 +309,7 @@ function transliterateArabicHebrew(str) {
     const geminationMark = (u.marks.includes(TRANSLIT_SHADDA) && !entry.forceDagesh) ? TRANSLIT_GEMINATION_MARK : '';
     out += letter + dagesh + niqqud + geminationMark + mod;
   }
-  return applyHebrewSofitForms(out);
+  return out;
 }
 
 const TRANSLIT_EN_CONSONANTS = {
