@@ -685,6 +685,13 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
 /* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
    .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
 .fillblank-sentence { font-size: 26px; line-height: 1.8; }
+/* Sentence is always real Arabic script regardless of the global learning-alphabet toggle (see
+   renderFillBlankView's sentenceHtml) -- these overrides win over the general .proverb-words
+   translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
+   don't flip just because the rest of the app is in a transliteration mode. Same pattern as
+   .flashcard-words above. */
+body.translit-mode .fillblank-sentence { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .fillblank-sentence { direction: rtl; text-align: center; }
 /* The "____" placeholder text is the only blank indicator -- no extra border-bottom, which
    used to render as a second (black) line stacked right under the grey underscore glyphs. */
 .fillblank-blank { display: inline-block; min-width: 64px; color: var(--light); }
@@ -714,6 +721,13 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
   min-height: 44px; font-size: 26px; line-height: 1.8;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
 }
+/* Built/answer row is always real Arabic script regardless of the global learning-alphabet
+   toggle (see scrambleChunkText's forceArabic param) -- same override pattern as
+   .flashcard-words/.fillblank-sentence above, so it doesn't flip font/direction just because
+   the rest of the app is in a transliteration mode. The scramble-tile pool below keeps
+   following scriptMode as before. */
+body.translit-mode .scramble-built { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .scramble-built { direction: rtl; text-align: center; }
 .scramble-built-empty { font-size: 15px; color: var(--light); }
 .scramble-tiles { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; width: 100%; margin-top: 24px; }
 .scramble-tile {
