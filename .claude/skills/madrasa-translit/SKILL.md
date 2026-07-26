@@ -149,14 +149,43 @@ for (const b of bare) { if (!seen.has(b.value)) { seen.add(b.value); console.log
    knowledge, but flag anything nontrivial (this project already has a
    "draft, not teacher-reviewed" convention for exactly this — see
    `AI-PROCESS.md`).
-3. **Watch for false positives** — some "bare" hits are correct as-is and
-   should NOT be touched: a hollow-verb imperative or a ل"י-root participle
-   that's pure consonant+long-vowel-mater+consonant (e.g. كون, عيش, جاي, تعال)
-   genuinely has no short vowel to mark — Madrasa's own dictionary and this
-   project's own already-voweled present-tense rows both leave these bare.
-   Check whether a *word* has zero marks anywhere in its own well-established
-   paradigm (e.g. compare against the verb's other, already-voweled
-   conjugation rows) before assuming it needs a fix.
+3. **The goal is a Hebrew reader being able to sound the word out.** A Hebrew
+   letter string with no niqqud at all (e.g. a bare consonant + dagesh and
+   nothing else) fails that goal even when the *Arabic* spelling is
+   phonemically unambiguous to a fluent reader — so treat "false positive"
+   as a claim that needs *paradigm-wide* evidence, not a shortcut to skip a
+   word. Don't assume a bare hollow-root word is exempt just because it looks
+   like the familiar كون/عيش/جاي/تعال shape.
+   - **Genuine exemption test:** pull *every* conjugated row for that verb
+     (present tense *and* imperative, not just the one flagged form) and check
+     whether the mater-preserving stem is bare in *all* of them. If e.g.
+     بَكون/بِتْكون/بِيْكون (present) are every bit as bare as the imperative كون,
+     that's real paradigm-wide evidence of a deliberate omission — leave the
+     whole family alone (don't mark the imperative while leaving present-tense
+     siblings untouched; that's *less* consistent, not more).
+   - **This exemption is narrow: it only covers the present/imperative stem
+     position where a mater ي/و represents the hollow root's own long vowel.**
+     It does NOT extend to:
+     - **3rd-person past tense** (كَان, عَاش, قَال, رَاح, شَاف, دَار, سَاق) — these
+       already mark fatha directly before the alif mater, and any bare
+       sibling in this slot (e.g. a 3rd-plural past) should be fixed to match.
+     - **1st/2nd-person past tense**, where the person suffix replaces the
+       mater outright (كُنْت, عِشْت, قُلْت, رِحْت, شِفْت, دِرْت, سُقْت, جِبْت) — these
+       already mark damma/kasra on the root consonant. A same-shaped bare form
+       for a *different* root in this exact slot (e.g. جيت/جيتي/جينا/جيتوا for
+       ج-ي-ي, "to come") is a real gap, not an exemption — fix it to match
+       (→ جِيت/جِيتي/جِينا/جِيتوا).
+     - **ل"י-root (final-weak) masculine singular participles** (حاكي, ماشي,
+       باقي, عاطي) — check the *feminine*/*plural* participle of the same verb
+       first: if it marks a sukun on the radical right before the -ية/-يين
+       suffix (حاكْية, حاكْيين), that confirms the slot is real and the bare
+       masculine form is a gap — mark kasra there instead (حاكِي, ماشِي,
+       باقِي, عاطِي). The **جاي/جايين** shape (root ج-ي-ي) is a true structural
+       exception here: there's no consonant between the alif and the final
+       glide-ي to carry a mark, unlike حاكي's ك — leave it bare.
+   - Only after checking the verb's *whole* paradigm this way — and finding it
+     genuinely uniform — should a hit be logged as a false positive rather
+     than fixed.
 4. **Static HTML mirrors data.json.** At least one lesson keeps a duplicate of
    a header string as static markup (`lesson-title-ar`/`lesson-location-ar` in
    `lesson.html`) that is read once into a JS variable and never re-synced
