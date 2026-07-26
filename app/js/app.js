@@ -2028,13 +2028,13 @@ function renderProverbsView() {
     const teaser = en ? g.proverbs[0].literalEn : g.proverbs[0].literalHe;
     const heading = '<div class="proverb-theme-head' + (isOpen ? ' open' : '') + '" onclick="toggleThemeExpand(\'' + g.theme.key + '\')">' +
         '<div class="proverb-theme-text">' +
-          '<div class="proverb-theme-top">' +
-            '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
-            '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
-          '</div>' +
+          '<span class="proverb-theme-name" dir="' + (en ? 'ltr' : 'rtl') + '">' + (en ? g.theme.en : g.theme.he) + '</span>' +
           '<span class="proverb-theme-teaser" dir="' + (en ? 'ltr' : 'rtl') + '">' + teaser + '</span>' +
         '</div>' +
-        '<span class="proverb-theme-chev">›</span>' +
+        '<div class="proverb-theme-side">' +
+          '<span class="proverb-theme-count">' + g.proverbs.length + '</span>' +
+          '<span class="proverb-theme-chev">›</span>' +
+        '</div>' +
     '</div>';
     return heading + (isOpen ? g.proverbs.map(proverbCardHtml).join('') : '');
   }).join('');

@@ -601,18 +601,19 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
 .proverbs-intro { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 24px; }
-/* Text column width is fixed (--theme-card-w, set in app.js off the widest theme title across
-   BOTH languages) and centered under that title's own text rather than stretched full-bleed --
-   see computeThemeCardWidth's note in app.js for why the width can't just track the current
-   language. The chevron sits outside that width as its own flex item at the side of the row
+/* Row spans the full width of the list -- same width as the .proverb-card cards below it -- so
+   its border-bottom rule lines up edge to edge with the cards instead of reading as a narrower,
+   floating strip. The text column keeps its own fixed width (--theme-card-w, set in app.js off
+   the widest theme title across BOTH languages -- see computeThemeCardWidth's note in app.js for
+   why the width can't just track the current language) and, together with the chevron, is
+   centered *within* that full-width row via justify-content rather than by shrinking the row
+   itself. The chevron sits outside the text column as its own flex item at the side of the group
    (previously it was stacked between the title and teaser, which read as clutter rather than an
-   "expand this group" control) so the whole row -- text column plus chevron -- is what gets
-   centered via margin:auto. A hover/focus background on the full row gives this collapsed state
-   the same "yes, tap here" affordance every other tappable card in the app already has. */
+   "expand this group" control). A hover/focus background on the full row gives this collapsed
+   state the same "yes, tap here" affordance every other tappable card in the app already has. */
 .proverb-theme-head {
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  width: fit-content; max-width: 100%; margin: 0 auto;
-  padding: 12px 16px; border-radius: 10px; border-bottom: 1px solid var(--rule);
+  width: 100%; padding: 12px 16px; border-radius: 10px; border-bottom: 1px solid var(--rule);
   cursor: pointer; user-select: none; transition: background .12s;
 }
 .proverb-theme-head:hover { background: var(--active-bg); }
@@ -623,11 +624,14 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 }
 .proverb-theme-top { display: flex; align-items: baseline; justify-content: center; gap: 7px; }
 .proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); user-select: text; -webkit-user-select: text; }
-.proverb-theme-count { font-size: 12px; font-weight: 600; color: var(--mid); }
 /* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
    doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
    ellipsis) since the card is narrow rather than a full-width single line. */
 .proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; user-select: text; -webkit-user-select: text; }
+/* Count sits beside the chevron rather than the bold title -- it's a hint about what the
+   control expands, not part of the theme's name. */
+.proverb-theme-side { flex-shrink: 0; display: flex; align-items: center; gap: 7px; }
+.proverb-theme-count { font-size: 12px; font-weight: 600; color: var(--mid); }
 /* Styled like a real disclosure control (bordered circle, same roundel language as
    .proverb-pronounce) rather than a bare glyph, so it reads as a button, not decoration. */
 .proverb-theme-chev {
