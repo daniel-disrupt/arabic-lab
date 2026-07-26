@@ -629,6 +629,12 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 }
 .proverb-theme-head:hover { background: var(--active-bg); }
 .proverb-theme-head:not(:first-child) { margin-top: 22px; }
+/* The app's overall layout stays RTL regardless of appLang (see the lang-en comment in app.js),
+   so this row's flex order -- text column, then the count+chevron side -- puts the side on the
+   left by default, matching Hebrew's right-to-left flow. English UI reads left-to-right, where
+   the count+chevron (the row's trailing "expand" control) belongs on the right instead, so flip
+   just this row's own direction rather than the app-wide layout. */
+body.lang-en .proverb-theme-head { direction: ltr; }
 .proverb-theme-text {
   display: flex; flex-direction: column; gap: 7px; align-items: center; text-align: center;
   width: var(--theme-card-w, auto); max-width: 100%;
