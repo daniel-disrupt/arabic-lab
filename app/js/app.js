@@ -2338,6 +2338,9 @@ function renderFillBlankView() {
       : '';
     payoffHtml =
       '<div class="flashcard-icon-row fillblank-icon-row">' +
+        (hasAudio
+          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
         '<button class="flashcard-icon-btn' + (fillblankShowInfo ? ' active' : '') + '" data-fb-btn="info" onclick="toggleFillBlankInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
       '</div>' +
       '<div class="flashcard-reveal' + (fillblankShowInfo ? ' open' : '') + '" id="fillblank-reveal-info">' +
@@ -2351,9 +2354,6 @@ function renderFillBlankView() {
   el.innerHTML =
     '<div class="flashcard-progress">' + (en ? 'Cycle ' : 'מחזור ') + fillblankCycle + ' · ' + (fillblankIdx + 1) + ' / ' + fillblankOrder.length + '</div>' +
     '<div class="flashcard">' +
-      (hasAudio && answered
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'fillblank-sentence\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
-        : '') +
       '<div class="flashcard-text-group">' +
         '<div class="proverb-words fillblank-sentence" id="fillblank-sentence" dir="' + dir + '">' + sentenceHtml + '</div>' +
         '<div class="flashcard-translit-line" dir="' + translitDir + '">' + translitLine + '</div>' +
@@ -2492,6 +2492,9 @@ function renderScrambleView() {
     payoffHtml =
       '<div class="fillblank-feedback">' + (en ? 'Solved!' : 'פתרת!') + '</div>' +
       '<div class="flashcard-icon-row scramble-icon-row">' +
+        (hasAudio
+          ? '<button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '" title="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
+          : '') +
         '<button class="flashcard-icon-btn' + (scrambleShowInfo ? ' active' : '') + '" data-sc-btn="info" onclick="toggleScrambleInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
       '</div>' +
       '<div class="flashcard-reveal' + (scrambleShowInfo ? ' open' : '') + '" id="scramble-reveal-info">' +
@@ -2505,9 +2508,6 @@ function renderScrambleView() {
   el.innerHTML =
     '<div class="flashcard-progress">' + (scrambleIdx + 1) + ' / ' + PROVERBS.length + '</div>' +
     '<div class="flashcard">' +
-      (hasAudio && solved
-        ? '<div class="flashcard-icon-row"><button class="flashcard-icon-btn" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'scramble-built\'), this)" aria-label="' + (en ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button></div>'
-        : '') +
       '<div class="scramble-built proverb-words" id="scramble-built" dir="' + dir + '">' + builtHtml + '</div>' +
       (builtTranslit ? '<div class="flashcard-translit-line" dir="' + translitDir + '">' + builtTranslit + '</div>' : '') +
       (!solved
