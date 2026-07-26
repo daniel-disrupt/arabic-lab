@@ -2328,9 +2328,10 @@ function renderFillBlankView() {
     ? '<div class="fillblank-feedback">' + (fillblankChoiceOrder[fillblankSelectedIdx] === correctWord ? (en ? 'Correct!' : 'נכון!') : (en ? 'Not quite.' : 'לא בדיוק.')) + '</div>'
     : '';
 
-  // Payoff after answering: single "i" info button revealing both rows at once (same merged
-  // pattern as Flashcards) rather than a wall of text dumped immediately -- a learner who just
-  // wants to confirm they got it right isn't forced past it to reach Next.
+  // Payoff after answering: same single merged info button as Flashcards (FC_INFO_ICON_SVG,
+  // toggleFlashcardInfo's pattern) rather than two separate book/lightbulb toggles -- one tap
+  // reveals both the literal breakdown and the explanation together. Listen lives in the same
+  // icon row instead of its own row above the card, again matching Flashcards.
   let payoffHtml = '';
   if (answered) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
@@ -2488,6 +2489,9 @@ function renderScrambleView() {
     .map((ci) => '<button class="scramble-tile" onclick="handleScrambleTap(' + ci + ', this)">' + scrambleChunkText(p, ci, false) + '</button>')
     .join('');
 
+  // Same single merged info button as Flashcards/Fill-in-the-Blank (FC_INFO_ICON_SVG) rather than
+  // two separate book/lightbulb toggles, with Listen folded into the same icon row instead of its
+  // own row above the card.
   let payoffHtml = '';
   if (solved) {
     const literalText = en ? p.literalEn : (p.literalHe || p.literalEn);
