@@ -651,11 +651,6 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; user-select: text; -webkit-user-select: text; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-/* Same anchor/alignment mismatch as .vocab-card-head above: .proverb-words is flex:1 and, once
-   translit-en-mode left-aligns its text, needs the row itself flipped to ltr so the flex:1 box
-   is anchored on the same side its text hugs -- otherwise the words strand themselves next to
-   .proverb-chev on the left while a dead gap opens up between them and .proverb-pronounce. */
-body.translit-en-mode .proverb-card-head { direction: ltr; }
 .proverb-pronounce {
   flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
   border: 1px solid var(--rule); background: transparent; cursor: pointer;
@@ -664,13 +659,22 @@ body.translit-en-mode .proverb-card-head { direction: ltr; }
 }
 .proverb-pronounce:hover { border-color: var(--black); color: var(--black); }
 .proverb-pronounce.playing { background: var(--black); color: var(--on-accent); border-color: var(--black); }
+/* Holds .proverb-words + .proverb-translit-line as one stacked unit -- the row's actual flex:1
+   child now, since the card is always real Arabic script (forceArabic) with the preferred
+   transliteration right below it, same forceArabic + preferredTranslit convention as the
+   Flashcards front face (.flashcard-text-group). */
+.proverb-text-group { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .proverb-words {
-  flex: 1; min-width: 0;
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
   font-size: 22px; line-height: 1.6; direction: rtl; text-align: right;
 }
-body.translit-mode .proverb-words { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
-body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
+/* The list card's .proverb-words is always real Arabic (see proverbCardHtml's forceArabic arg)
+   regardless of the site's translit-mode/translit-en-mode toggle -- scoped to .proverb-card so
+   this doesn't win over the Flashcards/Fill-in-the-Blank uses of the same base class, which
+   still need those toggles for their own overrides. */
+body.translit-mode .proverb-card .proverb-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
+body.translit-en-mode .proverb-card .proverb-words { direction: rtl; text-align: right; }
+.proverb-translit-line { font-size: 15px; color: var(--mid); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
 .proverb-word.live { box-shadow: inset 0 -3px 0 0 currentColor; border-radius: 2px; }
 .proverb-sep { color: var(--mid); }
 .proverb-chev { flex-shrink: 0; color: var(--mid); font-size: 16px; transform: rotate(90deg); transition: transform .18s; }
