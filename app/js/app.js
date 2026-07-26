@@ -79,6 +79,15 @@ const watchScaler = createFontScaler({
 function applyWatchScale() { watchScaler.apply(); }
 function adjustWatchScale(dir) { watchScaler.adjust(dir); }
 
+// Flashcards' own text-size control -- lives inside the card's icon row (rebuilt on every
+// renderFlashcardsView call) rather than static chrome like Reader/Watch's, so apply() is called
+// again at the end of every render instead of once at startup.
+const flashcardScaler = createFontScaler({
+  cssVar: '--fc-text-scale', storageKey: 'arabicLabFlashcardScale',
+  labelId: 'flashcard-text-size-label', decId: 'flashcard-text-size-dec', incId: 'flashcard-text-size-inc',
+});
+function adjustFlashcardScale(dir) { flashcardScaler.adjust(dir); }
+
 /* ─────────────── LANGUAGE PREFERENCE (global, top-bar) ─────────────── */
 // 'he' = Hebrew-primary with full grammatical scaffolding (בניין, שורש badges, Hebrew
 // conjugation column) — English still reachable per word/phrase via the EN chip.
@@ -2168,6 +2177,49 @@ const FC_BULB_ICON_SVG = '<svg width="14" height="17" viewBox="0 0 16 20" fill="
 const FC_INFO_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.3"/><path d="M10 9.2v5"/><circle cx="10" cy="6.3" r="0.9" fill="currentColor" stroke="none"/></svg>';
 const FC_USAGE_ICON_SVG = '<svg width="17" height="14" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 3.2c0-1.1.9-2 2-2h11c1.1 0 2 .9 2 2v7.6c0 1.1-.9 2-2 2H8l-4 3.2v-3.2h-1.5c-1.1 0-2-.9-2-2V3.2z"/></svg>';
 const FC_STAR_ICON_SVG = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 1.5l2.5 5.6 6 .6-4.5 4.1 1.3 6.1-5.3-3.2-5.3 3.2 1.3-6.1-4.5-4.1 6-.6z"/></svg>';
+const FC_EXPAND_ICON_SVG = '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 2H2v5M13 2h5v5M13 18h5v-5M7 18H2v-5"/></svg>';
+const FC_COMPRESS_ICON_SVG = '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h5V2M18 7h-5V2M18 13h-5v5M2 13h5v5"/></svg>';
+/* ─────────────── FLASHCARDS FULL SCREEN ───────────────
+   A CSS class (.flashcard-fullscreen, applied to #view-flashcards) does the actual layout work --
+   see style.css -- so this still fills the screen even where the real Fullscreen API below is
+   unsupported or the request is rejected (older iOS Safari webviews in particular). The real API
+   call is a bonus on top: where it succeeds it also hides the browser chrome (address bar). */
+let flashcardFullscreenOn = false;
+function callIfPresent(fn, ctx) {
+  if (!fn) return;
+  const result = fn.call(ctx);
+  if (result && result.catch) result.catch(() => {});
+}
+function toggleFlashcardFullscreen() {
+  const el = document.getElementById('view-flashcards');
+  if (!flashcardFullscreenOn) {
+    callIfPresent(el.requestFullscreen || el.webkitRequestFullscreen, el);
+    flashcardFullscreenOn = true;
+  } else {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      callIfPresent(document.exitFullscreen || document.webkitExitFullscreen, document);
+    }
+    flashcardFullscreenOn = false;
+  }
+  el.classList.toggle('flashcard-fullscreen', flashcardFullscreenOn);
+  renderFlashcardsView();
+}
+// Catches the learner exiting via Escape/back-gesture/browser UI instead of our own button, so
+// the toggle state and icon-row button stay in sync with reality either way.
+function syncFlashcardFullscreenState() {
+  if (flashcardFullscreenOn && !(document.fullscreenElement || document.webkitFullscreenElement)) {
+    flashcardFullscreenOn = false;
+    document.getElementById('view-flashcards').classList.remove('flashcard-fullscreen');
+    renderFlashcardsView();
+  }
+}
+document.addEventListener('fullscreenchange', syncFlashcardFullscreenState);
+document.addEventListener('webkitfullscreenchange', syncFlashcardFullscreenState);
+function flashcardFullscreenBtnHtml(en) {
+  const label = en ? (flashcardFullscreenOn ? 'Exit full screen' : 'Full screen') : (flashcardFullscreenOn ? 'צא ממסך מלא' : 'מסך מלא');
+  return '<button class="flashcard-icon-btn' + (flashcardFullscreenOn ? ' active' : '') + '" onclick="toggleFlashcardFullscreen()" aria-label="' + label + '" title="' + label + '">' +
+    (flashcardFullscreenOn ? FC_COMPRESS_ICON_SVG : FC_EXPAND_ICON_SVG) + '</button>';
+}
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
   if (!el) return;
@@ -2182,6 +2234,7 @@ function renderFlashcardsView() {
           ? ('Took ' + flashcardRound + ' round' + (flashcardRound === 1 ? '' : 's'))
           : ('לקח ' + flashcardRound + ' ' + (flashcardRound === 1 ? 'סבב' : 'סבבים'))) + '</div>' +
         '<button class="flashcard-nav-btn fillblank-restart-btn" onclick="shuffleFlashcardDeck(); renderFlashcardsView();">' + (en ? 'Start Over' : 'התחל מחדש') + '</button>' +
+        '<div class="flashcard-icon-row">' + flashcardFullscreenBtnHtml(en) + '</div>' +
       '</div>';
     return;
   }
@@ -2218,6 +2271,12 @@ function renderFlashcardsView() {
           : '') +
         '<button class="flashcard-icon-btn' + (flashcardShowInfo ? ' active' : '') + '" data-fc-btn="info" onclick="toggleFlashcardInfo()" aria-label="' + (en ? 'More' : 'עוד') + '" title="' + (en ? 'More' : 'עוד') + '">' + FC_INFO_ICON_SVG + '</button>' +
         '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>' +
+        '<div class="text-size-ctrl" id="flashcard-text-size-ctrl">' +
+          '<button class="text-size-btn" id="flashcard-text-size-dec" onclick="adjustFlashcardScale(-1)" aria-label="' + (en ? 'Decrease text size' : 'הקטן טקסט') + '">A&#8315;</button>' +
+          '<span class="text-size-label" id="flashcard-text-size-label">100%</span>' +
+          '<button class="text-size-btn" id="flashcard-text-size-inc" onclick="adjustFlashcardScale(1)" aria-label="' + (en ? 'Increase text size' : 'הגדל טקסט') + '">A&#8314;</button>' +
+        '</div>' +
+        flashcardFullscreenBtnHtml(en) +
       '</div>' +
       '<div class="flashcard-reveal' + (flashcardShowInfo ? ' open' : '') + '" id="flashcard-reveal-info">' +
         '<div class="flashcard-reveal-inner flashcard-info-rows">' +
@@ -2232,6 +2291,7 @@ function renderFlashcardsView() {
         ? (en ? 'Finish round ›' : 'סיום סבב ›')
         : (en ? 'Next ›' : 'הבא ›')) + '</button>' +
     '</div>';
+  flashcardScaler.apply();
 }
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
    One masked word per proverb, multiple choice from blankChoices (hand-authored per proverb --
