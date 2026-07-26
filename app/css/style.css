@@ -28,6 +28,18 @@ html, body {
   direction: rtl;
   transition: background .2s, color .2s;
 }
+/* ── SELECTABLE LESSON TEXT (design convention) ──
+   The app defaults to user-select: none above so taps on buttons/tabs/tiles don't fire a native
+   text-selection instead of the intended action. Any lesson content that's meant to be read
+   (proverb cards, flashcards, fill-in-the-blank sentences, word-scramble answers, vocab entries,
+   verb conjugation cards, the Reader/Watch headers, the About page) opts back into
+   user-select: text on its own container so learners can highlight and copy it -- see
+   .proverb-card, .flashcard, .fillblank-sentence, .scramble-built, .vocab-item, .verb-card,
+   .lesson-head, .watch-head, .about-wrap below. Any new lesson view/tab should follow the same
+   pattern: opt its content container into user-select: text, don't flip the global default.
+   The one deliberate exception is text with its own drag/tap gesture that native selection would
+   fight with -- the Reader's word-drag phrase lookup and the Watch transcript's word-range
+   selection -- both of those stay user-select: none by design. */
 button, .tab, .word, .vocab-chip, .verb-pill, .verb-group-header { touch-action: manipulation; }
 
 /* ── BRAND MARK (عربي joined to ערבי letter-by-letter, + LAB) ──
@@ -381,8 +393,9 @@ body.translit-en-mode .verb-pill-ar, body.translit-en-mode .verb-pill-root { dir
 /* drill-down card (left column) */
 .verb-pills + .verb-card { flex: 1; min-width: 0; }
 
-/* main verb card */
-.verb-card { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+/* main verb card -- selectable/copyable by default (see SELECTABLE LESSON TEXT convention near
+   the top of this file); cascades to the Arabic/gloss/conjugation text inside. */
+.verb-card { border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; user-select: text; -webkit-user-select: text; }
 
 .verb-card-head {
   padding: 24px 28px 20px;
@@ -508,9 +521,12 @@ body.lang-en .vocab-empty { direction: ltr; }
 body.lang-en .vocab-no-results { direction: ltr; }
 .vocab-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 @media (max-width: 560px) { .vocab-list { grid-template-columns: 1fr; } }
+/* Selectable/copyable by default (see SELECTABLE LESSON TEXT convention near the top of this
+   file); cascades to the saved word's Arabic/Hebrew/English text below. */
 .vocab-item {
   border: 1px solid var(--rule); border-radius: 10px; background: var(--bg);
   padding: 16px 16px 6px; display: flex; flex-direction: column;
+  user-select: text; -webkit-user-select: text;
 }
 .vocab-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
 /* .vocab-row-ar is flex:1, so in the inherited RTL layout it's anchored at the right (the "start"
@@ -606,12 +622,12 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
   width: var(--theme-card-w, auto); max-width: 100%;
 }
 .proverb-theme-top { display: flex; align-items: baseline; justify-content: center; gap: 7px; }
-.proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); }
+.proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); user-select: text; -webkit-user-select: text; }
 .proverb-theme-count { font-size: 12px; font-weight: 600; color: var(--mid); }
 /* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
    doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
    ellipsis) since the card is narrow rather than a full-width single line. */
-.proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; }
+.proverb-theme-teaser { font-size: 17px; line-height: 1.4; color: var(--black); opacity: .55; user-select: text; -webkit-user-select: text; }
 /* Styled like a real disclosure control (bordered circle, same roundel language as
    .proverb-pronounce) rather than a bare glyph, so it reads as a button, not decoration. */
 .proverb-theme-chev {
@@ -624,7 +640,11 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverb-theme-head.open .proverb-theme-chev {
   transform: rotate(-90deg); background: var(--black); color: var(--on-accent); border-color: var(--black);
 }
-.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; }
+/* Selectable/copyable by default (see SELECTABLE LESSON TEXT convention near the top of this
+   file) -- unlike the Reader/Watch transcript, proverb cards have no drag-gesture on their
+   words, so native text selection can't conflict with anything; this cascades to
+   .proverb-words/.proverb-sep/.proverb-explain-text below. */
+.proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; user-select: text; -webkit-user-select: text; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 /* Same anchor/alignment mismatch as .vocab-card-head above: .proverb-words is flex:1 and, once
@@ -680,10 +700,13 @@ body.lang-en .proverb-explain-row.icon-row { direction: ltr; }
    "Round N ·" / "Cycle N ·" prefix used by Flashcards/Fill-in-the-Blank happens to mask the same
    bug there). direction:ltr keeps the digits and the "/" in the order they were written in. */
 body.lang-en .flashcard-progress { direction: ltr; }
+/* Selectable/copyable by default (see SELECTABLE LESSON TEXT convention near the top of this
+   file); cascades to .flashcard-words/-translit-line/-reveal-text below. */
 .flashcard {
   border: 1px solid var(--rule); border-radius: 16px; background: var(--bg);
   padding: 40px 32px 28px;
   display: flex; flex-direction: column; align-items: center; text-align: center;
+  user-select: text; -webkit-user-select: text;
 }
 /* Arabic + transliteration read as one caption-style unit -- tight gap between them -- with a
    clearly bigger gap before the icon row/reveals below, so the default (nothing revealed) card
@@ -752,7 +775,7 @@ body.lang-en .flashcard-nav { direction: ltr; }
 
 /* ── FILL-IN-THE-BLANK TAB ── (reuses .flashcard/.flashcard-progress/.flashcard-nav/
    .flashcard-icon-row/.flashcard-icon-btn from the Flashcards tab above) */
-.fillblank-sentence { font-size: 26px; line-height: 1.8; }
+.fillblank-sentence { font-size: 26px; line-height: 1.8; user-select: text; -webkit-user-select: text; }
 /* Sentence is always real Arabic script regardless of the global learning-alphabet toggle (see
    renderFillBlankView's sentenceHtml) -- these overrides win over the general .proverb-words
    translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
@@ -793,6 +816,7 @@ body.lang-en .fillblank-feedback { direction: ltr; }
 .scramble-built {
   min-height: 44px; font-size: 26px; line-height: 1.8;
   display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  user-select: text; -webkit-user-select: text;
 }
 /* Built/answer row is always real Arabic script regardless of the global learning-alphabet
    toggle (see scrambleChunkText's forceArabic param) -- same override pattern as
