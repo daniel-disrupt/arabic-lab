@@ -1255,7 +1255,7 @@ function renderVerbsView() {
             <td class="conj-ar" dir="${scriptDir()}">${arText(row.ar)}</td>
             <td class="conj-he">${row.he}</td>
             <td class="conj-pronoun">${row.pronoun}</td>
-            ${row.context ? `<td class="conj-context">${row.context}</td>` : '<td></td>'}
+            ${row.context ? `<td class="conj-context">${arText(row.context)}</td>` : '<td></td>'}
           </tr>
         `).join('')}
       </table>
