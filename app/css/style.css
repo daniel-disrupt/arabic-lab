@@ -476,6 +476,13 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
 .vocab-title { font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
 .vocab-count { font-size: 12px; color: var(--mid); }
 .vocab-empty { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; line-height: 1.6; }
+/* No dir is set on this element (it's a static node whose textContent gets swapped in
+   applyAppLang, not re-templated with an inline dir like most other prose strings) -- so its
+   English copy was inheriting the page's RTL base direction. That's harmless for text-align
+   (already centered either way) but the bidi algorithm still reorders trailing punctuation in a
+   one-line English sentence sitting in an RTL paragraph: the final period was rendering *before*
+   "No words...' instead of after "Save". direction:ltr fixes the reordering, not just alignment. */
+body.lang-en .vocab-empty { direction: ltr; }
 .vocab-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 .vocab-search {
   flex: 1 1 200px; min-width: 160px; font-size: 13px; padding: 8px 12px;
@@ -497,6 +504,8 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
   font-family: inherit;
 }
 .vocab-no-results { grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--mid); font-size: 14px; }
+/* Same bidi-reordering fix as .vocab-empty above -- this string is also built without an inline dir. */
+body.lang-en .vocab-no-results { direction: ltr; }
 .vocab-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
 @media (max-width: 560px) { .vocab-list { grid-template-columns: 1fr; } }
 .vocab-item {
@@ -504,6 +513,14 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
   padding: 16px 16px 6px; display: flex; flex-direction: column;
 }
 .vocab-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+/* .vocab-row-ar is flex:1, so in the inherited RTL layout it's anchored at the right (the "start"
+   side) and grows leftward toward .vocab-card-actions -- fine while the word itself is right-aligned
+   Arabic/Hebrew script, but once translit-en-mode left-aligns that word's text (see .vocab-row-ar
+   below), the text hugs the LEFT edge of a box still anchored at the right, stranding a dead gap
+   between the word and the card's right edge. Flipping the head to ltr re-anchors the flex:1 box
+   at the left so the (now left-aligned) text sits flush against it with no gap, and the action
+   icons settle at the right -- the standard LTR list-row convention (content, then controls). */
+body.translit-en-mode .vocab-card-head { direction: ltr; }
 .vocab-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .vocab-row-ar {
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
@@ -587,6 +604,11 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverb-card { border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); padding: 14px 16px; transition: border-color .12s; }
 .proverb-card.expanded { border-color: var(--black); }
 .proverb-card-head { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+/* Same anchor/alignment mismatch as .vocab-card-head above: .proverb-words is flex:1 and, once
+   translit-en-mode left-aligns its text, needs the row itself flipped to ltr so the flex:1 box
+   is anchored on the same side its text hugs -- otherwise the words strand themselves next to
+   .proverb-chev on the left while a dead gap opens up between them and .proverb-pronounce. */
+body.translit-en-mode .proverb-card-head { direction: ltr; }
 .proverb-pronounce {
   flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
   border: 1px solid var(--rule); background: transparent; cursor: pointer;
@@ -611,6 +633,14 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
    buttons, plus a usage-only speech-bubble -- see proverbExplainHtml in app.js) -- icon sits
    beside the text instead of stacked above it, so this runs as a row, not a column. */
 .proverb-explain-row.icon-row { display: flex; flex-direction: row; align-items: flex-start; gap: 10px; }
+/* The row's own direction (not just its text's) needs to follow appLang: the icon is always
+   first in the DOM (a leading marker before the text, not a trailing decoration), and
+   flex-direction stays a plain row rather than row-reverse, so which side the icon lands on is
+   purely a function of the row's inherited direction. In Hebrew that inherited RTL correctly
+   puts the icon on the right (the start side, ahead of the text); left as rtl in English mode
+   it would still put the icon on the right, reading backwards for LTR eyes. Flipping the row to
+   ltr here keeps "icon leads the text" true in both languages instead of only one. */
+body.lang-en .proverb-explain-row.icon-row { direction: ltr; }
 .proverb-explain-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: var(--mid); }
 /* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
    isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. min-width: 0
@@ -622,6 +652,11 @@ body.translit-en-mode .proverb-words { direction: ltr; text-align: left; }
 
 /* ── FLASHCARDS TAB ── */
 .flashcard-progress { text-align: center; font-size: 12px; color: var(--mid); letter-spacing: .04em; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+/* No dir on this element -- in Word Scramble, whose progress string is bare "N / total" with no
+   leading word to anchor a strong-LTR run, an RTL paragraph reorders it to read "total / N" (the
+   "Round N ·" / "Cycle N ·" prefix used by Flashcards/Fill-in-the-Blank happens to mask the same
+   bug there). direction:ltr keeps the digits and the "/" in the order they were written in. */
+body.lang-en .flashcard-progress { direction: ltr; }
 .flashcard {
   border: 1px solid var(--rule); border-radius: 16px; background: var(--bg);
   padding: 40px 32px 28px;
@@ -676,6 +711,15 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    "icon + text, no label" visual language across both tabs. */
 .flashcard-info-rows { display: flex; flex-direction: column; gap: 10px; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+/* The Prev/Next buttons are built with a hardcoded leading "‹ " / trailing " ›" regardless of
+   language (see goToFlashcard/goToFillBlank/goToScramble nav markup in app.js) -- rendered inside
+   the inherited RTL row, the "‹"/"›" are weak/neutral bidi characters that get reordered relative
+   to the strong-LTR "Prev"/"Next" word next to them, so English mode was showing "Prev ›" and
+   "‹ Next" -- chevron on the wrong side of each label -- and, since the row itself stayed RTL, the
+   Prev button (first in the DOM) rendered on the right and Next (second) on the left, backwards
+   from the LTR reading convention. Flipping the row to ltr fixes both at once: each label's own
+   chevron lands back on the correct side, and Prev/Next fall into their expected left/right slots. */
+body.lang-en .flashcard-nav { direction: ltr; }
 .flashcard-nav-btn {
   flex: 1; font-size: 13px; font-weight: 600; padding: 10px; border-radius: 8px;
   border: 1px solid var(--rule); background: var(--bg); color: var(--black); cursor: pointer; transition: all .12s;
@@ -709,6 +753,11 @@ body.translit-mode .fillblank-choice-btn { font-family: -apple-system, 'Segoe UI
 .fillblank-choice-btn.correct { background: #e8f5e9; border-color: #2e7d32; color: #1b5e20; }
 .fillblank-choice-btn.incorrect { background: #fdecea; border-color: #c62828; color: #b71c1c; }
 .fillblank-feedback { font-size: 14px; font-weight: 600; margin-top: 14px; }
+/* Built without an inline dir (see fillblank/scramble render in app.js) -- in the inherited RTL
+   context this one-line, punctuation-terminated English string ("Solved!", "Correct!", "Not
+   quite.") gets bidi-reordered so the trailing mark renders first ("!Solved" instead of
+   "Solved!"). Same fix as .vocab-empty/.vocab-no-results/.flashcard-progress above. */
+body.lang-en .fillblank-feedback { direction: ltr; }
 .fillblank-icon-row { margin-top: 16px; }
 .fillblank-done { gap: 10px; padding: 56px 32px; }
 .fillblank-done-title { font-size: 22px; font-weight: 700; }
