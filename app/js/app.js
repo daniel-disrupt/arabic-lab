@@ -1974,12 +1974,21 @@ function proverbExplainHtml(p) {
 function proverbCardHtml(p) {
     const expanded = expandedProverbIds.has(p.id);
     const hasAudio = !!(p.audio && p.audio.src);
+    // Card is always real Arabic script with the preferred transliteration right below it --
+    // same forceArabic + preferredTranslit convention as the Flashcards front face -- so the
+    // learner sees both scripts before ever tapping into the literal/explanation reveal below,
+    // regardless of the site's global learning-alphabet toggle.
+    const plainText = p.arWords.map(t => t.w).join(' ');
+    const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
     return '<div class="proverb-card' + (expanded ? ' expanded' : '') + '">' +
       '<div class="proverb-card-head" onclick="toggleProverbExpand(\'' + p.id + '\')">' +
         (hasAudio
           ? '<button class="proverb-pronounce" onclick="event.stopPropagation(); playProverbAudio(\'' + p.id + '\', document.getElementById(\'proverb-words-' + p.id + '\'), this)" aria-label="' + (appLang === 'en' ? 'Listen' : 'השמע') + '">' + PRONOUNCE_ICON_SVG + '</button>'
           : '') +
-        '<div class="proverb-words" id="proverb-words-' + p.id + '" dir="' + scriptDir() + '">' + proverbWordsHtml(p) + '</div>' +
+        '<div class="proverb-text-group">' +
+          '<div class="proverb-words" id="proverb-words-' + p.id + '" dir="rtl">' + proverbWordsHtml(p, true) + '</div>' +
+          '<div class="proverb-translit-line" dir="' + translitDir + '">' + preferredTranslit(plainText) + '</div>' +
+        '</div>' +
         '<span class="proverb-chev">›</span>' +
       '</div>' +
       (expanded ? proverbExplainHtml(p) : '') +
