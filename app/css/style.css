@@ -145,8 +145,12 @@ body.lang-en .mobile-header-title { direction: ltr; }
 }
 /* The drawer is only ~260px wide after padding -- a label plus 3 buttons side by side (the
    header popover's layout) doesn't fit at any reasonable button text length, so stack label
-   above buttons here instead of shrinking text to chase a moving target. */
-.side-menu-settings .switch-group { flex-direction: column; align-items: flex-end; gap: 8px; }
+   above buttons here instead of shrinking text to chase a moving target.
+   Selector is scoped by #side-menu (not just .side-menu-settings) so its specificity beats
+   body.lang-en .switch-group below -- without the id, that rule's extra type selector
+   out-specifies this one in English mode and silently puts the label back beside the
+   buttons, overflowing the drawer. */
+#side-menu .side-menu-settings .switch-group { flex-direction: column; align-items: flex-end; gap: 8px; }
 /* The drawer itself is RTL-oriented regardless of UI language -- .side-menu-item above stays
    text-align:right and border-right-highlighted even in English, since it's anchored to the
    hamburger's side. These settings rows match that same unconditional RTL treatment: label
