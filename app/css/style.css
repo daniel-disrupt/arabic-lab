@@ -3,7 +3,7 @@
   --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
   --rule: #E4E3E0; --active-bg: #F0EFE9;
   --bg: #fff; --on-accent: #fff; --on-accent-rgb: 255,255,255; --tint-rgb: 13,13,13;
-  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1; --fc-text-scale: 1; --fc-back-scale: 1;
+  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1;
   --ar-word-spacing: 0.2em;
 }
 /* ── READER MODE (dark theme, toggled from the mobile hamburger menu) ──
@@ -624,7 +624,12 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .chunk-preview-word.live { box-shadow: inset 0 -3px 0 0 currentColor; }
 
 /* ── PROVERBS TAB ── */
-.proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
+/* Wider than Flashcards/Fill-in-the-Blank/Word-Scramble below -- this tab's cards hold running
+   theme lists and multi-line literal/explanation text, so the extra width goes toward bigger
+   default text (see .proverb-words/.proverb-explain-text) rather than a manual text-size control,
+   which doesn't earn its keep on card-sized content -- see "Text size controls" in CLAUDE.md. */
+.proverbs-inner { max-width: 880px; margin: 0 auto; padding: 32px 24px 48px; }
+.flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
 .tab-intro { font-size: 15px; line-height: 1.7; color: var(--black); }
@@ -676,7 +681,7 @@ body.lang-en .proverb-theme-head { direction: ltr; }
   width: var(--theme-card-w, auto); max-width: 100%;
 }
 .proverb-theme-top { display: flex; align-items: baseline; justify-content: flex-start; gap: 7px; }
-.proverb-theme-name { font-size: 21px; font-weight: 700; color: var(--black); user-select: text; -webkit-user-select: text; }
+.proverb-theme-name { font-size: 23px; font-weight: 700; color: var(--black); user-select: text; -webkit-user-select: text; }
 /* Shown whether the group is open or closed -- a taste of what's inside so picking a topic
    doesn't mean tapping in blind (see PROVERBS TAB render note in app.js). Left to wrap (no
    ellipsis) since the card is narrow rather than a full-width single line. */
@@ -723,7 +728,7 @@ body.lang-en .proverb-theme-head { direction: ltr; }
    gap between words rather than relying on the font metrics alone. */
 .proverb-words {
   font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif;
-  font-size: 22px; line-height: 1.6; direction: rtl; text-align: right;
+  font-size: 26px; line-height: 1.6; direction: rtl; text-align: right;
   word-spacing: var(--ar-word-spacing);
 }
 /* The list card's .proverb-words is always real Arabic (see proverbCardHtml's forceArabic arg)
@@ -732,7 +737,7 @@ body.lang-en .proverb-theme-head { direction: ltr; }
    still need those toggles for their own overrides. */
 body.translit-mode .proverb-card .proverb-words { font-family: 'Traditional Arabic','Arabic Typesetting','Scheherazade New',serif; }
 body.translit-en-mode .proverb-card .proverb-words { direction: rtl; text-align: right; }
-.proverb-translit-line { font-size: 15px; color: var(--mid); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
+.proverb-translit-line { font-size: 17px; color: var(--mid); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; }
 /* English transliteration keeps its own dir="ltr" (see proverbCardHtml's translitDir) so the
    Latin word order reads normally left-to-right, but the block itself is still right-justified --
    text-align is independent of dir -- so it sits flush under the right-aligned Arabic line above
@@ -768,7 +773,7 @@ body.lang-en .proverb-explain-row.icon-row { direction: ltr; }
    is the same flex-shrink fix .proverb-words needs above -- without it this text, as a row
    sibling of the fixed-width icon, won't shrink below its own content width and can overflow
    the card instead of wrapping. overflow-wrap covers any single token too long to fit at all. */
-.proverb-explain-text { flex: 1; min-width: 0; font-size: 16px; line-height: 1.6; overflow-wrap: break-word; }
+.proverb-explain-text { flex: 1; min-width: 0; font-size: 18px; line-height: 1.6; overflow-wrap: break-word; }
 .stub-view { padding: 64px 20px; text-align: center; color: var(--mid); font-size: 14px; }
 
 /* ── FLASHCARDS TAB ── */
@@ -790,11 +795,7 @@ body.lang-en .flashcard-progress { direction: ltr; }
    clearly bigger gap before the icon row/reveals below, so the default (nothing revealed) card
    reads as a compact, deliberate block instead of a mostly-empty box. */
 .flashcard-text-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
-/* Both scaled by the in-card text-size control (adjustFlashcardScale/--fc-text-scale) --
-   .flashcard-words is already Flashcards-only, but .flashcard-translit-line is reused by
-   Fill-in-the-Blank/Word-Scramble too, so its scaled rule is scoped to #flashcards-inner
-   specifically to avoid resizing text in those other tabs. */
-.flashcard-words { font-size: calc(40px * var(--fc-text-scale)); line-height: 1.5; }
+.flashcard-words { font-size: 40px; line-height: 1.5; }
 /* The card is always real Arabic script regardless of the global learning-alphabet toggle (see
    proverbWordsHtml's forceArabic param) -- these two overrides win over the general .proverb-words
    translit-mode/translit-en-mode rules (same specificity, declared later) so the font/direction
@@ -810,7 +811,6 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    highlight half of that pair. */
 .flashcard-translit-word.tapped { background: var(--black); color: var(--on-accent); border-radius: 3px; }
 .flashcard-translit-line { font-size: 19px; color: var(--mid); }
-#flashcards-inner .flashcard-translit-line { font-size: calc(19px * var(--fc-text-scale)); }
 /* Word-gloss tray and the info reveal panel both use the same animated max-height accordion as
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
    already in the DOM (see toggleFlashcardFlip/handleFlashcardWordTap), so the browser has a
@@ -847,16 +847,6 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    .proverb-explain -- reuses .proverb-explain-row/-icon/-text directly for one consistent
    "icon + text, no label" visual language across both tabs. */
 .flashcard-info-rows { display: flex; flex-direction: column; gap: 10px; }
-/* Back-face text (literal/meaning reveal) scales independently of the front's --fc-text-scale via
-   its own control (adjustFlashcardBackScale/--fc-back-scale, flashcard-back-text-size-ctrl in
-   app.js) -- scoped to #flashcards-inner since .proverb-explain-row/-icon/-text/.flashcard-info-rows
-   are shared with the Proverbs tab and the Fill-in-the-Blank/Word-Scramble reveal panels, none of
-   which should resize along with Flashcards. Fullscreen has its own viewport-clamped version of
-   these same rules further down that also multiplies in this scale. */
-#flashcards-inner .flashcard-info-rows { gap: calc(10px * var(--fc-back-scale)); }
-#flashcards-inner .proverb-explain-row.icon-row { gap: calc(10px * var(--fc-back-scale)); }
-#flashcards-inner .proverb-explain-icon { width: calc(20px * var(--fc-back-scale)); height: calc(16px * 1.6 * var(--fc-back-scale)); }
-#flashcards-inner .proverb-explain-text { font-size: calc(16px * var(--fc-back-scale)); line-height: 1.6; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 /* The Prev/Next buttons are built with a hardcoded leading "‹ " / trailing " ›" regardless of
    language (see goToFlashcard/goToFillBlank/goToScramble nav markup in app.js) -- rendered inside
@@ -963,13 +953,13 @@ body.lang-en .flashcard-nav { direction: ltr; }
    puts the back face's own generous whitespace to use instead of sitting at a fixed small size. */
 .flashcard-face-back .flashcard-info-rows { width: 100%; text-align: start; }
 /* Same width+height clamp formula as the front face above, so the back's default size also fills
-   the card rather than sitting at a vw-only floor -- and now also multiplied by --fc-back-scale,
-   the back's own independent text-size control (adjustFlashcardBackScale in app.js), separate
-   from the front's --fc-text-scale. */
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: calc(clamp(16px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: calc(clamp(12px, 1.6vw + 1.2vh, 20px) * var(--fc-back-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); height: calc(clamp(18px, 2.6vw + 2vh, 30px) * 1.65 * var(--fc-back-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: calc(clamp(18px, 2.6vw + 2vh, 30px) * var(--fc-back-scale)); line-height: 1.65; }
+   the card rather than sitting at a vw-only floor. Icon height matches the text clamp's own
+   line-box (font-size * line-height, same reasoning as the shared .proverb-explain-icon rule
+   above) rather than the width's clamp, so the icon stays aligned to the first line of text. */
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: clamp(16px, 2.4vw + 1.8vh, 32px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: clamp(12px, 1.6vw + 1.2vh, 20px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: clamp(22px, 2.4vw + 1.8vh, 32px); height: calc(clamp(18px, 2.6vw + 2vh, 30px) * 1.65); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: clamp(18px, 2.6vw + 2vh, 30px); line-height: 1.65; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
    A CSS-driven fixed overlay rather than relying solely on the real Fullscreen API -- the
@@ -1008,11 +998,9 @@ body.lang-en .flashcard-nav { direction: ltr; }
    .fc-front-translit above) and writes the largest px value that still fits into these two custom
    properties, so a short proverb fills its 50%/30% rows and a long one shrinks instead of
    overflowing off the top of a centered box. The clamp() here is only the fallback for the
-   instant before that JS runs on first paint. --fc-text-scale (the manual +/- control) still
-   multiplies on top either way, so growing past the fitted size is what puts .fc-front-arabic's
-   scroll to use. */
-#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(var(--fc-arabic-fit-base, clamp(56px, 8vw + 6vh, 130px)) * var(--fc-text-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(var(--fc-translit-fit-base, clamp(24px, 3vw + 2.4vh, 50px)) * var(--fc-text-scale)); }
+   instant before that JS runs on first paint. */
+#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: var(--fc-arabic-fit-base, clamp(56px, 8vw + 6vh, 130px)); }
+#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: var(--fc-translit-fit-base, clamp(24px, 3vw + 2.4vh, 50px)); }
 /* Landscape has little spare height, so trims the card's own padding/gaps to leave more of it to
    the text and reveal panel rather than shrinking the text itself. */
 @media (orientation: landscape) {
