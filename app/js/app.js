@@ -11,6 +11,7 @@ let INTRO_CONTENT = { en: { title: '', text: '' }, he: { title: '', text: '' } }
 let ABOUT_CONTENT = { en: { dir: 'ltr', sections: [] }, he: { dir: 'rtl', sections: [] } };
 let PROVERBS_INTRO = { en: '', he: '' };
 let HEADER_GLOSS = { title: null, location: null };
+let LESSON_TAB_LABELS = {}; // optional per-lesson tab label overrides, e.g. { en: { watch: 'Listen' } }
 
 /* ─────────────── READER STATE ─────────────── */
 const wordEls = [];
@@ -205,15 +206,19 @@ function applyAppLang() {
   document.getElementById('lesson-title').textContent = intro.title;
   document.getElementById('lesson-intro').textContent = intro.text;
   const tabLabels = TAB_LABELS[appLang];
+  // A lesson can override a tab's displayed label (e.g. an audio-only lesson calling the
+  // "watch" tab "Listen" instead of the video-lesson default "Home") without affecting any
+  // other lesson sharing the same tab id -- see initLesson()'s LESSON_TAB_LABELS assignment.
+  const lessonLabels = LESSON_TAB_LABELS[appLang] || {};
   ALL_TAB_NAMES.forEach(name => {
-    const label = tabLabels[name];
+    const label = lessonLabels[name] != null ? lessonLabels[name] : tabLabels[name];
     if (label == null) return;
     const tabEl = document.getElementById('tab-' + name);
     if (tabEl) tabEl.textContent = label;
     const menuEl = document.getElementById('menu-tab-' + name);
     if (menuEl) menuEl.textContent = label;
   });
-  document.getElementById('mobile-header-title').textContent = tabLabels[activeTabName];
+  document.getElementById('mobile-header-title').textContent = lessonLabels[activeTabName] != null ? lessonLabels[activeTabName] : tabLabels[activeTabName];
   const home = HOME_CONTENT[appLang];
   document.getElementById('watch-title').textContent = home.title;
   document.getElementById('watch-subtitle').innerHTML = home.subtitle;
@@ -448,11 +453,15 @@ function applyReaderMode() {
 }
 applyReaderMode();
 
-// #lesson-title-ar/#lesson-location-ar are hardcoded per-lesson markup in lesson.html, not
-// populated by JS -- capture the pristine Arabic once so applyScriptMode() can re-derive
-// (rather than re-fetch) their text on every toggle, same static-element pattern as audioEl above.
-const lessonTitleArOriginal = document.getElementById('lesson-title-ar') ? document.getElementById('lesson-title-ar').textContent : '';
-const lessonLocationArOriginal = document.getElementById('lesson-location-ar') ? document.getElementById('lesson-location-ar').textContent : '';
+// #lesson-title-ar/#lesson-location-ar start out as hardcoded markup in lesson.html (the
+// original Abed lesson's title/location, never updated for it since it's a straight port of
+// that lesson's original bespoke HTML) -- capture the pristine Arabic once so applyScriptMode()
+// can re-derive (rather than re-fetch) their text on every toggle, same static-element pattern
+// as audioEl above. `let` (not `const`) because initLesson() overwrites both the DOM text and
+// these captured originals from bundle.headerGloss when a lesson provides one, so newer lessons
+// aren't stuck displaying Abed's title/location.
+let lessonTitleArOriginal = document.getElementById('lesson-title-ar') ? document.getElementById('lesson-title-ar').textContent : '';
+let lessonLocationArOriginal = document.getElementById('lesson-location-ar') ? document.getElementById('lesson-location-ar').textContent : '';
 
 function rootMetaHtml(root, sharedRoot) {
   if (!root) return '';
@@ -2825,6 +2834,7 @@ function initLesson(bundle) {
   PROVERBS_INTRO = bundle.proverbsIntro || PROVERBS_INTRO;
   HEADER_GLOSS = bundle.headerGloss || HEADER_GLOSS;
   PROVERBS = bundle.proverbs || [];
+  LESSON_TAB_LABELS = bundle.meta.tabLabels || {};
 
   const base = 'lessons/' + bundle.meta.slug + '/';
   LESSON_BASE = base;
@@ -2833,8 +2843,32 @@ function initLesson(bundle) {
     document.getElementById('watch-video-source').src = base + bundle.meta.videoPath;
     document.getElementById('watch-captions').src = base + bundle.meta.captionsPath;
     watchVideoEl.load();
+  } else if (bundle.meta.audioPath) {
+    // Audio-only "Listen" lesson: the same <video> element plays the audio track just fine
+    // (HTMLVideoElement and HTMLAudioElement share currentTime/duration/play/pause, which is
+    // all buildWatchTranscript()/updateWatchLiveWord()/etc. ever touch) -- the .audio-only class
+    // just hides the visual video-picture chrome (box, play overlay, mobile caption burn-in),
+    // which has nothing meaningful to show without a picture. See style.css for the CSS side.
+    const src = document.getElementById('watch-video-source');
+    src.src = base + bundle.meta.audioPath;
+    src.type = 'audio/mpeg';
+    document.querySelector('.watch-video-wrap').classList.add('audio-only');
+    watchVideoEl.load();
   }
   document.title = bundle.meta.title;
+
+  // Override the Reader's visible title/location -- see the lessonTitleArOriginal/
+  // lessonLocationArOriginal declaration for why this can't just stay static markup.
+  if (HEADER_GLOSS.title && HEADER_GLOSS.title.ar) {
+    lessonTitleArOriginal = HEADER_GLOSS.title.ar;
+    const e = document.getElementById('lesson-title-ar');
+    if (e) e.textContent = lessonTitleArOriginal;
+  }
+  if (HEADER_GLOSS.location && HEADER_GLOSS.location.ar) {
+    lessonLocationArOriginal = HEADER_GLOSS.location.ar;
+    const e = document.getElementById('lesson-location-ar');
+    if (e) e.textContent = lessonLocationArOriginal;
+  }
 
   buildReader();
   buildWatchTranscript();

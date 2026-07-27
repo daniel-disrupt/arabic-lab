@@ -1,17 +1,17 @@
 ---
 name: lesson-voice-karaoke
-description: Add TTS voice audio + word-level karaoke highlighting to a lesson (or a new lesson's items). Use when a lesson needs a pronounce/play button with synced word highlighting, when generating or regenerating audio for an existing lesson (Proverbs, Reader, or a future one), or when the user asks for "voice", "audio", "karaoke", or "pronunciation" on lesson content.
+description: Add TTS or real-recording voice audio + word-level karaoke highlighting to a lesson (or a new lesson's items). Use when a lesson needs a pronounce/play button with synced word highlighting, when generating or regenerating audio for an existing lesson (Proverbs, Reader, Watch, or a future one), or when the user asks for "voice", "audio", "karaoke", or "pronunciation" on lesson content.
 ---
 
 # Voice audio + karaoke highlighting for a lesson
 
-This project has two working, shipped implementations of "play audio, highlight
-the current word as it plays." Before writing anything new, identify which
-shape a lesson needs — the UI/CSS/highlight machinery already exists for both
-and essentially never needs new JS or CSS; the only real work is usually the
-audio-generation script.
+This project has three working, shipped-or-proven implementations of "play
+audio, highlight the current word as it plays." Before writing anything new,
+identify which shape a lesson needs — the UI/CSS/highlight machinery already
+exists for all three and essentially never needs new JS or CSS; the only real
+work is usually the audio/timing-generation script.
 
-## The two architectures
+## The three architectures
 
 **1. Lesson-wide single track, global word index** (the Reader/Watch pattern —
 `abed-jaffa-speech`). One long recording covering the whole lesson;
@@ -34,7 +34,25 @@ per-item lesson (see "Adding this to a new lesson" below). Use this shape for
 a lesson made of many small, discrete, independently-playable units: proverbs,
 vocab items, single example sentences, etc.
 
-Both shapes share the same core UI primitives in `app/js/app.js`:
+**3. Real recording, direct alignment** (the Watch tab pattern, and now
+generalized — first done ad hoc for `abed-jaffa-speech`'s Watch tab, later
+turned into a reusable script for the Sami Abu Shehadeh Jaffa-story lesson).
+No TTS involved at all: the lesson's audio *is* a real recording (a podcast
+excerpt, an interview, a speech), and a literal-cleanup transcript of that same
+recording is aligned directly against it. Driver script:
+`scripts/align-real-audio-words.py <audio.wav> <transcript.txt> <output.json>`
+— one whisper pass with `word_timestamps=True` over the whole file, then
+per-segment-windowed fuzzy matching (same `best_partition` algorithm as
+`align-voiceover-words.py`, see below) against the known transcript text.
+Output is `[{idx, word, start?, end?}, ...]` with global word indices, same
+convention as the lesson-wide TTS shape — feed it into the same
+`wordEls[].globalIdx` / `data-gi` rendering pattern. Use this shape when the
+lesson's own real audio (not a synthesized voiceover) should drive playback —
+e.g. an interview/speech clip where hearing the actual person's voice matters,
+as opposed to Reader-style lessons where a clean synthesized narration is
+preferred.
+
+All three shapes share the same core UI primitives in `app/js/app.js`:
 `findActiveTimedIndex(sortedTimedWords, time)` (the generic "which word is
 active at time t" lookup, given a `{idx,t}[]` sorted by `t`), and per-word
 `data-gi="<idx>"` stamps on rendered word spans that the highlight targets via
@@ -46,19 +64,34 @@ shape) or `buildReader()` (lesson-wide shape) already do.
 
 ## The core reliability principle
 
-Word-level alignment is only trustworthy when the audio is **TTS-synthesized
-directly from the same text being aligned back to** — that makes
-faster-whisper's pass closer to forced alignment than free transcription,
-since there's no rephrasing/reordering between what was said and what's
-written. Alignment against a *real recording* of independently spoken content
-is inherently lossy: the Reader's Watch-tab-vs-Reader-tab comparison found
-~87% word match when aligning a raw recording to its own ASR transcript, but
-only ~65% when aligning that same recording to a separately *edited* reading
-text (see `files/CONTENT_PROJECT_BRIEF.md`'s pilot notes). For any new
-TTS-synthesized-audio case, expect the reliable end of that range, but still:
+Word-level alignment reliability runs on a spectrum, from most to least
+trustworthy, depending on how far the "known" text is from what's literally
+in the audio:
+
+1. **TTS-synthesized directly from the same text being aligned back to**
+   (architectures 1 and 2 above) — closest to forced alignment, since there's
+   no rephrasing/reordering between what was said and what's written.
+2. **A real recording aligned against its own literal-cleanup transcript**
+   (architecture 3) — the transcript is a lightly-corrected version of what
+   was actually said (obvious ASR misfires fixed, but not smoothed into essay
+   prose), so it stays very close to forced-alignment quality. Measured at
+   **~87-93%** across two real cases: the original Watch tab (`abed-jaffa-speech`,
+   ~87%) and the Sami Abu Shehadeh Jaffa-story lesson (92.7%, 1020/1100 words,
+   using `align-real-audio-words.py`'s segment-windowed fuzzy matching).
+3. **A real recording aligned against a heavily *rewritten* reading-edition
+   essay** — the least reliable case, only ~65% (see
+   `files/CONTENT_PROJECT_BRIEF.md`'s pilot notes), because the essay's
+   smoothed spoken syntax and reconstructed phrasing genuinely diverges from
+   what was said. Avoid this combination if avoidable — prefer case 2's
+   literal-cleanup transcript for anything that needs to stay audio-synced,
+   and reserve the fully-rewritten essay for a separate Reader-style text
+   (optionally with its own TTS voiceover, architecture 1) rather than trying
+   to sync it to the real recording directly.
+
+Regardless of which case applies:
 
 - **Always print/inspect the per-item match rate** (words aligned / total
-  words). Both driver scripts do this already — don't skip it.
+  words). All three driver scripts do this already — don't skip it.
 - **Never fabricate a timestamp** for a word the aligner didn't match. Leave
   it out of `wordTimes` entirely; the UI already handles a word with no
   matching `idx` by simply never highlighting it, rather than guessing.
@@ -111,20 +144,46 @@ TTS-synthesized-audio case, expect the reliable end of that range, but still:
    trusting the rest of the batch).
 5. Commit the new audio files and the updated `data.json` together.
 
-If a new lesson is instead one continuous passage (lesson-wide shape), follow
-`scripts/generate-voiceover.js` and `scripts/align-voiceover-words.py`
-directly — same alignment tool, different chunking/output wiring (ffmpeg
-concat, `voiceover-data.js` output file instead of writing into `data.json`).
+If a new lesson is instead one continuous passage (lesson-wide shape), use
+`scripts/generate-voiceover-for-lesson.js <slug>` (reads/writes that lesson's
+own `app/lessons/<slug>/data.json` directly — the current architecture) rather
+than the older `scripts/generate-voiceover.js`, which still targets the
+retired hardcoded `app/js/lesson-data.js`/`voiceover-data.js` files nothing
+loads anymore (kept only as historical reference for regenerating Abed's
+original lesson if that ever comes up). Same underlying pipeline
+(`align-voiceover-words.py`, ffmpeg concat) either way.
+
+## Adding this to a new real-recording-style lesson
+
+1. Prerequisites: the lesson's actual audio file (real recording, not
+   synthesized) and a literal-cleanup transcript of it — segment-level
+   `[start -> end] text` lines, obvious ASR misfires already fixed but *not*
+   smoothed into essay prose (see the reliability principle above for why
+   that distinction matters). Producing that transcript in the first place —
+   sourcing the raw audio, scouting-pass transcription to find the relevant
+   clip, high-quality re-transcription — is a separate, earlier pipeline step.
+2. Run `python scripts/align-real-audio-words.py <audio.wav> <transcript.txt>
+   <output.json>`. Inspect the printed match rate and any fuzzy-match lines
+   before trusting the output — same standard as the TTS scripts.
+3. Wire `output.json`'s `{idx, word, start}` entries into the lesson-wide
+   `wordEls[].globalIdx` / `data-gi` rendering pattern (same as
+   `voiceover-data.js` in architecture 1) — a word with no `start` key simply
+   never highlights, by design.
+4. Verify by ear + eye before committing, same as the other two shapes.
 
 ## Requirements
 
-- Node 18+ (both driver scripts use global `fetch`)
-- ffmpeg + ffprobe on PATH — **only** for the lesson-wide shape (concatenation
-  + chunk-duration labels); the per-item shape needs neither.
-- Python 3 + `faster-whisper` (`pip install faster-whisper`) — shared by both
-  shapes via `align-voiceover-words.py`, unmodified regardless of which
-  driver script calls it.
-- `OPENAI_API_KEY` env var for whichever driver script does the synthesizing.
+- Node 18+ (architectures 1 and 2's driver scripts use global `fetch` for the
+  TTS API call) — **not needed** for architecture 3, which is pure Python.
+- ffmpeg + ffprobe on PATH — for the lesson-wide TTS shape (concatenation +
+  chunk-duration labels) and for preparing architecture 3's source audio
+  (extracting/splicing the real recording); the per-item TTS shape needs
+  neither.
+- Python 3 + `faster-whisper` (`pip install faster-whisper`) — shared by all
+  three shapes' alignment step, unmodified regardless of which driver script
+  calls it. Architecture 3 needs *only* this (no API key at all).
+- `OPENAI_API_KEY` env var for whichever driver script does the TTS
+  synthesizing (architectures 1 and 2 only).
   **Export this in your own terminal and run the script there — never paste
   a real key into a Claude Code (or any agent) session.** If you're working
   with an agent on this, it should hand you the exact command to run
