@@ -795,9 +795,9 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    the Vocab tab's .vocab-expand/.open -- toggling only flips this class on an element that's
    already in the DOM (see toggleFlashcardFlip/handleFlashcardWordTap), so the browser has a
    real starting height to transition from instead of the layout just snapping. In full screen,
-   the word-gloss tray becomes a positioned popover instead -- see .flashcard-face-front
-   .flashcard-word-tray further down -- but the info-reveal accordion here still applies as-is to
-   the normal in-page card. */
+   the tray instead lives in its own reserved row -- see .fc-front-tray further down -- fading
+   in/out rather than expanding, since that row's height is already reserved and needs no
+   accordion; the info-reveal accordion here still applies as-is to the normal in-page card. */
 .flashcard-word-tray {
   max-height: 0; overflow: hidden; opacity: 0; width: 100%;
   font-size: 15px; background: var(--active-bg); border-radius: 8px;
@@ -885,25 +885,35 @@ body.lang-en .flashcard-nav { direction: ltr; }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
 .flashcard-face-back { transform: rotateY(180deg); }
-.flashcard-face-front .flashcard-text-group { margin-bottom: 0; }
-/* Reserves a fixed strip along the bottom of the front face for the gloss tray below, so the
-   proverb+transliteration block (centered by the base .flashcard-face justify-content: center)
-   sits a bit higher within the remaining space instead of dead-center on the whole face -- the
-   same room a tapped word's gloss will dock into, rather than the tray having to float over
-   whichever text happens to be nearby (that used to land on top of the transliteration line
-   whenever a word was too close to the face's bottom edge for the popover to fit above it). */
-.flashcard-face-front { padding-bottom: clamp(64px, 15vh, 130px); }
-/* The gloss tray docks to one consistent spot -- centered along the bottom of the front face,
-   inside the padding-bottom reserve above -- regardless of which word was tapped, instead of the
-   old per-word popover (positionFlashcardWordTray) that floated above/below the tapped word and
-   could end up covering the transliteration line when there wasn't room above. */
-.flashcard-face-front .flashcard-word-tray {
-  position: absolute; left: 50%; bottom: 0; width: auto; max-width: 88%; margin: 0; max-height: none; overflow: visible;
-  padding: 10px 16px; opacity: 0; transform: translateX(-50%) scale(.94); pointer-events: none;
-  box-shadow: 0 6px 20px rgba(0,0,0,.18); z-index: 2;
+/* Front face is split into three fixed-height rows -- Arabic proverb (50%), transliteration
+   (30%), word-gloss tray (20%) -- rather than one flex column centering everything as a single
+   block. That single-block layout let a long proverb's vertically-centered text overflow off the
+   TOP of the face with no way to scroll up to it (flex centering only reveals overflow evenly on
+   both sides, and the browser won't scroll into the negative half), and had the tray floating as
+   an absolute overlay docked to the bottom on a guessed padding-bottom reserve, which landed on
+   top of the transliteration line whenever that guess was too small for the actual translit
+   text. A dedicated row per section removes both the guess and the unreachable overflow. */
+.flashcard-face-front { display: grid; grid-template-rows: 50% 30% 20%; }
+.fc-front-row {
+  display: flex; flex-direction: column; align-items: center; justify-content: safe center;
+  min-width: 0; min-height: 0; width: 100%; overflow: hidden;
+}
+/* `safe center` (not plain `center`) is what makes the scroll below actually reach content that
+   overflows its row -- plain centering would still clip the top half unreachable; falling back to
+   start-alignment once content no longer fits keeps it anchored to the top of the scrollable row
+   instead, same "safe" fix already used on the fullscreen .flashcard itself further down. */
+.fc-front-arabic, .fc-front-translit { overflow-y: auto; }
+.fc-front-tray { overflow: visible; }
+/* Tray now lives in its own always-reserved 20% row (.fc-front-tray) instead of floating as an
+   absolute overlay above the card, so it no longer needs position/left/bottom/z-index -- just a
+   fade+scale-in when a word gets tapped, the same as its own font-size filling the row. */
+.fc-front-tray .flashcard-word-tray {
+  max-height: none; width: auto; max-width: 92%; margin: 0; overflow: visible;
+  padding: 0 16px; font-size: clamp(16px, 2.2vw + 1.6vh, 32px);
+  opacity: 0; transform: scale(.94); pointer-events: none;
   transition: opacity .16s, transform .16s;
 }
-.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
+.fc-front-tray .flashcard-word-tray.open { opacity: 1; transform: scale(1); pointer-events: auto; }
 /* Base .flashcard-face centers everything (fine for the front's Arabic+translit block), but
    info-rows' prose reads better justified to the reading-direction edge -- RTL/Hebrew flush right,
    LTR/English flush left -- like the normal card's .flashcard-reveal-inner already does (text-align:
@@ -953,22 +963,21 @@ body.lang-en .flashcard-nav { direction: ltr; }
 #view-flashcards.flashcard-fullscreen .flashcard {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; justify-content: safe center;
 }
-/* Bigger base sizes than the normal in-flow card, scaling with BOTH viewport width and height (not
-   vw alone) so the default -- before anyone touches the text-size control -- already fills up a
-   portrait phone's abundant vertical space instead of sitting at the vw-only floor (a bare 9vw is
-   under 48px on most phone widths, leaving the tall fullscreen card mostly empty above/below a
-   short proverb). The vh term is what actually grows with the phone's height; the vw term is what
-   takes over once rotated into landscape (more width, less height). Still multiplied by the same
-   manual --fc-text-scale control on top. */
-#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(clamp(56px, 8vw + 6vh, 130px) * var(--fc-text-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(clamp(24px, 3vw + 2.4vh, 50px) * var(--fc-text-scale)); }
+/* Base sizes are computed per-card by fitFlashcardFrontFace() in app.js -- it measures the actual
+   proverb/transliteration text against its own row's real height and width (.fc-front-arabic/
+   .fc-front-translit above) and writes the largest px value that still fits into these two custom
+   properties, so a short proverb fills its 50%/30% rows and a long one shrinks instead of
+   overflowing off the top of a centered box. The clamp() here is only the fallback for the
+   instant before that JS runs on first paint. --fc-text-scale (the manual +/- control) still
+   multiplies on top either way, so growing past the fitted size is what puts .fc-front-arabic's
+   scroll to use. */
+#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(var(--fc-arabic-fit-base, clamp(56px, 8vw + 6vh, 130px)) * var(--fc-text-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(var(--fc-translit-fit-base, clamp(24px, 3vw + 2.4vh, 50px)) * var(--fc-text-scale)); }
 /* Landscape has little spare height, so trims the card's own padding/gaps to leave more of it to
    the text and reveal panel rather than shrinking the text itself. */
 @media (orientation: landscape) {
   #view-flashcards.flashcard-fullscreen .flashcards-inner { padding: 12px 32px; }
   #view-flashcards.flashcard-fullscreen .flashcard { padding: 20px 32px 16px; }
-  #view-flashcards.flashcard-fullscreen .flashcard-text-group { margin-bottom: 14px; }
-  #view-flashcards.flashcard-fullscreen .flashcard-face-front { padding-bottom: clamp(52px, 13vh, 96px); }
 }
 /* Phone landscape specifically (max-height keeps this off tablets/desktop, which have height to
    spare for the normal stacked layout) -- stacking progress + card + nav row + toolbar leaves

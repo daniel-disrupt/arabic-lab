@@ -2360,12 +2360,19 @@ function renderFlashcardsView() {
   const cardIconRowHtml = fullscreen ? '' : ('<div class="flashcard-icon-row">' + playBtnHtml + flipBtnHtml + starBtnHtml + '</div>');
   const toolbarHtml = '<div class="flashcard-toolbar">' + (fullscreen ? (playBtnHtml + flipBtnHtml + starBtnHtml) : '') + textSizeCtrlHtml + backTextSizeCtrlHtml + flashcardFullscreenBtnHtml(en) + '</div>';
 
-  const frontFaceHtml =
-    '<div class="flashcard-text-group">' +
-      '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
-      '<div class="flashcard-translit-line" id="flashcard-translit-line" dir="' + translitDir + '">' + proverbTranslitWordsHtml(p, flashcardWordTrayGi) + '</div>' +
-    '</div>' +
-    '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>';
+  // Full screen gives the Arabic/transliteration/word-tray each their own fixed-height row (see
+  // .fc-front-row/.fc-front-arabic/-translit/-tray in style.css) instead of stacking them as one
+  // centered block -- that's what fitFlashcardFrontFace() below measures against. The normal
+  // in-page card keeps the original stacked .flashcard-text-group layout unchanged.
+  const frontFaceHtml = fullscreen
+    ? '<div class="fc-front-row fc-front-arabic"><div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div></div>' +
+      '<div class="fc-front-row fc-front-translit"><div class="flashcard-translit-line" id="flashcard-translit-line" dir="' + translitDir + '">' + proverbTranslitWordsHtml(p, flashcardWordTrayGi) + '</div></div>' +
+      '<div class="fc-front-row fc-front-tray"><div class="flashcard-word-tray" id="flashcard-word-tray"></div></div>'
+    : '<div class="flashcard-text-group">' +
+        '<div class="proverb-words flashcard-words" id="flashcard-words" dir="rtl">' + proverbWordsHtml(p, true, true) + '</div>' +
+        '<div class="flashcard-translit-line" id="flashcard-translit-line" dir="' + translitDir + '">' + proverbTranslitWordsHtml(p, flashcardWordTrayGi) + '</div>' +
+      '</div>' +
+      '<div class="flashcard-word-tray" id="flashcard-word-tray"></div>';
   const infoRowsHtml =
     explainRow(FC_BOOK_ICON_SVG, en ? 'Literally' : 'פירוש מילולי', literalText) +
     explainRow(FC_BULB_ICON_SVG, en ? 'Meaning' : 'משמעות', meaningText);
@@ -2404,7 +2411,49 @@ function renderFlashcardsView() {
     cardHtml + navHtml + toolbarHtml;
   flashcardScaler.apply();
   flashcardBackScaler.apply();
+  if (fullscreen) fitFlashcardFrontFace();
 }
+// Sizes the fullscreen front face's Arabic/transliteration text to fill their own reserved row
+// (.fc-front-arabic/.fc-front-translit in style.css) instead of a single viewport-only clamp()
+// that ignores how long a given proverb actually is -- a short proverb now grows to fill its
+// 50%/30% rows, a long one shrinks to fit rather than overflowing off the top of a vertically
+// centered box. Measures at the scale-independent base size; --fc-text-scale still multiplies on
+// top via the CSS calc() (see the fullscreen .flashcard-words/-translit-line rules), so the
+// manual +/- controls keep working -- they just grow/shrink from this fitted base instead of a
+// fixed one, and pushing past it is what puts the Arabic row's scroll to use.
+function fitTextToRow(el, minPx, maxPx) {
+  const row = el.parentElement;
+  const prevInline = el.style.fontSize;
+  if (!row || !row.clientHeight) { el.style.fontSize = prevInline; return maxPx; }
+  let lo = minPx, hi = maxPx, best = minPx;
+  for (let i = 0; i < 8; i++) {
+    const mid = Math.floor((lo + hi) / 2);
+    el.style.fontSize = mid + 'px';
+    const fits = el.scrollHeight <= row.clientHeight + 0.5 && el.scrollWidth <= row.clientWidth + 0.5;
+    if (fits) { best = mid; lo = mid + 1; } else { hi = mid - 1; }
+  }
+  el.style.fontSize = prevInline;
+  return best;
+}
+function fitFlashcardFrontFace() {
+  if (!flashcardFullscreenOn) return;
+  const wordsEl = document.getElementById('flashcard-words');
+  const translitEl = document.getElementById('flashcard-translit-line');
+  const inner = document.getElementById('flashcard-flip-inner');
+  if (!wordsEl || !translitEl || !inner) return;
+  inner.style.setProperty('--fc-arabic-fit-base', fitTextToRow(wordsEl, 26, 160) + 'px');
+  inner.style.setProperty('--fc-translit-fit-base', fitTextToRow(translitEl, 14, 64) + 'px');
+}
+// The Arabic web font (see .proverb-words) may still be loading the first time a card renders --
+// refit once it's actually in, since measuring against the fallback font's metrics would lock in
+// the wrong size.
+if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(fitFlashcardFrontFace);
+let flashcardFitResizeTimer = null;
+window.addEventListener('resize', () => {
+  if (!flashcardFullscreenOn) return;
+  clearTimeout(flashcardFitResizeTimer);
+  flashcardFitResizeTimer = setTimeout(fitFlashcardFrontFace, 120);
+});
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
    One masked word per proverb, multiple choice from blankChoices (hand-authored per proverb --
    see word_glosses-style caveat: AI-drafted, not yet reviewed by a native speaker). Choice order
