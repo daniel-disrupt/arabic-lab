@@ -242,7 +242,7 @@ body.lang-en .switch-label { text-align: left; }
 .view.active { display: flex; }
 
 /* ── READER ── */
-.scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .reader { max-width: 660px; margin: 0 auto; padding: 40px 0 48px; }
 .lesson-head { padding: 0 28px 32px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; text-align: right; user-select: text; -webkit-user-select: text; }
 .lesson-title { font-size: 22px; font-weight: 600; line-height: 1.35; direction: rtl; text-align: start; margin-bottom: 10px; cursor: pointer; transition: opacity .12s; }
@@ -363,7 +363,7 @@ body.lang-en .gloss-he { direction: ltr; }
 .audio-bar.audio-off { display: none; }
 
 /* ── VERBS VIEW ── */
-.verbs-scroll { flex: 1; overflow-y: auto; }
+.verbs-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .verbs-inner { max-width: 1360px; margin: 0 auto; padding: 32px 24px 48px; }
 
 .verbs-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
@@ -508,7 +508,7 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
 .conj-context { font-size: 11px; color: var(--light); font-style: italic; text-align: left; direction: ltr; padding-left: 8px; }
 
 /* ── VOCAB VIEW ── */
-.vocab-scroll { flex: 1; overflow-y: auto; }
+.vocab-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .vocab-inner { max-width: 900px; margin: 0 auto; padding: 32px 24px 48px; }
 .vocab-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
 .vocab-title { font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
@@ -625,7 +625,7 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 
 /* ── PROVERBS TAB ── */
 .proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
-.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
+.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
 .proverbs-intro { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 24px; }
 /* Row spans the full width of the list -- same width as the .proverb-card cards below it -- so
@@ -1095,7 +1095,7 @@ body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', syst
 .scramble-reset-btn:hover { color: var(--black); }
 
 /* WATCH VIEW */
-.watch-scroll { flex: 1; overflow-y: auto; }
+.watch-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
 .watch-head { padding-bottom: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; direction: rtl; text-align: start; user-select: text; -webkit-user-select: text; }
 body.lang-en .watch-head { direction: ltr; }
@@ -1241,7 +1241,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 }
 
 /* ABOUT VIEW */
-.about-scroll { flex: 1; overflow-y: auto; }
+.about-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .about-wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 64px; user-select: text; -webkit-user-select: text; }
 .about-section { margin-bottom: 40px; }
 .about-eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mid); margin-bottom: 8px; }
