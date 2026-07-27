@@ -4014,7 +4014,15 @@
           "heading": "Proverbs I'd actually say",
           "paragraphs": [
             "I picked proverbs that map onto day-to-day life — neighbors, patience, hard work, luck — rather than ones I'd never realistically reach for.",
-            "I've also mostly left out proverbs that lean on Allah or overt religious framing. I'm not Muslim, I'm not religious, and I wouldn't talk that way in Hebrew — so there's no reason to start in Arabic. I'd rather express myself authentically, as I am, in this new language, which means favoring proverbs that are more universal and secular."
+            "I've also mostly left out proverbs that lean on overt religious framing. I'm not Muslim, I'm not religious, and I wouldn't talk that way in Hebrew. So I gravitate towards proverbs that are more universal and secular."
+          ]
+        },
+        {
+          "eyebrow": "How I Built This",
+          "heading": "The process, and where AI came in",
+          "paragraphs": [
+            "AI did a lot of the heavy lifting here: researching and sourcing proverbs that fit that bar, translating each one into Hebrew and English, drafting the tashkeel that shows how it's actually pronounced, and generating the audio you can tap to hear. I also used an AI coding assistant (Claude Code) to build the site itself — the flashcards, fill-in-the-blank, and word-scramble tools all came together through that back-and-forth. I had several trusted human experts check my work along the way — confirming I'd picked the right proverbs, contributing a few of their own favorites, and helping fine-tune them for how the dialect is actually spoken.",
+            "For a detailed technical write-up of that process — including what went wrong along the way and what I learned about working with agentic AI — see <a href=\"#\" onclick=\"openAiProcessDoc(); return false;\">AI-PROCESS.md</a> (<a href=\"AI-PROCESS.md\" download=\"AI-PROCESS.md\">download</a>)."
           ]
         }
       ]
@@ -4035,14 +4043,34 @@
           "heading": "פתגמים שבאמת הייתי אומר",
           "paragraphs": [
             "בחרתי פתגמים שקשורים לחיי היומיום — שכנים, סבלנות, עבודה קשה, מזל — ולא כאלה שלעולם לא הייתי נזקק להם באמת.",
-            "כמעט ולא נכנסו לכאן פתגמים שנשענים על אללה או על מסגרת דתית מפורשת. אני לא מוסלמי, אני לא דתי, ולא הייתי מדבר ככה בעברית — אז אין סיבה שאתחיל לדבר ככה בערבית. אני מעדיף לבטא את עצמי בצורה אותנטית, כפי שאני, גם בשפה החדשה הזאת — וזה אומר להעדיף פתגמים אוניברסליים וחילוניים יותר."
+            "כמעט ולא נכנסו לכאן פתגמים שנשענים על מסגרת דתית מפורשת. אני לא מוסלמי, אני לא דתי, ולא הייתי מדבר ככה בעברית. אז אני נוטה לפתגמים אוניברסליים וחילוניים יותר."
+          ]
+        },
+        {
+          "eyebrow": "איך בניתי את זה",
+          "heading": "התהליך, והיכן נכנסה בינה מלאכותית",
+          "paragraphs": [
+            "בינה מלאכותית עשתה חלק גדול מהעבודה הקשה כאן: איתור ובחירת פתגמים שעומדים בקריטריונים האלה, תרגום כל פתגם לעברית ולאנגלית, הוספת התשכיל שמראה איך הוא נהגה בפועל, והפקת ההקראה שאפשר להשמיע בהקשה. השתמשתי גם בעוזר תכנות מבוסס בינה מלאכותית (Claude Code) כדי לבנות את האתר עצמו — הכרטיסיות, השלמת המילים וסידור המילים נבנו כולם דרך אותו דיאלוג. כמה מומחים אנושיים שאני סומך עליהם בדקו את העבודה שלי בדרך — אישרו שבחרתי את הפתגמים הנכונים, הוסיפו כמה מהפתגמים האהובים עליהם, ועזרו לכוונן אותם כדי שיתאימו לאיך שהניב באמת מדובר.",
+            "לכתיבה טכנית מפורטת יותר על התהליך הזה — כולל מה שהשתבש בדרך ומה שלמדתי על עבודה עם בינה מלאכותית אגנטית — ראו <a href=\"#\" onclick=\"openAiProcessDoc(); return false;\">AI-PROCESS.md</a> (<a href=\"AI-PROCESS.md\" download=\"AI-PROCESS.md\">הורדה</a>)."
           ]
         }
       ]
     }
   },
   "proverbsIntro": {
-    "en": "Everyday Palestinian proverbs, chosen for real day-to-day life rather than textbook piety — no religious language required. Tap a theme below to open it up.",
-    "he": "פתגמים פלסטיניים יומיומיים, שנבחרו לחיי היומיום האמיתיים ולא לאדיקות של ספר לימוד — בלי צורך בשפה דתית. הקישו על נושא כדי לפתוח אותו."
+    "en": "Welcome to Arabic Lab's proverb collection — Palestinian proverbs for real day-to-day life. Tap a theme below to open it, then tap any proverb to reveal the literal translation and what it actually means. Once you've read through them, head to Flashcards, Fill in the Blank, or Word Scramble to practice them. Translations and transliterations here were drafted with AI tools and checked by native speakers — see <a href=\"#\" onclick=\"switchTab('about'); return false;\">About</a> for the full story of how this project came together.",
+    "he": "ברוכים הבאים לאוסף הפתגמים של Arabic Lab — פתגמים פלסטיניים לחיי היומיום האמיתיים. הקישו על נושא כדי לפתוח אותו, ואז על כל פתגם כדי לראות את התרגום המילולי ואת המשמעות האמיתית שלו. אחרי שתקראו כמה, עברו לכרטיסיות, להשלמת מילים או לסידור מילים כדי להתאמן עליהם. התרגומים והתעתיקים כאן נוצרו בעזרת כלי בינה מלאכותית ונבדקו על ידי דוברי שפת אם — ראו <a href=\"#\" onclick=\"switchTab('about'); return false;\">אודות</a> לסיפור המלא על איך הפרויקט הזה נבנה."
+  },
+  "flashcardsIntro": {
+    "en": "Each card shows a proverb in Arabic — tap the info button to flip the card and see the literal translation and meaning, and star anything you want to revisit. Finish a round and only the starred cards come back for the next one, so you can keep drilling until nothing's left starred.",
+    "he": "כל כרטיסייה מציגה פתגם בערבית — הקישו על כפתור המידע כדי להפוך את הכרטיסייה ולראות את התרגום המילולי והמשמעות, וסמנו בכוכב כל פתגם שתרצו לחזור עליו. בסיום סבב, רק הכרטיסיות המסומנות בכוכב יחזרו לסבב הבא, כך שתוכלו להתאמן עד שלא יישאר אף כוכב."
+  },
+  "fillblankIntro": {
+    "en": "Each proverb is missing one word — pick the right one from the choices to complete it, then tap More to check the meaning.",
+    "he": "בכל פתגם חסרה מילה אחת — בחרו את המילה הנכונה מבין האפשרויות כדי להשלים אותו, ואז הקישו על ׳עוד׳ כדי לבדוק את המשמעות."
+  },
+  "scrambleIntro": {
+    "en": "The proverb's pieces are scrambled — tap them in order to rebuild it, then check the meaning once you've solved it.",
+    "he": "חלקי הפתגם מסודרים באקראי — הקישו עליהם בסדר הנכון כדי לשחזר אותו, ואז בדקו את המשמעות לאחר שפתרתם."
   }
 }
