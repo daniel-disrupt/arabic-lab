@@ -88,6 +88,18 @@ const flashcardScaler = createFontScaler({
 });
 function adjustFlashcardScale(dir) { flashcardScaler.adjust(dir); }
 
+// Independent text-size control for the card's BACK (the literal/meaning reveal) -- its own
+// scale variable/storage key so growing the recall-challenge front doesn't also grow the answer
+// text on the back, and vice versa. Both controls' markup is always in the DOM (see
+// renderFlashcardsView's textSizeCtrlHtml/backTextSizeCtrlHtml), toggled with a `hidden` class
+// depending on flashcardFlipped rather than being conditionally rendered, so both scalers' apply()
+// always finds its elements and there's no null-ref risk from calling the wrong one.
+const flashcardBackScaler = createFontScaler({
+  cssVar: '--fc-back-scale', storageKey: 'arabicLabFlashcardBackScale',
+  labelId: 'flashcard-back-text-size-label', decId: 'flashcard-back-text-size-dec', incId: 'flashcard-back-text-size-inc',
+});
+function adjustFlashcardBackScale(dir) { flashcardBackScaler.adjust(dir); }
+
 /* ─────────────── LANGUAGE PREFERENCE (global, top-bar) ─────────────── */
 // 'he' = Hebrew-primary with full grammatical scaffolding (בניין, שורש badges, Hebrew
 // conjugation column) — English still reachable per word/phrase via the EN chip.
@@ -2181,6 +2193,14 @@ function toggleFlashcardFlip() {
   flashcardFlipped = !flashcardFlipped;
   const btn = document.querySelector('.flashcard-icon-btn[data-fc-btn="info"]');
   if (btn) btn.classList.toggle('active', flashcardFlipped);
+  // Swap which of the two text-size controls (front/back, see textSizeCtrlHtml/
+  // backTextSizeCtrlHtml in renderFlashcardsView) is visible -- this function patches specific
+  // elements directly rather than re-rendering, so these have to be flipped here too or they'd
+  // only ever match flashcardFlipped's state as of the last full render.
+  const frontCtrl = document.getElementById('flashcard-text-size-ctrl');
+  const backCtrl = document.getElementById('flashcard-back-text-size-ctrl');
+  if (frontCtrl) frontCtrl.classList.toggle('hidden', flashcardFlipped);
+  if (backCtrl) backCtrl.classList.toggle('hidden', !flashcardFlipped);
   if (flashcardFullscreenOn) {
     const inner = document.getElementById('flashcard-flip-inner');
     if (inner) inner.classList.toggle('flipped', flashcardFlipped);
@@ -2334,18 +2354,29 @@ function renderFlashcardsView() {
     : '';
   const flipBtnHtml = '<button class="flashcard-icon-btn' + (flashcardFlipped ? ' active' : '') + '" data-fc-btn="info" onclick="toggleFlashcardFlip()" aria-label="' + flipLabel + '" title="' + flipLabel + '">' + FC_INFO_ICON_SVG + '</button>';
   const starBtnHtml = '<button class="flashcard-icon-btn flashcard-star-btn' + (starred ? ' starred' : '') + '" onclick="toggleFlashcardStar()" aria-label="' + (en ? 'Save to retry' : 'שמור לחזרה') + '" title="' + (en ? 'Save to retry' : 'שמור לחזרה') + '">' + FC_STAR_ICON_SVG + '</button>';
+  // Front (recall challenge: Arabic + transliteration) and back (literal/meaning reveal) each
+  // get their own independent text-size control -- growing the answer text on the back shouldn't
+  // also blow up the front, and vice versa. Both controls are always rendered; only the one
+  // matching the currently-showing face is visible (`hidden` class), so flashcardScaler.apply()/
+  // flashcardBackScaler.apply() below always find their elements regardless of flip state.
   const textSizeCtrlHtml =
-    '<div class="text-size-ctrl" id="flashcard-text-size-ctrl">' +
+    '<div class="text-size-ctrl' + (flashcardFlipped ? ' hidden' : '') + '" id="flashcard-text-size-ctrl">' +
       '<button class="text-size-btn" id="flashcard-text-size-dec" onclick="adjustFlashcardScale(-1)" aria-label="' + (en ? 'Decrease text size' : 'הקטן טקסט') + '">A&#8315;</button>' +
       '<span class="text-size-label" id="flashcard-text-size-label">100%</span>' +
       '<button class="text-size-btn" id="flashcard-text-size-inc" onclick="adjustFlashcardScale(1)" aria-label="' + (en ? 'Increase text size' : 'הגדל טקסט') + '">A&#8314;</button>' +
+    '</div>';
+  const backTextSizeCtrlHtml =
+    '<div class="text-size-ctrl' + (flashcardFlipped ? '' : ' hidden') + '" id="flashcard-back-text-size-ctrl">' +
+      '<button class="text-size-btn" id="flashcard-back-text-size-dec" onclick="adjustFlashcardBackScale(-1)" aria-label="' + (en ? 'Decrease text size' : 'הקטן טקסט') + '">A&#8315;</button>' +
+      '<span class="text-size-label" id="flashcard-back-text-size-label">100%</span>' +
+      '<button class="text-size-btn" id="flashcard-back-text-size-inc" onclick="adjustFlashcardBackScale(1)" aria-label="' + (en ? 'Increase text size' : 'הגדל טקסט') + '">A&#8314;</button>' +
     '</div>';
 
   // Full screen: every control lives in the external toolbar below the nav. Normal in-page mode
   // keeps play/flip/star inside the card as before -- only text-size + full-screen move out,
   // per the original ask -- so the card's own icon row is only rendered there.
   const cardIconRowHtml = fullscreen ? '' : ('<div class="flashcard-icon-row">' + playBtnHtml + flipBtnHtml + starBtnHtml + '</div>');
-  const toolbarHtml = '<div class="flashcard-toolbar">' + (fullscreen ? (playBtnHtml + flipBtnHtml + starBtnHtml) : '') + textSizeCtrlHtml + flashcardFullscreenBtnHtml(en) + '</div>';
+  const toolbarHtml = '<div class="flashcard-toolbar">' + (fullscreen ? (playBtnHtml + flipBtnHtml + starBtnHtml) : '') + textSizeCtrlHtml + backTextSizeCtrlHtml + flashcardFullscreenBtnHtml(en) + '</div>';
 
   const frontFaceHtml =
     '<div class="flashcard-text-group">' +
@@ -2390,6 +2421,7 @@ function renderFlashcardsView() {
     '<div class="flashcard-progress">' + (en ? 'Round ' : 'סבב ') + flashcardRound + ' · ' + (flashcardIdx + 1) + ' / ' + flashcardOrder.length + '</div>' +
     cardHtml + navHtml + toolbarHtml;
   flashcardScaler.apply();
+  flashcardBackScaler.apply();
 }
 /* ─────────────── FILL-IN-THE-BLANK TAB ───────────────
    One masked word per proverb, multiple choice from blankChoices (hand-authored per proverb --
