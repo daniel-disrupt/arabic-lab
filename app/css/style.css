@@ -1109,6 +1109,11 @@ body.lang-en .watch-head { direction: ltr; }
    either panel seeks the video and highlights + scrolls the matching line in both. */
 .watch-layout { display: flex; gap: 20px; align-items: flex-start; }
 .watch-video-wrap { position: relative; flex: 0 0 auto; width: 100%; max-width: 380px; }
+/* Audio-only "Listen" lesson: no picture to show, so the whole video-picture box (including its
+   close/expand buttons, play overlay, and mobile caption burn-in) is hidden -- the <video>
+   element itself still plays the audio track underneath (see initLesson() in app.js). The two
+   .watch-transcript panels are already flex:1 so they expand to fill the freed width on their own. */
+.watch-video-wrap.audio-only { display: none; }
 .watch-video { display: block; width: 100%; max-height: 58vh; border-radius: 8px; background: #000; }
 .watch-video-play-overlay {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);

@@ -5,6 +5,7 @@
 # Raw source materials & pipeline intermediates (audio/video/transcripts/scripts
 # used to derive app/js/*-data.js) — not needed to run the app, kept locally only
 abed project/
+sami project/
 
 # OS cruft
 .DS_Store
