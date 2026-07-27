@@ -742,7 +742,14 @@ body.translit-en-mode .proverb-translit-line { text-align: right; }
    it would still put the icon on the right, reading backwards for LTR eyes. Flipping the row to
    ltr here keeps "icon leads the text" true in both languages instead of only one. */
 body.lang-en .proverb-explain-row.icon-row { direction: ltr; }
-.proverb-explain-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: var(--mid); }
+/* Height matches the text's own line-box (font-size * line-height) rather than a fixed guess --
+   combined with align-items: flex-start on the row above, that puts this box's top edge and the
+   text's first line's top edge at the same place, so centering the SVG inside it (align-items/
+   justify-content: center below) lands the icon dead center on that first line specifically,
+   instead of drifting off it once the row's icon-size and text-size formulas fall out of sync at
+   another scale (the Flashcards fullscreen back face's independently-scaled version further down
+   is the case this was actually written for). */
+.proverb-explain-icon { flex-shrink: 0; width: 20px; height: calc(16px * 1.6); display: flex; align-items: center; justify-content: center; color: var(--mid); }
 /* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
    isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. min-width: 0
    is the same flex-shrink fix .proverb-words needs above -- without it this text, as a row
@@ -835,7 +842,7 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    these same rules further down that also multiplies in this scale. */
 #flashcards-inner .flashcard-info-rows { gap: calc(10px * var(--fc-back-scale)); }
 #flashcards-inner .proverb-explain-row.icon-row { gap: calc(10px * var(--fc-back-scale)); }
-#flashcards-inner .proverb-explain-icon { width: calc(20px * var(--fc-back-scale)); height: calc(20px * var(--fc-back-scale)); }
+#flashcards-inner .proverb-explain-icon { width: calc(20px * var(--fc-back-scale)); height: calc(16px * 1.6 * var(--fc-back-scale)); }
 #flashcards-inner .proverb-explain-text { font-size: calc(16px * var(--fc-back-scale)); line-height: 1.6; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 /* The Prev/Next buttons are built with a hardcoded leading "‹ " / trailing " ›" regardless of
@@ -884,7 +891,14 @@ body.lang-en .flashcard-nav { direction: ltr; }
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.flashcard-face-back { transform: rotateY(180deg); }
+/* overflow-y: auto + justify-content: safe center is the same fix already applied to the front
+   face's rows (see .fc-front-row above) and to the fullscreen .flashcard itself further down --
+   without it, growing the back's own text-size control (adjustFlashcardBackScale) past what the
+   face can hold centers the overflow evenly off BOTH edges, and flex alignment doesn't allow
+   scrolling into the negative half, so the top of the reveal (the first icon/row) becomes
+   permanently unreachable. `safe` falls back to top-alignment once content stops fitting, keeping
+   the first row anchored at the scrollable top instead. */
+.flashcard-face-back { transform: rotateY(180deg); overflow-y: auto; justify-content: safe center; }
 /* Front face is split into three fixed-height rows -- Arabic proverb (50%), transliteration
    (30%), word-gloss tray (20%) -- rather than one flex column centering everything as a single
    block. That single-block layout let a long proverb's vertically-centered text overflow off the
@@ -941,7 +955,7 @@ body.lang-en .flashcard-nav { direction: ltr; }
    from the front's --fc-text-scale. */
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: calc(clamp(16px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); }
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: calc(clamp(12px, 1.6vw + 1.2vh, 20px) * var(--fc-back-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); height: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); height: calc(clamp(18px, 2.6vw + 2vh, 30px) * 1.65 * var(--fc-back-scale)); }
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: calc(clamp(18px, 2.6vw + 2vh, 30px) * var(--fc-back-scale)); line-height: 1.65; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
