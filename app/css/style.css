@@ -201,7 +201,7 @@ body.lang-en .switch-group { flex-direction: row; }
 .switch-label { font-size: 10px; font-weight: 700; letter-spacing: .05em; color: var(--mid); white-space: nowrap; text-align: right; }
 body.lang-en .switch-label { text-align: left; }
 
-/* ── READER MODE TOGGLE (dark theme switch, mobile hamburger menu only) ── */
+/* ── READER MODE TOGGLE (dark theme switch, mobile hamburger drawer + desktop settings popover) ── */
 .reader-mode-toggle {
   width: 40px; height: 22px; border-radius: 11px; padding: 0; flex-shrink: 0;
   border: 1px solid var(--rule); background: transparent; cursor: pointer;
