@@ -851,9 +851,8 @@ body.lang-en .flashcard-nav { direction: ltr; }
    .flashcard-icon-row/.flashcard-reveal that the normal in-page card and the Fill-in-the-Blank/
    Word-Scramble tabs still use unchanged.) flex:1 lets the flip-inner grow to fill the full-screen
    .flashcard's own flex:1 height (rather than shrink-wrapping to content and leaving .flashcard to
-   center a shorter block, which used to leave each face's own box only as tall as its text --
-   too little headroom for positionFlashcardWordTray, in app.js, to ever place the gloss popover
-   above a word instead of below it). grid-template-rows/columns: minmax(0,1fr) then makes the
+   center a shorter block, which used to leave each face's own box too short to reserve room for
+   the docked gloss tray below the text). grid-template-rows/columns: minmax(0,1fr) then makes the
    single grid cell -- both faces stack into it via grid-area: 1 / 1 -- stretch to fill that full
    height, so each face's own justify-content: center still centers its content, just within the
    whole card's height instead of a shrink-wrapped one. */
@@ -872,26 +871,24 @@ body.lang-en .flashcard-nav { direction: ltr; }
 }
 .flashcard-face-back { transform: rotateY(180deg); }
 .flashcard-face-front .flashcard-text-group { margin-bottom: 0; }
-/* The gloss tray is positioned per-tap by positionFlashcardWordTray (app.js), anchored directly
-   above/below the tapped word instead of pinned to a fixed spot on the card -- a fixed bottom
-   placement used to sit right on top of the transliteration line. top/left here are just
-   placeholder defaults; JS overwrites them inline every time the tray opens. Floating freely over
-   the text (rather than the previous edge-pinned bar) is why this gets its own shadow/z-index --
-   it needs to read as a popover, not part of the card's flat layout. Overrides the base accordion
-   rule's max-height/width -- see .flashcard-word-tray above -- for this context specifically. */
-/* padding is set unconditionally here (unlike the base rule's .open-only padding) -- this popover
-   doesn't animate its own size open/closed like the accordion does, only opacity/transform, and
-   positionFlashcardWordTray (app.js) measures this element's real rendered box (including padding)
-   to place it, before the .open class is added -- if padding only appeared once .open lands, that
-   measurement would be too small and the popover would end up a few px off from where it was
-   actually aimed. */
+/* Reserves a fixed strip along the bottom of the front face for the gloss tray below, so the
+   proverb+transliteration block (centered by the base .flashcard-face justify-content: center)
+   sits a bit higher within the remaining space instead of dead-center on the whole face -- the
+   same room a tapped word's gloss will dock into, rather than the tray having to float over
+   whichever text happens to be nearby (that used to land on top of the transliteration line
+   whenever a word was too close to the face's bottom edge for the popover to fit above it). */
+.flashcard-face-front { padding-bottom: clamp(64px, 15vh, 130px); }
+/* The gloss tray docks to one consistent spot -- centered along the bottom of the front face,
+   inside the padding-bottom reserve above -- regardless of which word was tapped, instead of the
+   old per-word popover (positionFlashcardWordTray) that floated above/below the tapped word and
+   could end up covering the transliteration line when there wasn't room above. */
 .flashcard-face-front .flashcard-word-tray {
-  position: absolute; top: 0; left: 0; width: auto; max-width: 82%; margin: 0; max-height: none; overflow: visible;
-  padding: 10px 16px; opacity: 0; transform: scale(.94); pointer-events: none;
+  position: absolute; left: 50%; bottom: 0; width: auto; max-width: 88%; margin: 0; max-height: none; overflow: visible;
+  padding: 10px 16px; opacity: 0; transform: translateX(-50%) scale(.94); pointer-events: none;
   box-shadow: 0 6px 20px rgba(0,0,0,.18); z-index: 2;
   transition: opacity .16s, transform .16s;
 }
-.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+.flashcard-face-front .flashcard-word-tray.open { opacity: 1; transform: translateX(-50%) scale(1); pointer-events: auto; }
 /* Base .flashcard-face centers everything (fine for the front's Arabic+translit block), but
    info-rows' prose reads better justified to the reading-direction edge -- RTL/Hebrew flush right,
    LTR/English flush left -- like the normal card's .flashcard-reveal-inner already does (text-align:
@@ -948,6 +945,7 @@ body.lang-en .flashcard-nav { direction: ltr; }
   #view-flashcards.flashcard-fullscreen .flashcards-inner { padding: 12px 32px; }
   #view-flashcards.flashcard-fullscreen .flashcard { padding: 20px 32px 16px; }
   #view-flashcards.flashcard-fullscreen .flashcard-text-group { margin-bottom: 14px; }
+  #view-flashcards.flashcard-fullscreen .flashcard-face-front { padding-bottom: clamp(52px, 13vh, 96px); }
 }
 /* Phone landscape specifically (max-height keeps this off tablets/desktop, which have height to
    spare for the normal stacked layout) -- stacking progress + card + nav row + toolbar leaves
