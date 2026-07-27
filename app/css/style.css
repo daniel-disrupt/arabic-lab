@@ -893,9 +893,20 @@ body.lang-en .flashcard-nav { direction: ltr; }
    an absolute overlay docked to the bottom on a guessed padding-bottom reserve, which landed on
    top of the transliteration line whenever that guess was too small for the actual translit
    text. A dedicated row per section removes both the guess and the unreachable overflow. */
-.flashcard-face-front { display: grid; grid-template-rows: 50% 30% 20%; }
+/* align-items: stretch overrides the `center` that .flashcard-face (the base rule sharing this
+   same element) still sets for the normal in-flow card -- left as `center`, a grid item is sized
+   to its own content instead of its row track, so a row's content can silently grow past its
+   50/30/20% share and spill into the next row instead of being clamped there, which is exactly
+   what let the Arabic block bleed down over the transliteration row on any proverb long enough to
+   wrap across a phone-width card. */
+.flashcard-face-front { display: grid; grid-template-rows: 50% 30% 20%; align-items: stretch; }
+/* align-items: stretch here (not `center`) is the other half of the same fix -- it's what makes
+   each row's text div fill the row's full width so the text actually wraps against that width
+   (and so fitFlashcardFrontFace's row.clientHeight/clientWidth measurements below reflect the
+   row's real box instead of the text's own unconstrained content size). Horizontal centering
+   still comes from the text's own text-align, same as the normal in-flow card. */
 .fc-front-row {
-  display: flex; flex-direction: column; align-items: center; justify-content: safe center;
+  display: flex; flex-direction: column; align-items: stretch; justify-content: safe center;
   min-width: 0; min-height: 0; width: 100%; overflow: hidden;
 }
 /* `safe center` (not plain `center`) is what makes the scroll below actually reach content that
@@ -906,10 +917,12 @@ body.lang-en .flashcard-nav { direction: ltr; }
 .fc-front-tray { overflow: visible; }
 /* Tray now lives in its own always-reserved 20% row (.fc-front-tray) instead of floating as an
    absolute overlay above the card, so it no longer needs position/left/bottom/z-index -- just a
-   fade+scale-in when a word gets tapped, the same as its own font-size filling the row. */
+   fade+scale-in when a word gets tapped, the same as its own font-size filling the row.
+   align-self: center opts this one element back out of the row's stretch above -- it's a small
+   pill-shaped gloss popover, not a full-width block like the Arabic/transliteration text. */
 .fc-front-tray .flashcard-word-tray {
   max-height: none; width: auto; max-width: 92%; margin: 0; overflow: visible;
-  padding: 0 16px; font-size: clamp(16px, 2.2vw + 1.6vh, 32px);
+  padding: 0 16px; font-size: clamp(16px, 2.2vw + 1.6vh, 32px); align-self: center;
   opacity: 0; transform: scale(.94); pointer-events: none;
   transition: opacity .16s, transform .16s;
 }
