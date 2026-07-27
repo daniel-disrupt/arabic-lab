@@ -2195,26 +2195,6 @@ function toggleFlashcardFlip() {
     document.getElementById('flashcard-reveal-info').classList.toggle('open', flashcardFlipped);
   }
 }
-// Anchors the gloss tray directly above the tapped word (below it instead, if there isn't room
-// above) rather than pinning it to a fixed spot on the card -- a fixed placement used to sit right
-// on top of the transliteration line regardless of where the tapped word actually was. Pure pixel
-// geometry via getBoundingClientRect, which is already physical left/right regardless of RTL, so
-// no direction-specific math is needed. Full screen only -- the normal in-page card's tray stays
-// the original accordion below the text, which has room to scroll if needed.
-function positionFlashcardWordTray(wordEl, trayEl) {
-  const front = document.querySelector('.flashcard-face-front');
-  if (!front) return;
-  const frontRect = front.getBoundingClientRect();
-  const wordRect = wordEl.getBoundingClientRect();
-  const trayRect = trayEl.getBoundingClientRect();
-  const margin = 10;
-  let top = wordRect.top - frontRect.top - trayRect.height - margin;
-  if (top < margin) top = wordRect.bottom - frontRect.top + margin;
-  let left = wordRect.left - frontRect.left + wordRect.width / 2 - trayRect.width / 2;
-  left = Math.max(margin, Math.min(left, frontRect.width - trayRect.width - margin));
-  trayEl.style.top = top + 'px';
-  trayEl.style.left = left + 'px';
-}
 function handleFlashcardWordTap(e, gi) {
   e.stopPropagation();
   const p = PROVERBS[flashcardOrder[flashcardIdx]];
@@ -2232,7 +2212,6 @@ function handleFlashcardWordTap(e, gi) {
   const gloss = p.wordGlosses && p.wordGlosses[gi];
   trayEl.textContent = gloss ? (en ? gloss.en : gloss.he) : (en ? 'Not glossed yet' : 'טרם תורגם');
   trayEl.dir = en ? 'ltr' : 'rtl';
-  if (flashcardFullscreenOn && wordEl) positionFlashcardWordTray(wordEl, trayEl);
   trayEl.classList.add('open');
 }
 // Always the Hebrew transliteration unless the site's learning-alphabet toggle is specifically
