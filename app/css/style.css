@@ -627,7 +627,20 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
 .proverbs-inner, .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
 .proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
-.proverbs-intro { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 24px; }
+.tab-intro { font-size: 15px; line-height: 1.7; color: var(--black); }
+.proverbs-inner > .tab-intro { margin: 0 0 24px; }
+/* Flashcards/Fill-in-the-Blank/Word Scramble render their whole card into -inner's innerHTML on
+   every interaction (star, next, flip...), so their intro line has to live as a sibling outside
+   it (see renderFlashcardsView/renderFillBlankView/renderScrambleView in app.js) rather than
+   nested inside like the Proverbs tab's -- it isn't covered by -inner's own max-width/padding,
+   so it needs its own copy of that centering. */
+.flashcards-scroll > .tab-intro,
+.fillblank-scroll > .tab-intro,
+.scramble-scroll > .tab-intro { max-width: 720px; margin: 0 auto; padding: 32px 24px 0; }
+/* Hidden in fullscreen -- .flashcards-scroll and .flashcards-inner both become height:100% there
+   (see FULLSCREEN rules below), and the intro's own height on top of that would push the card
+   past the viewport, re-opening the overlap bug the fullscreen layout already had fixed once. */
+#view-flashcards.flashcard-fullscreen .tab-intro { display: none; }
 /* Row spans the full width of the list -- same width as the .proverb-card cards below it -- so
    its border-bottom rule lines up edge to edge with the cards instead of reading as a narrower,
    floating strip. The text column keeps its own fixed width (--theme-card-w, set in app.js off

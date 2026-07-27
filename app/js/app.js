@@ -10,6 +10,9 @@ let HOME_CONTENT = { en: { title: '', subtitle: '', intro: [] }, he: { title: ''
 let INTRO_CONTENT = { en: { title: '', text: '' }, he: { title: '', text: '' } };
 let ABOUT_CONTENT = { en: { dir: 'ltr', sections: [] }, he: { dir: 'rtl', sections: [] } };
 let PROVERBS_INTRO = { en: '', he: '' };
+let FLASHCARDS_INTRO = { en: '', he: '' };
+let FILLBLANK_INTRO = { en: '', he: '' };
+let SCRAMBLE_INTRO = { en: '', he: '' };
 let HEADER_GLOSS = { title: null, location: null };
 
 /* ─────────────── READER STATE ─────────────── */
@@ -2060,7 +2063,9 @@ function renderProverbsView() {
   const en = appLang === 'en';
   const introEl = document.getElementById('proverbs-intro');
   if (introEl) {
-    introEl.textContent = PROVERBS_INTRO[appLang] || '';
+    // innerHTML, not textContent -- the intro text carries a tappable "About" link
+    // (same <a onclick="switchTab(...)"> pattern as ABOUT_CONTENT/HOME_CONTENT).
+    introEl.innerHTML = PROVERBS_INTRO[appLang] || '';
     introEl.dir = en ? 'ltr' : 'rtl';
   }
   const groups = PROVERB_THEME_ORDER.map(t => ({ theme: t, proverbs: [] }));
@@ -2294,8 +2299,13 @@ function flashcardFullscreenBtnHtml(en) {
 function renderFlashcardsView() {
   const el = document.getElementById('flashcards-inner');
   if (!el) return;
-  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   const en = appLang === 'en';
+  const introEl = document.getElementById('flashcards-intro');
+  if (introEl) {
+    introEl.textContent = FLASHCARDS_INTRO[appLang] || '';
+    introEl.dir = en ? 'ltr' : 'rtl';
+  }
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   if (flashcardDone) {
     el.innerHTML =
       '<div class="flashcard-progress">' + (en ? 'Round ' + flashcardRound : 'סבב ' + flashcardRound) + '</div>' +
@@ -2536,8 +2546,13 @@ function toggleFillBlankInfo() {
 function renderFillBlankView() {
   const el = document.getElementById('fillblank-inner');
   if (!el) return;
-  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   const en = appLang === 'en';
+  const introEl = document.getElementById('fillblank-intro');
+  if (introEl) {
+    introEl.textContent = FILLBLANK_INTRO[appLang] || '';
+    introEl.dir = en ? 'ltr' : 'rtl';
+  }
+  if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   if (fillblankDone) {
     el.innerHTML =
       '<div class="flashcard-progress">' + (en ? 'Cycle ' + fillblankCycle : 'מחזור ' + fillblankCycle) + '</div>' +
@@ -2727,11 +2742,16 @@ function handleScrambleTap(ci, btnEl) {
 function renderScrambleView() {
   const el = document.getElementById('scramble-inner');
   if (!el) return;
+  const en = appLang === 'en';
+  const introEl = document.getElementById('scramble-intro');
+  if (introEl) {
+    introEl.textContent = SCRAMBLE_INTRO[appLang] || '';
+    introEl.dir = en ? 'ltr' : 'rtl';
+  }
   if (!PROVERBS.length) { el.innerHTML = stubViewHtml(); return; }
   if (!scrambleOrder.length) shuffleScrambleDeck();
   if (scrambleIdx >= scrambleOrder.length) scrambleIdx = 0;
   const p = PROVERBS[scrambleOrder[scrambleIdx]];
-  const en = appLang === 'en';
   const hasAudio = !!(p.audio && p.audio.src);
   const proseDir = en ? 'ltr' : 'rtl';
   const translitDir = scriptMode === 'translit-en' ? 'ltr' : 'rtl';
@@ -2823,6 +2843,9 @@ function initLesson(bundle) {
   INTRO_CONTENT = bundle.introContent || INTRO_CONTENT;
   ABOUT_CONTENT = bundle.aboutContent || ABOUT_CONTENT;
   PROVERBS_INTRO = bundle.proverbsIntro || PROVERBS_INTRO;
+  FLASHCARDS_INTRO = bundle.flashcardsIntro || FLASHCARDS_INTRO;
+  FILLBLANK_INTRO = bundle.fillblankIntro || FILLBLANK_INTRO;
+  SCRAMBLE_INTRO = bundle.scrambleIntro || SCRAMBLE_INTRO;
   HEADER_GLOSS = bundle.headerGloss || HEADER_GLOSS;
   PROVERBS = bundle.proverbs || [];
 
