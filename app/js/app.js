@@ -416,9 +416,11 @@ function applyScriptMode() {
 }
 
 /* ─────────────── READER MODE (black background, white text -- glare/battery-friendly) ───────────────
-   Toggled only from the mobile hamburger drawer (see .side-menu-settings in lesson.html) -- the
-   toggle itself touches nothing lesson-specific, just the static header/menu chrome already in
-   the page, so it applies immediately at load rather than waiting for initLesson(). */
+   Toggled from the mobile hamburger drawer and the desktop header's settings popover (see
+   .side-menu-settings / #settings-menu in lesson.html) -- the toggle itself touches nothing
+   lesson-specific, just the static header/menu chrome already in the page, so it applies
+   immediately at load rather than waiting for initLesson(). Neither copy carries an id (same
+   reasoning as .lang-switch-btn/.script-switch-btn), so both stay in sync via class selector. */
 let readerModeOn = localStorage.getItem('arabicLabReaderMode') === 'on';
 function toggleReaderMode() {
   readerModeOn = !readerModeOn;
@@ -427,9 +429,10 @@ function toggleReaderMode() {
 }
 function applyReaderMode() {
   document.body.classList.toggle('reader-mode', readerModeOn);
-  const btn = document.getElementById('reader-mode-toggle');
-  btn.classList.toggle('on', readerModeOn);
-  btn.setAttribute('aria-checked', String(readerModeOn));
+  document.querySelectorAll('.reader-mode-toggle').forEach(btn => {
+    btn.classList.toggle('on', readerModeOn);
+    btn.setAttribute('aria-checked', String(readerModeOn));
+  });
 }
 applyReaderMode();
 
