@@ -3,7 +3,7 @@
   --black: #0D0D0D; --mid: #8A8A8A; --light: #C8C7C4;
   --rule: #E4E3E0; --active-bg: #F0EFE9;
   --bg: #fff; --on-accent: #fff; --on-accent-rgb: 255,255,255; --tint-rgb: 13,13,13;
-  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1; --fc-text-scale: 1;
+  --tray-h: 148px; --bar-h: 64px; --reader-scale: 1; --watch-scale: 1; --fc-text-scale: 1; --fc-back-scale: 1;
   --ar-word-spacing: 0.2em;
 }
 /* ── READER MODE (dark theme, toggled from the mobile hamburger menu) ──
@@ -304,6 +304,11 @@ body.translit-en-mode .chunk p { direction: ltr; text-align: left; }
 .text-size-btn:hover:not(:disabled) { background: var(--active-bg); }
 .text-size-btn:disabled { color: var(--light); cursor: default; }
 .text-size-label { font-size: 10px; color: var(--mid); min-width: 28px; text-align: center; font-variant-numeric: tabular-nums; }
+/* Flashcards' front/back controls share the toolbar but only one applies to what's currently
+   showing (see textSizeCtrlHtml/backTextSizeCtrlHtml in renderFlashcardsView, app.js) -- both are
+   always rendered so their scalers' apply() never hits a missing element, and this just hides
+   whichever one doesn't match the card's current face. */
+.text-size-ctrl.hidden { display: none; }
 
 /* ── READER BOTTOM ── */
 .reader-bottom { flex-shrink: 0; background: var(--bg); padding-bottom: env(safe-area-inset-bottom); position: relative; }
@@ -822,6 +827,16 @@ body.translit-en-mode .flashcard-words { direction: rtl; text-align: center; }
    .proverb-explain -- reuses .proverb-explain-row/-icon/-text directly for one consistent
    "icon + text, no label" visual language across both tabs. */
 .flashcard-info-rows { display: flex; flex-direction: column; gap: 10px; }
+/* Back-face text (literal/meaning reveal) scales independently of the front's --fc-text-scale via
+   its own control (adjustFlashcardBackScale/--fc-back-scale, flashcard-back-text-size-ctrl in
+   app.js) -- scoped to #flashcards-inner since .proverb-explain-row/-icon/-text/.flashcard-info-rows
+   are shared with the Proverbs tab and the Fill-in-the-Blank/Word-Scramble reveal panels, none of
+   which should resize along with Flashcards. Fullscreen has its own viewport-clamped version of
+   these same rules further down that also multiplies in this scale. */
+#flashcards-inner .flashcard-info-rows { gap: calc(10px * var(--fc-back-scale)); }
+#flashcards-inner .proverb-explain-row.icon-row { gap: calc(10px * var(--fc-back-scale)); }
+#flashcards-inner .proverb-explain-icon { width: calc(20px * var(--fc-back-scale)); height: calc(20px * var(--fc-back-scale)); }
+#flashcards-inner .proverb-explain-text { font-size: calc(16px * var(--fc-back-scale)); line-height: 1.6; }
 .flashcard-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
 /* The Prev/Next buttons are built with a hardcoded leading "‹ " / trailing " ›" regardless of
    language (see goToFlashcard/goToFillBlank/goToScramble nav markup in app.js) -- rendered inside
@@ -897,10 +912,14 @@ body.lang-en .flashcard-nav { direction: ltr; }
    viewport-scaled text (clamp, matching how .flashcard-words/-translit-line scale in full screen)
    puts the back face's own generous whitespace to use instead of sitting at a fixed small size. */
 .flashcard-face-back .flashcard-info-rows { width: 100%; text-align: start; }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: clamp(14px, 3vw, 30px); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: clamp(10px, 2vw, 18px); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: clamp(20px, 3vw, 30px); height: clamp(20px, 3vw, 30px); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: clamp(16px, 3.4vw, 27px); line-height: 1.65; }
+/* Same width+height clamp formula as the front face above, so the back's default size also fills
+   the card rather than sitting at a vw-only floor -- and now also multiplied by --fc-back-scale,
+   the back's own independent text-size control (adjustFlashcardBackScale in app.js), separate
+   from the front's --fc-text-scale. */
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: calc(clamp(16px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: calc(clamp(12px, 1.6vw + 1.2vh, 20px) * var(--fc-back-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); height: calc(clamp(22px, 2.4vw + 1.8vh, 32px) * var(--fc-back-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: calc(clamp(18px, 2.6vw + 2vh, 30px) * var(--fc-back-scale)); line-height: 1.65; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
    A CSS-driven fixed overlay rather than relying solely on the real Fullscreen API -- the
@@ -934,11 +953,15 @@ body.lang-en .flashcard-nav { direction: ltr; }
 #view-flashcards.flashcard-fullscreen .flashcard {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; justify-content: safe center;
 }
-/* Bigger base sizes than the normal in-flow card, scaling with viewport width so rotating into
-   landscape (more width, less height) grows rather than shrinks the text -- still multiplied by
-   the same manual --fc-text-scale control. */
-#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(clamp(48px, 9vw, 120px) * var(--fc-text-scale)); }
-#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(clamp(20px, 3.5vw, 48px) * var(--fc-text-scale)); }
+/* Bigger base sizes than the normal in-flow card, scaling with BOTH viewport width and height (not
+   vw alone) so the default -- before anyone touches the text-size control -- already fills up a
+   portrait phone's abundant vertical space instead of sitting at the vw-only floor (a bare 9vw is
+   under 48px on most phone widths, leaving the tall fullscreen card mostly empty above/below a
+   short proverb). The vh term is what actually grows with the phone's height; the vw term is what
+   takes over once rotated into landscape (more width, less height). Still multiplied by the same
+   manual --fc-text-scale control on top. */
+#view-flashcards.flashcard-fullscreen .flashcard-words { font-size: calc(clamp(56px, 8vw + 6vh, 130px) * var(--fc-text-scale)); }
+#view-flashcards.flashcard-fullscreen .flashcard-translit-line { font-size: calc(clamp(24px, 3vw + 2.4vh, 50px) * var(--fc-text-scale)); }
 /* Landscape has little spare height, so trims the card's own padding/gaps to leave more of it to
    the text and reveal panel rather than shrinking the text itself. */
 @media (orientation: landscape) {
