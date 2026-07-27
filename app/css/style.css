@@ -242,7 +242,7 @@ body.lang-en .switch-label { text-align: left; }
 .view.active { display: flex; }
 
 /* ── READER ── */
-.scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.scroll-area { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .reader { max-width: 660px; margin: 0 auto; padding: 40px 0 48px; }
 .lesson-head { padding: 0 28px 32px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; text-align: right; user-select: text; -webkit-user-select: text; }
 .lesson-title { font-size: 22px; font-weight: 600; line-height: 1.35; direction: rtl; text-align: start; margin-bottom: 10px; cursor: pointer; transition: opacity .12s; }
@@ -363,7 +363,7 @@ body.lang-en .gloss-he { direction: ltr; }
 .audio-bar.audio-off { display: none; }
 
 /* ── VERBS VIEW ── */
-.verbs-scroll { flex: 1; overflow-y: auto; }
+.verbs-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .verbs-inner { max-width: 1360px; margin: 0 auto; padding: 32px 24px 48px; }
 
 .verbs-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
@@ -508,7 +508,7 @@ body.translit-en-mode .conj-ar { direction: ltr; text-align: left; }
 .conj-context { font-size: 11px; color: var(--light); font-style: italic; text-align: left; direction: ltr; padding-left: 8px; }
 
 /* ── VOCAB VIEW ── */
-.vocab-scroll { flex: 1; overflow-y: auto; }
+.vocab-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .vocab-inner { max-width: 900px; margin: 0 auto; padding: 32px 24px 48px; }
 .vocab-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
 .vocab-title { font-size: 13px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; }
@@ -630,9 +630,22 @@ body.translit-en-mode .vocab-expand-text { direction: ltr; text-align: left; }
    which doesn't earn its keep on card-sized content -- see "Text size controls" in CLAUDE.md. */
 .proverbs-inner { max-width: 880px; margin: 0 auto; padding: 32px 24px 48px; }
 .flashcards-inner, .fillblank-inner, .scramble-inner { max-width: 720px; margin: 0 auto; padding: 32px 24px 48px; }
-.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; }
+.proverbs-scroll, .flashcards-scroll, .fillblank-scroll, .scramble-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .proverb-list { display: flex; flex-direction: column; gap: 14px; }
-.proverbs-intro { font-size: 15px; line-height: 1.7; color: var(--black); margin: 0 0 24px; }
+.tab-intro { font-size: 15px; line-height: 1.7; color: var(--black); }
+.proverbs-inner > .tab-intro { margin: 0 0 24px; }
+/* Flashcards/Fill-in-the-Blank/Word Scramble render their whole card into -inner's innerHTML on
+   every interaction (star, next, flip...), so their intro line has to live as a sibling outside
+   it (see renderFlashcardsView/renderFillBlankView/renderScrambleView in app.js) rather than
+   nested inside like the Proverbs tab's -- it isn't covered by -inner's own max-width/padding,
+   so it needs its own copy of that centering. */
+.flashcards-scroll > .tab-intro,
+.fillblank-scroll > .tab-intro,
+.scramble-scroll > .tab-intro { max-width: 720px; margin: 0 auto; padding: 32px 24px 0; }
+/* Hidden in fullscreen -- .flashcards-scroll and .flashcards-inner both become height:100% there
+   (see FULLSCREEN rules below), and the intro's own height on top of that would push the card
+   past the viewport, re-opening the overlap bug the fullscreen layout already had fixed once. */
+#view-flashcards.flashcard-fullscreen .tab-intro { display: none; }
 /* Row spans the full width of the list -- same width as the .proverb-card cards below it -- so
    its border-bottom rule lines up edge to edge with the cards instead of reading as a narrower,
    floating strip. The text column keeps its own fixed width (--theme-card-w, set in app.js off
@@ -747,7 +760,14 @@ body.translit-en-mode .proverb-translit-line { text-align: right; }
    it would still put the icon on the right, reading backwards for LTR eyes. Flipping the row to
    ltr here keeps "icon leads the text" true in both languages instead of only one. */
 body.lang-en .proverb-explain-row.icon-row { direction: ltr; }
-.proverb-explain-icon { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; display: flex; align-items: center; justify-content: center; color: var(--mid); }
+/* Height matches the text's own line-box (font-size * line-height) rather than a fixed guess --
+   combined with align-items: flex-start on the row above, that puts this box's top edge and the
+   text's first line's top edge at the same place, so centering the SVG inside it (align-items/
+   justify-content: center below) lands the icon dead center on that first line specifically,
+   instead of drifting off it once the row's icon-size and text-size formulas fall out of sync at
+   another scale (the Flashcards fullscreen back face's independently-scaled version further down
+   is the case this was actually written for). */
+.proverb-explain-icon { flex-shrink: 0; width: 20px; height: calc(16px * 1.6); display: flex; align-items: center; justify-content: center; color: var(--mid); }
 /* dir is set inline per-row from appLang (HE/EN prose), not from scriptMode -- explain-it text
    isn't Arabic, so it must never follow the Arabic-script/transliteration toggle. min-width: 0
    is the same flex-shrink fix .proverb-words needs above -- without it this text, as a row
@@ -874,7 +894,14 @@ body.lang-en .flashcard-nav { direction: ltr; }
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
-.flashcard-face-back { transform: rotateY(180deg); }
+/* overflow-y: auto + justify-content: safe center is the same fix already applied to the front
+   face's rows (see .fc-front-row above) and to the fullscreen .flashcard itself further down --
+   without it, growing the back's own text-size control (adjustFlashcardBackScale) past what the
+   face can hold centers the overflow evenly off BOTH edges, and flex alignment doesn't allow
+   scrolling into the negative half, so the top of the reveal (the first icon/row) becomes
+   permanently unreachable. `safe` falls back to top-alignment once content stops fitting, keeping
+   the first row anchored at the scrollable top instead. */
+.flashcard-face-back { transform: rotateY(180deg); overflow-y: auto; justify-content: safe center; }
 /* Front face is split into three fixed-height rows -- Arabic proverb (50%), transliteration
    (30%), word-gloss tray (20%) -- rather than one flex column centering everything as a single
    block. That single-block layout let a long proverb's vertically-centered text overflow off the
@@ -926,10 +953,12 @@ body.lang-en .flashcard-nav { direction: ltr; }
    puts the back face's own generous whitespace to use instead of sitting at a fixed small size. */
 .flashcard-face-back .flashcard-info-rows { width: 100%; text-align: start; }
 /* Same width+height clamp formula as the front face above, so the back's default size also fills
-   the card rather than sitting at a vw-only floor. */
+   the card rather than sitting at a vw-only floor. Icon height matches the text clamp's own
+   line-box (font-size * line-height, same reasoning as the shared .proverb-explain-icon rule
+   above) rather than the width's clamp, so the icon stays aligned to the first line of text. */
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .flashcard-info-rows { gap: clamp(16px, 2.4vw + 1.8vh, 32px); }
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-row.icon-row { gap: clamp(12px, 1.6vw + 1.2vh, 20px); }
-#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: clamp(22px, 2.4vw + 1.8vh, 32px); height: clamp(22px, 2.4vw + 1.8vh, 32px); }
+#view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-icon { width: clamp(22px, 2.4vw + 1.8vh, 32px); height: calc(clamp(18px, 2.6vw + 2vh, 30px) * 1.65); }
 #view-flashcards.flashcard-fullscreen .flashcard-face-back .proverb-explain-text { font-size: clamp(18px, 2.6vw + 2vh, 30px); line-height: 1.65; }
 
 /* ── FLASHCARDS FULL SCREEN ── (toggleFlashcardFullscreen in app.js)
@@ -1067,7 +1096,7 @@ body.translit-mode .scramble-tile { font-family: -apple-system, 'Segoe UI', syst
 .scramble-reset-btn:hover { color: var(--black); }
 
 /* WATCH VIEW */
-.watch-scroll { flex: 1; overflow-y: auto; }
+.watch-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .watch-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 24px 64px; }
 .watch-head { padding-bottom: 24px; border-bottom: 1px solid var(--rule); margin-bottom: 28px; direction: rtl; text-align: start; user-select: text; -webkit-user-select: text; }
 body.lang-en .watch-head { direction: ltr; }
@@ -1213,7 +1242,7 @@ body.lang-en .watch-transcript-tr-panel .watch-cue { direction: ltr; text-align:
 }
 
 /* ABOUT VIEW */
-.about-scroll { flex: 1; overflow-y: auto; }
+.about-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .about-wrap { max-width: 640px; margin: 0 auto; padding: 40px 24px 64px; user-select: text; -webkit-user-select: text; }
 .about-section { margin-bottom: 40px; }
 .about-eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--mid); margin-bottom: 8px; }
