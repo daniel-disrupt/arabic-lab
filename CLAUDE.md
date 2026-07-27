@@ -60,3 +60,21 @@ highlightable and copyable, not locked down by that default.
 - **Exception:** don't add this to text that has its own drag/tap gesture, which native
   selection would fight with — the Reader's word-drag phrase-lookup and the Watch
   transcript's word-range selection are deliberately left `user-select: none`.
+
+## Text size controls
+
+A manual A⁻/A⁺ control (`.text-size-ctrl`/`.text-size-btn`, built by
+`createFontScaler()` in `app/js/app.js`) only belongs on views with a real block of
+continuous running text to resize — at least a paragraph or two. Reader (the transcript)
+and Watch (the caption columns) both qualify and keep their own independent scale/
+localStorage key via `createFontScaler`.
+
+- **Don't add one** to little-card or single-sentence content — Flashcards, Fill-in-the-
+  Blank, Word Scramble, and the Proverbs tab's cards. Flashcards used to have front/back
+  text-size controls; they were removed because a one-line proverb or a sentence or two
+  of explanation doesn't give a +/- control enough to actually do — there's no reflow to
+  speak of. If a lesson view like this needs bigger text, widen the view's container and
+  bump the content's own font-size instead (see `.proverbs-inner`/`.proverb-words` in
+  `app/css/style.css` for the pattern) rather than handing the learner a knob.
+- **Do add one** the same way Reader/Watch do it (`createFontScaler`, its own CSS
+  variable + `localStorage` key) for any new view that's substantial running prose.
