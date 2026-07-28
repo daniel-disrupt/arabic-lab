@@ -6,6 +6,7 @@
 # used to derive app/js/*-data.js) — not needed to run the app, kept locally only
 abed project/
 sami project/
+proverbs project/
 
 # OS cruft
 .DS_Store
